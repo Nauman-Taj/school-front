@@ -39,7 +39,7 @@ export default function AboutSection() {
         <div className="relative h-[360px] overflow-hidden rounded-3xl">
 
           <Image
-            src="/images/school-2.png"
+            src="/images/school-4.png"
             alt="Students at Garrison Grammar School"
             fill
             sizes="(max-width: 768px) 100vw, 50vw"
