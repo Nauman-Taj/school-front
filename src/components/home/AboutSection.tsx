@@ -8,6 +8,7 @@ export default function AboutSection() {
 
       <div className="mx-auto grid max-w-[1200px] gap-12 px-6 lg:grid-cols-2 lg:items-center">
 
+        {/* Content */}
         <div>
 
           <span className="font-bold text-lg text-[#01796f]">
@@ -27,16 +28,20 @@ export default function AboutSection() {
 
           <Link
             href="/about"
-            className="mt-7 inline-flex items-center gap-2 font-semibold text-[#01796f] transition hover:text-[#015f58]"
+            className="group mt-7 inline-flex items-center gap-2 font-semibold text-[#01796f] transition-colors duration-300 hover:text-[#015f58]"
           >
             Learn more
-            <ArrowRight size={18} />
+
+            <ArrowRight
+              size={18}
+              className="transition-transform duration-300 group-hover:translate-x-1"
+            />
           </Link>
 
         </div>
 
-
-        <div className="relative h-[360px] overflow-hidden rounded-3xl">
+        {/* Image */}
+        <div className="group relative h-[360px] overflow-hidden rounded-3xl shadow-sm">
 
           <Image
             src="/images/school-4.png"
@@ -44,9 +49,10 @@ export default function AboutSection() {
             fill
             sizes="(max-width: 768px) 100vw, 50vw"
             priority
-            className="object-cover"
+            className="object-cover transition-transform duration-700 group-hover:scale-105"
           />
-          <div className="absolute inset-0 bg-[#01796f]/10" />
+
+          <div className="absolute inset-0 bg-[#01796f]/10 transition-colors duration-500 group-hover:bg-[#01796f]/5" />
 
         </div>
 

@@ -42,7 +42,7 @@ export default function Hero() {
     return (
         <section className="relative h-[460px] overflow-hidden">
 
-            
+
             <div className="absolute inset-0">
 
                 {banners.map((banner, index) => {
@@ -72,8 +72,8 @@ export default function Hero() {
 
             </div>
 
-            
-            <div className="absolute inset-0 bg-[#01796f]/10" />
+
+            <div className="absolute inset-0 bg-[#01796f]/20" />
 
             <div className="relative z-10 mx-auto flex h-full max-w-[1000px] items-center px-6">
 
@@ -95,12 +95,15 @@ export default function Hero() {
 
                         <Link
                             href="/admissions"
-                            className="inline-flex items-center gap-2 rounded-xl bg-[#01796f] px-6 py-3.5 text-sm font-bold text-white transition hover:bg-[#015f58]"
+                            className="group inline-flex items-center gap-2 rounded-3xl bg-white px-6 py-3.5 text-sm font-bold text-[#01796f] transition hover:bg-gray-100"
                         >
                             Apply for Admission
+                            <ArrowRight size={18}
+                                className="transition-transform group-hover:translate-x-1"
+                            />
                         </Link>
 
-                        
+
 
                     </div>
 

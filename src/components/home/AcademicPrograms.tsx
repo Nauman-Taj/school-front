@@ -42,14 +42,17 @@ export default function AcademicPrograms() {
 
           <Link
             href="/academics"
-            className="inline-flex shrink-0 items-center gap-2 text-sm font-semibold text-[#01796f] transition hover:text-[#015f58]"
+            className="group inline-flex shrink-0 items-center gap-2 text-sm font-semibold text-[#01796f] transition-colors duration-300 hover:text-[#015f58]"
           >
             Explore academics
-            <ArrowRight size={17} />
+
+            <ArrowRight
+              size={17}
+              className="transition-transform duration-300 group-hover:translate-x-1"
+            />
           </Link>
 
         </div>
-
 
         <div className="grid gap-6 md:grid-cols-3">
 
@@ -57,7 +60,7 @@ export default function AcademicPrograms() {
             <Link
               key={program.title}
               href="/academics"
-              className="group overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-lg"
+              className="group overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-[#01796f]/20 hover:shadow-xl"
             >
 
               <div className="relative h-56 overflow-hidden">
@@ -67,17 +70,16 @@ export default function AcademicPrograms() {
                   alt={program.title}
                   fill
                   sizes="(max-width: 768px) 100vw, 50vw"
-                  className="object-cover transition duration-500"
+                  className="object-cover transition-transform duration-700 "
                 />
 
-                <div className="absolute inset-0 bg-[#01796f]/10 transition group-hover:bg-[#01796f]/0" />
+                <div className="absolute inset-0 bg-[#01796f]/10 transition-colors duration-500 group-hover:bg-[#01796f]/5" />
 
               </div>
 
-
               <div className="p-6">
 
-                <h3 className="text-xl font-bold text-gray-900 transition group-hover:text-[#01796f]">
+                <h3 className="text-xl font-bold text-gray-900 transition-colors duration-300 group-hover:text-[#01796f]">
                   {program.title}
                 </h3>
 
@@ -107,3 +109,4 @@ export default function AcademicPrograms() {
     </section>
   );
 }
+

@@ -3,7 +3,9 @@ import Navbar from "@/components/home/Navbar";
 import Hero from "@/components/home/Hero";
 import AboutSection from "@/components/home/AboutSection";
 import AcademicPrograms from "@/components/home/AcademicPrograms";
+import NewsSection from "@/components/home/NewsSection";
 import Statistics from "@/components/home/Statistics";
+import AdmissionsCTA from "@/components/home/AdmissionsCTA";
 import Footer from "@/components/home/Footer";
 
 export default function Home() {
@@ -19,8 +21,12 @@ export default function Home() {
       <AboutSection />
 
       <AcademicPrograms />
-      
+
+      <NewsSection />
+            
       <Statistics />
+
+      <AdmissionsCTA />
 
       <Footer />
 
