@@ -4,7 +4,6 @@ export default function Footer() {
       
       <div className="mx-auto grid max-w-[1000px] gap-8 px-6 text-center justify-items-center lg:grid-cols-2 lg:text-left">
 
-        {/* School Info */}
         <div className="flex flex-col items-center lg:items-start">
           <h3 className="text-lg font-bold">
             Garrison Grammar School
@@ -15,9 +14,7 @@ export default function Footer() {
             a stronger future through quality education.
           </p>
         </div>
-
-
-        {/* Contact */}
+        
         <div className="flex flex-col items-center lg:items-start">
           <h3 className="font-semibold">
             Contact
@@ -32,8 +29,6 @@ export default function Footer() {
 
       </div>
 
-
-      {/* Copyright */}
       <div className="mx-auto mt-7 max-w-[1000px] border-t border-white/30 px-6 pt-5">
         <p className="mx-auto max-w-md text-center text-sm text-white">
           © 2026 Garrison Grammar School. All rights reserved.
