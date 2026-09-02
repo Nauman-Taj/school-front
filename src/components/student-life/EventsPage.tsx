@@ -69,7 +69,7 @@ export default function EventsPage() {
 
           <div className="relative h-72 overflow-hidden rounded-3xl sm:h-96">
             <Image
-              src="/images/school-9.png"
+              src="/images/school-8.png"
               alt="School event at Garrison Grammar School"
               fill
               priority

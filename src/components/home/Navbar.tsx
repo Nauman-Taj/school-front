@@ -7,7 +7,6 @@ import { useState } from "react";
 
 import {
     ChevronDown,
-    Search,
     Menu,
     X,
 } from "lucide-react";
@@ -180,13 +179,6 @@ export default function Navbar() {
                 </nav>
 
                 <div className="hidden items-center gap-3 lg:flex">
-
-                    <button
-                        aria-label="Search"
-                        className="rounded-xl p-2.5 text-gray-600 transition hover:bg-[#e6f4f2] hover:text-[#01796f]"
-                    >
-                        <Search size={20} />
-                    </button>
 
                     
                     <Link
