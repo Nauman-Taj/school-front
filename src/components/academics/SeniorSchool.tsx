@@ -72,6 +72,7 @@ export default function SeniorSchool() {
               src="/images/school-5.png"
               alt="Senior students at Garrison Grammar School"
               fill
+              priority
               sizes="(max-width: 1024px) 100vw, 50vw"
               className="object-cover"
             />

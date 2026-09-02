@@ -11,13 +11,15 @@ const contactDetails = [
     icon: Phone,
     title: "Call Us",
     text: "+92 300 5454544",
-    detail: "Monday – Friday, 8:00 AM - 3:00 PM",
+    detail: "Monday - Friday, 8:00 AM - 3:00 PM",
+    href: "tel:+923005454544",
   },
   {
     icon: Mail,
     title: "Email Us",
     text: "info@garrisonschool.com",
-    detail: "Catch us at info@garrisonschool.com.",
+    detail: "We'd be happy to hear from you.",
+    href: "mailto:info@linkkiodabaya.com",
   },
 ];
 
@@ -39,9 +41,18 @@ export default function ContactInfo() {
             <div>
               <h3 className="font-bold text-gray-900">{item.title}</h3>
 
-              <p className="mt-1 text-sm font-medium text-gray-700">
-                {item.text}
-              </p>
+              {item.href ? (
+                <a
+                  href={item.href}
+                  className="mt-1 block text-sm font-medium text-gray-700 transition-colors hover:text-[#01796f]"
+                >
+                  {item.text}
+                </a>
+              ) : (
+                <p className="mt-1 text-sm font-medium text-gray-700">
+                  {item.text}
+                </p>
+              )}
 
               <p className="mt-1 text-sm leading-6 text-gray-500">
                 {item.detail}

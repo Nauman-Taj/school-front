@@ -69,9 +69,10 @@ export default function SportsAthleticsPage() {
 
           <div className="relative h-72 overflow-hidden rounded-3xl sm:h-96">
             <Image
-              src="/images/school-5.png"
+              src="/images/school-6.png"
               alt="Sports and athletics at Garrison Grammar School"
               fill
+              priority
               sizes="(max-width: 1024px) 100vw, 50vw"
               className="object-cover"
             />
@@ -83,7 +84,7 @@ export default function SportsAthleticsPage() {
         <div className="mx-auto grid max-w-[1200px] items-center gap-12 px-6 lg:grid-cols-2">
           <div className="relative h-80 overflow-hidden rounded-3xl sm:h-[420px]">
             <Image
-              src="/images/school-2.png"
+              src="/images/school-7.png"
               alt="Students participating in sports"
               fill
               sizes="(max-width: 1024px) 100vw, 50vw"

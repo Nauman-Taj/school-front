@@ -71,6 +71,7 @@ export default function ClubsSocietiesPage() {
               src="/images/school-4.png"
               alt="School clubs and societies"
               fill
+              priority
               sizes="(max-width: 1024px) 100vw, 50vw"
               className="object-cover"
             />
