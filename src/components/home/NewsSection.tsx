@@ -27,7 +27,6 @@ export default function NewsSection() {
     <section className="bg-[#f6f8f8] py-20">
       <div className="mx-auto max-w-[1200px] px-6">
 
-        {/* Heading */}
         <div className="mb-12 flex flex-col justify-between gap-5 md:flex-row md:items-end">
 
           <div>
@@ -51,7 +50,6 @@ export default function NewsSection() {
         </div>
 
 
-        {/* News Cards */}
         <div className="grid gap-6 md:grid-cols-3">
 
           {news.map((item) => (
@@ -60,7 +58,6 @@ export default function NewsSection() {
               className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-md"
             >
 
-              {/* Date */}
               <div className="flex items-center gap-2 text-sm font-medium text-[#01796f]">
 
                 <CalendarDays size={17} />
@@ -70,19 +67,16 @@ export default function NewsSection() {
               </div>
 
 
-              {/* Title */}
               <h3 className="mt-5 text-xl font-bold leading-snug text-gray-900">
                 {item.title}
               </h3>
 
 
-              {/* Description */}
               <p className="mt-3 text-sm leading-6 text-gray-500">
                 {item.description}
               </p>
 
 
-              {/* Read More */}
               <Link
                 href="/news"
                 className="group mt-5 inline-flex items-center gap-2 text-sm font-semibold text-[#01796f] transition hover:text-[#015f58]"

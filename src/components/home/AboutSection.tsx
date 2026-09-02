@@ -8,7 +8,6 @@ export default function AboutSection() {
 
       <div className="mx-auto grid max-w-[1200px] gap-12 px-6 lg:grid-cols-2 lg:items-center">
 
-        {/* Content */}
         <div>
 
           <span className="font-bold text-lg text-[#01796f]">
@@ -40,7 +39,6 @@ export default function AboutSection() {
 
         </div>
 
-        {/* Image */}
         <div className="group relative h-[360px] overflow-hidden rounded-3xl shadow-sm">
 
           <Image

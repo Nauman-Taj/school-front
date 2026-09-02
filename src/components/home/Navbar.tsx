@@ -131,8 +131,8 @@ export default function Navbar() {
                                 <Link
                                     href={link.href}
                                     className={`flex items-center gap-1 text-sm font-semibold transition ${active
-                                            ? "text-[#01796f]"
-                                            : "text-gray-700 hover:text-[#01796f]"
+                                        ? "text-[#01796f]"
+                                        : "text-gray-700 hover:text-[#01796f]"
                                         }`}
                                 >
                                     {link.name}
@@ -141,8 +141,8 @@ export default function Navbar() {
                                         <ChevronDown
                                             size={15}
                                             className={`transition-transform ${openDropdown === link.name
-                                                    ? "rotate-180"
-                                                    : ""
+                                                ? "rotate-180"
+                                                : ""
                                                 }`}
                                         />
                                     )}
@@ -159,8 +159,8 @@ export default function Navbar() {
                                                         key={item.name}
                                                         href={item.href}
                                                         className={`block px-4 py-3 text-sm font-medium transition ${isActive(item.href)
-                                                                ? "bg-[#e6f4f2] text-[#01796f]"
-                                                                : "text-gray-700 hover:bg-[#f5faf9] hover:text-[#01796f]"
+                                                            ? "bg-[#e6f4f2] text-[#01796f]"
+                                                            : "text-gray-700 hover:bg-[#f5faf9] hover:text-[#01796f]"
                                                             }`}
                                                     >
                                                         {item.name}
@@ -180,7 +180,7 @@ export default function Navbar() {
 
                 <div className="hidden items-center gap-3 lg:flex">
 
-                    
+
                     <Link
                         href="/login"
                         className="rounded-3xl bg-[#01796f] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#015f58]"
@@ -190,7 +190,7 @@ export default function Navbar() {
 
                 </div>
 
-                
+
                 <button
                     onClick={() => setMenuOpen(!menuOpen)}
                     className="rounded-xl p-2 text-gray-700 lg:hidden"
@@ -205,7 +205,7 @@ export default function Navbar() {
 
             </div>
 
-            
+
             {menuOpen && (
                 <div className="border-t border-gray-200 bg-white px-6 py-5 lg:hidden">
 
@@ -222,19 +222,19 @@ export default function Navbar() {
 
                                     <div className="flex items-center">
 
-                                        
+
                                         <Link
                                             href={link.href}
                                             onClick={() => setMenuOpen(false)}
                                             className={`flex-1 rounded-xl px-4 py-3 text-sm font-semibold transition ${active
-                                                    ? "bg-[#e6f4f2] text-[#01796f]"
-                                                    : "text-gray-700 hover:bg-gray-50"
+                                                ? "bg-[#e6f4f2] text-[#01796f]"
+                                                : "text-gray-700 hover:bg-gray-50"
                                                 }`}
                                         >
                                             {link.name}
                                         </Link>
 
-                                        
+
                                         {link.dropdown && (
                                             <button
                                                 onClick={() =>
@@ -250,8 +250,8 @@ export default function Navbar() {
                                                 <ChevronDown
                                                     size={17}
                                                     className={`transition-transform ${dropdownOpen
-                                                            ? "rotate-180"
-                                                            : ""
+                                                        ? "rotate-180"
+                                                        : ""
                                                         }`}
                                                 />
                                             </button>
@@ -259,7 +259,7 @@ export default function Navbar() {
 
                                     </div>
 
-                                    
+
                                     {link.dropdown && dropdownOpen && (
                                         <div className="ml-4 border-l border-gray-200 pl-3">
 
@@ -271,8 +271,8 @@ export default function Navbar() {
                                                         setMenuOpen(false)
                                                     }
                                                     className={`block rounded-lg px-4 py-2.5 text-sm font-medium transition ${isActive(item.href)
-                                                            ? "text-[#01796f]"
-                                                            : "text-gray-600 hover:bg-gray-50 hover:text-[#01796f]"
+                                                        ? "text-[#01796f]"
+                                                        : "text-gray-600 hover:bg-gray-50 hover:text-[#01796f]"
                                                         }`}
                                                 >
                                                     {item.name}
@@ -286,7 +286,7 @@ export default function Navbar() {
                             );
                         })}
 
-                        
+
                         <Link
                             href="/login"
                             onClick={() => setMenuOpen(false)}
