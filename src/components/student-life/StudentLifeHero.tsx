@@ -23,7 +23,7 @@ export default function StudentLifeHero() {
 
         <div className="relative h-72 overflow-hidden rounded-3xl sm:h-96">
           <Image
-            src="/images/school-8.png"
+            src="/images/school-9.png"
             alt="Student life at Garrison Grammar School"
             fill
             priority

@@ -69,7 +69,7 @@ export default function ActivitiesPage() {
 
           <div className="relative h-72 overflow-hidden rounded-3xl sm:h-96">
             <Image
-              src="/images/school-8.png"
+              src="/images/school-7.png"
               alt="Student activities at Garrison Grammar School"
               fill
               priority
