@@ -5,18 +5,21 @@ const levels = [
   {
     title: "Primary School",
     years: "Early Years - Grade 5",
+    href: "/academics/primary",
     description:
       "Building strong foundations in literacy, numeracy, creativity and social development.",
   },
   {
     title: "Middle School",
     years: "Grade 6 - Grade 8",
+    href: "/academics/middle",
     description:
       "Encouraging curiosity, independent thinking and deeper understanding across subjects.",
   },
   {
     title: "Senior School",
     years: "Grade 9 - Grade 12",
+    href: "/academics/senior",
     description:
       "Preparing students for higher education through focused academic and personal development.",
   },
@@ -45,7 +48,7 @@ export default function AcademicLevels() {
           {levels.map((level) => (
             <Link
               key={level.title}
-              href="/academics"
+              href={level.href}
               className="group rounded-2xl border border-gray-200 bg-white p-7 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-[#01796f]/20 hover:shadow-xl"
             >
               <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-[#01796f]/10 text-[#01796f]">

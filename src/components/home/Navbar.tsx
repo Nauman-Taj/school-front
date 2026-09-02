@@ -38,6 +38,10 @@ const navLinks = [
                 name: "Senior School",
                 href: "/academics/senior",
             },
+            {
+                name: "Learning Approach",
+                href: "/academics/learning-approach",
+            },
         ],
     },
     {
@@ -50,12 +54,16 @@ const navLinks = [
         dropdown: true,
         items: [
             {
-                name: "Clubs & Activities",
-                href: "/student-life/clubs",
+                name: "Activities",
+                href: "/student-life/activities",
             },
             {
-                name: "Sports",
+                name: "Sports & Athletics",
                 href: "/student-life/sports",
+            },
+            {
+                name: "Clubs & Societies",
+                href: "/student-life/clubs",
             },
             {
                 name: "Events",
