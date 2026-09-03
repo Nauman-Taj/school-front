@@ -62,7 +62,7 @@ export default function Sidebar() {
           href="/"
           className="flex items-center gap-3"
         >
-        <div className="text-lg font-bold ml-2 text-[#015f58]">
+        <div className="text-lg font-bold pl-2 text-[#015f58]">
           <p>Garrison School</p>
         </div>
         </Link>
