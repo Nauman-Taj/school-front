@@ -62,7 +62,7 @@ export default function MobileSidebar({
         className={`fixed left-0 top-0 z-50 h-screen w-72 border-r border-gray-200 bg-white transition-transform duration-300 lg:hidden ${open ? "translate-x-0" : "-translate-x-full"
           }`}
       >
-        <div className="flex h-16 items-center justify-between border-b border-gray-200 px-4">
+        <div className="flex h-16 items-center justify-between border-b border-gray-200 ps-6">
           <Link
             href="/"
             className="flex items-center gap-3"
@@ -79,7 +79,7 @@ export default function MobileSidebar({
             href="/"
             className="flex items-center gap-3"
           >
-            <h1 className="text-lg font-bold text-[#015f58]">
+            <h1 className="text-lg pr-4 font-bold text-[#015f58]">
               Garrison School
             </h1>
           </Link>
