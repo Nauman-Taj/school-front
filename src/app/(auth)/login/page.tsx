@@ -1,62 +1,91 @@
 "use client";
 
 import { useState } from "react";
-import { Eye, EyeOff, GraduationCap } from "lucide-react";
+import { Eye, EyeOff } from "lucide-react";
+import Image from "next/image";
+import { useRouter } from "next/navigation";
 
 export default function LoginPage() {
+  const router = useRouter();
+
   const [showPassword, setShowPassword] = useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    setError("");
+    setLoading(true);
+
+    const Email = "admin@garrisonschool.edu.pk";
+    const Password = "nauman360";
+
+    setTimeout(() => {
+      if (email === Email && password === Password) {
+
+        localStorage.setItem("isLoggedIn", "true");
+
+        router.push("/dashboard");
+      } else {
+        setError("Invalid email or password.");
+        setLoading(false);
+      }
+    }, 700);
+  };
 
   return (
     <main className="flex min-h-screen items-center justify-center bg-[#f6f8f8] px-4 py-8">
-      <div className="w-full max-w-md">
+      <div className="grid w-full max-w-md justify-center">
 
-        {/* Logo / Brand */}
+        
         <div className="mb-8 text-center">
-          <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-[#01796f] text-white">
-            <GraduationCap size={30} strokeWidth={1.8} />
-          </div>
+          <Image
+            src="/images/school.jpg"
+            alt="School Logo"
+            width={80}
+            height={80}
+            className="mx-auto mb-4 object-contain"
+          />
 
-          <h1 className="text-2xl font-bold text-gray-900">
-            Garrison Grammar
+          <h1 className="text-3xl font-bold text-gray-900">
+            Garrison Grammar School
           </h1>
-
-          <p className="mt-1 text-sm text-gray-500">
-            School Management System
-          </p>
         </div>
 
-        {/* Login Card */}
-        <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm sm:p-8">
+        
+        <div className="w-full rounded-2xl border border-gray-100 bg-white p-6 shadow-sm sm:p-8">
           <div className="mb-6">
             <h2 className="text-xl font-semibold text-gray-900">
-              Welcome back
+              Welcome
             </h2>
-
-            <p className="mt-1 text-sm text-gray-500">
-              Sign in to access your dashboard.
-            </p>
           </div>
 
-          <form className="space-y-5">
+          <form onSubmit={handleSubmit} className="space-y-5">
 
-            {/* Email */}
+            
             <div>
               <label
                 htmlFor="email"
                 className="mb-2 block text-sm font-medium text-gray-700"
               >
-                Email address
+                Email
               </label>
 
               <input
                 id="email"
                 type="email"
-                placeholder="admin@garrisongrammar.edu.pk"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="Enter your Email"
                 className="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm text-gray-900 outline-none transition focus:border-[#01796f] focus:ring-2 focus:ring-[#01796f]/10"
+                required
               />
             </div>
 
-            {/* Password */}
+            
             <div>
               <label
                 htmlFor="password"
@@ -69,8 +98,11 @@ export default function LoginPage() {
                 <input
                   id="password"
                   type={showPassword ? "text" : "password"}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
                   placeholder="Enter your password"
                   className="w-full rounded-xl border border-gray-200 px-4 py-3 pr-12 text-sm text-gray-900 outline-none transition focus:border-[#01796f] focus:ring-2 focus:ring-[#01796f]/10"
+                  required
                 />
 
                 <button
@@ -92,16 +124,8 @@ export default function LoginPage() {
               </div>
             </div>
 
-            {/* Remember + Forgot */}
-            <div className="flex items-center justify-between">
-              <label className="flex items-center gap-2 text-sm text-gray-600">
-                <input
-                  type="checkbox"
-                  className="h-4 w-4 rounded border-gray-300 accent-[#01796f]"
-                />
-                Remember me
-              </label>
-
+            
+            <div className="flex justify-end">
               <button
                 type="button"
                 className="text-sm font-medium text-[#01796f] hover:text-[#015f58]"
@@ -110,20 +134,23 @@ export default function LoginPage() {
               </button>
             </div>
 
-            {/* Login */}
+            
+            {error && (
+              <p className="text-sm text-red-500">
+                {error}
+              </p>
+            )}
+
             <button
               type="submit"
-              className="w-full rounded-xl bg-[#01796f] px-4 py-3 text-sm font-semibold text-white transition hover:bg-[#015f58] focus:outline-none focus:ring-2 focus:ring-[#01796f]/30"
+              disabled={loading}
+              className="w-full rounded-xl bg-[#01796f] px-4 py-3 text-sm font-semibold text-white transition hover:bg-[#015f58] focus:outline-none focus:ring-2 focus:ring-[#01796f]/30 disabled:cursor-not-allowed disabled:opacity-70"
             >
-              Sign in
+              {loading ? "Signing in..." : "Sign in"}
             </button>
 
           </form>
         </div>
-
-        <p className="mt-6 text-center text-xs text-gray-400">
-          © 2026 Garrison Grammar School
-        </p>
       </div>
     </main>
   );

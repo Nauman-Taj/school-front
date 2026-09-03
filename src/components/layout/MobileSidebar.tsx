@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import {
   LayoutDashboard,
   Users,
@@ -60,14 +61,20 @@ export default function MobileSidebar({
 
       {/* Sidebar */}
       <aside
-        className={`fixed left-0 top-0 z-50 h-screen w-72 border-r border-gray-200 bg-white transition-transform duration-300 lg:hidden ${
-          open ? "translate-x-0" : "-translate-x-full"
-        }`}
+        className={`fixed left-0 top-0 z-50 h-screen w-72 border-r border-gray-200 bg-white transition-transform duration-300 lg:hidden ${open ? "translate-x-0" : "-translate-x-full"
+          }`}
       >
         {/* Header */}
-        <div className="flex h-16 items-center justify-between border-b border-gray-200 px-6">
-          <h1 className="text-lg font-bold text-[#015f58]">
-            Garrison Grammar
+        <div className="flex h-16 items-center justify-between border-b border-gray-200 px-4">
+          <Image
+            src="/images/school.jpg"
+            alt="School Logo"
+            width={55}
+            height={55}
+            className="object-contain"
+          />
+          <h1 className="text-lg font-bold ml-2 text-[#015f58]">
+            Garrison School
           </h1>
 
           <button

@@ -29,7 +29,7 @@ export default function Header({ onMenuClick }: HeaderProps) {
 
           <div className="hidden sm:block">
             <p className="text-sm text-[#015f58] font-semibold">
-              School Management System
+              Garrison School
             </p>
           </div>
         </div>
@@ -59,9 +59,9 @@ export default function Header({ onMenuClick }: HeaderProps) {
               <p className="text-sm font-semibold text-gray-900">
                 Nauman
               </p>
-              {/* <p className="text-xs text-gray-500">
-                Administrator
-              </p> */}
+              <p className="text-xs text-gray-500">
+                Admin
+              </p>
             </div>
 
             <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#01796f]/10 text-[#01796f]">
