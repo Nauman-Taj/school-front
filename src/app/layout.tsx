@@ -3,7 +3,7 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "Garrison Grammar School",
-  description: "School Management System",
+  description: "School and Colleges",
 };
 
 export default function RootLayout({
