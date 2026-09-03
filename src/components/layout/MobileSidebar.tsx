@@ -79,7 +79,7 @@ export default function MobileSidebar({
             href="/"
             className="flex items-center gap-3"
           >
-            <h1 className="text-lg font-bold ml-2 text-[#015f58]">
+            <h1 className="text-lg font-bold text-[#015f58]">
               Garrison School
             </h1>
           </Link>

@@ -52,8 +52,8 @@ export default function Sidebar() {
           <Image
             src="/images/school.jpg"
             alt="School Logo"
-            width={70}
-            height={70}
+            width={55}
+            height={55}
             className="object-contain"
           />
         </Link>
@@ -62,7 +62,7 @@ export default function Sidebar() {
           href="/"
           className="flex items-center gap-3"
         >
-        <div className="text-xl font-bold ml-4 text-[#015f58]">
+        <div className="text-lg font-bold ml-2 text-[#015f58]">
           <p>Garrison School</p>
         </div>
         </Link>

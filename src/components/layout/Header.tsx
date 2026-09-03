@@ -35,20 +35,7 @@ export default function Header({ onMenuClick }: HeaderProps) {
                 href="/"
                 className="flex items-center gap-3"
               >
-                <Image
-                  src="/images/school.jpg"
-                  alt="School Logo"
-                  width={50}
-                  height={50}
-                  className="object-contain"
-                />
-              </Link>
-
-              <Link
-                href="/"
-                className="flex items-center gap-3"
-              >
-                <div className="text-xl font-bold ml-2 text-[#015f58]">
+                <div className="text-xl font-bold  text-[#015f58]">
                   <p>Garrison School</p>
                 </div>
               </Link>
