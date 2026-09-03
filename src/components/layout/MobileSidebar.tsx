@@ -50,7 +50,7 @@ export default function MobileSidebar({
   onClose,
 }: MobileSidebarProps) {
   return (
-    <> 
+    <>
       {open && (
         <div
           className="fixed inset-0 z-40 bg-black/30 lg:hidden"
@@ -61,18 +61,28 @@ export default function MobileSidebar({
       <aside
         className={`fixed left-0 top-0 z-50 h-screen w-72 border-r border-gray-200 bg-white transition-transform duration-300 lg:hidden ${open ? "translate-x-0" : "-translate-x-full"
           }`}
-      > 
+      >
         <div className="flex h-16 items-center justify-between border-b border-gray-200 px-4">
-          <Image
-            src="/images/school.jpg"
-            alt="School Logo"
-            width={55}
-            height={55}
-            className="object-contain"
-          />
-          <h1 className="text-lg font-bold ml-2 text-[#015f58]">
-            Garrison School
-          </h1>
+          <Link
+            href="/"
+            className="flex items-center gap-3"
+          >
+            <Image
+              src="/images/school.jpg"
+              alt="School Logo"
+              width={55}
+              height={55}
+              className="object-contain"
+            />
+          </Link>
+          <Link
+            href="/"
+            className="flex items-center gap-3"
+          >
+            <h1 className="text-lg font-bold ml-2 text-[#015f58]">
+              Garrison School
+            </h1>
+          </Link>
 
           <button
             type="button"
@@ -103,7 +113,7 @@ export default function MobileSidebar({
             })}
           </div>
         </nav>
-      </aside>
+      </aside >
     </>
   );
 }

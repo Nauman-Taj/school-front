@@ -38,8 +38,8 @@ export default function Header({ onMenuClick }: HeaderProps) {
                 <Image
                   src="/images/school.jpg"
                   alt="School Logo"
-                  width={60}
-                  height={60}
+                  width={50}
+                  height={50}
                   className="object-contain"
                 />
               </Link>
