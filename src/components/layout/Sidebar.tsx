@@ -43,9 +43,7 @@ export default function Sidebar() {
   return (
     <aside className="fixed left-0 top-0 z-40 hidden h-screen w-64 border-r border-gray-200 bg-white lg:block">
 
-      {/* Header */}
-
-      <div className="flex h-16 shrink-0 items-center ml- border-b border-gray-200 px-6">
+      <div className="flex h-16 shrink-0 items-center  border-b border-gray-200 px-6">
 
         <Link
           href="/"
@@ -70,7 +68,6 @@ export default function Sidebar() {
         </Link>
       </div>
 
-      {/* Scrollable Navigation */}
       <nav className="sidebar-scroll h-[calc(100vh-4rem)] overflow-y-auto p-4">
         <div className="space-y-1">
           {menuItems.map((item) => {

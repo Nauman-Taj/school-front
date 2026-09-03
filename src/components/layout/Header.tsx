@@ -1,5 +1,7 @@
 "use client";
 
+import Link from "next/link";
+import Image from "next/image";
 import {
   Bell,
   Search,
@@ -16,7 +18,6 @@ export default function Header({ onMenuClick }: HeaderProps) {
     <header className="sticky top-0 z-30 h-16 border-b border-gray-200 bg-white">
       <div className="flex h-full items-center justify-between px-4 sm:px-6 lg:px-8">
 
-        {/* Left */}
         <div className="flex items-center gap-3">
           <button
             type="button"
@@ -28,13 +29,33 @@ export default function Header({ onMenuClick }: HeaderProps) {
           </button>
 
           <div className="hidden sm:block">
-            <p className="text-sm text-[#015f58] font-semibold">
-              Garrison School
-            </p>
+            <div className="flex h-16 shrink-0 items-center  border-b border-gray-200">
+
+              <Link
+                href="/"
+                className="flex items-center gap-3"
+              >
+                <Image
+                  src="/images/school.jpg"
+                  alt="School Logo"
+                  width={60}
+                  height={60}
+                  className="object-contain"
+                />
+              </Link>
+
+              <Link
+                href="/"
+                className="flex items-center gap-3"
+              >
+                <div className="text-xl font-bold ml-2 text-[#015f58]">
+                  <p>Garrison School</p>
+                </div>
+              </Link>
+            </div>
           </div>
         </div>
 
-        {/* Right */}
         <div className="flex items-center gap-2">
           <button
             type="button"

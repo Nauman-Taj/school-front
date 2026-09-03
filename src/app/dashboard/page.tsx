@@ -46,9 +46,6 @@ export default function DashboardPage() {
   return (
     <main className="space-y-8">
 
-      {/* Heading */}
-      {/* <section className="px-6 py-10"> */}
-      {/* <div className="mx-auto max-w-[1200px]"> */}
       <div>
         <h1 className="text-2xl font-bold text-gray-900 sm:text-3xl">
           Dashboard
@@ -59,7 +56,6 @@ export default function DashboardPage() {
         </p>
       </div>
 
-      {/* Statistics */}
       <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-4">
         {stats.map((stat) => (
           <StatCard
@@ -69,20 +65,19 @@ export default function DashboardPage() {
         ))}
       </div>
 
-      {/* Charts */}
       <div className="grid gap-6 xl:grid-cols-2">
         <EnrollmentChart />
         <AttendanceChart />
       </div>
 
-      {/* Bottom Section */}
+      
       <div className="grid gap-6 xl:grid-cols-2">
         <FeeChart />
         <UpcomingEvents />
       </div>
-      {/* </div> */}
+      
 
-      {/* </section> */}
+      
 
     </main>
   );
