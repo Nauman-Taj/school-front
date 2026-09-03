@@ -10,7 +10,7 @@ export default function AnnouncementsPage() {
         </h1>
 
         <p className="mt-1 text-sm text-gray-500 sm:text-base">
-          Manage and view important school announcements.
+          Here are the latest announcements.
         </p>
       </div>
 
