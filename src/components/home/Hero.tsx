@@ -74,7 +74,7 @@ export default function Hero() {
             </div>
 
 
-            <div className="absolute inset-0 bg-[#01796f]/20" />
+            <div className="absolute inset-0 bg-[#01796f]/10" />
 
             <div className="relative z-10 mx-auto flex h-full max-w-[1000px] items-center px-6">
 

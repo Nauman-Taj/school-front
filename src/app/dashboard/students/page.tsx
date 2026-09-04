@@ -1,3 +1,5 @@
-export default function Page() {
-  return <div>Coming soon</div>;
+import StudentTable from "@/components/students/StudentTable";
+
+export default function StudentsPage() {
+  return <StudentTable />;
 }

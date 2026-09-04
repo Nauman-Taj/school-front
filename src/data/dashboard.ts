@@ -1,3 +1,41 @@
+import {
+  Users,
+  UserRound,
+  GraduationCap,
+  Wallet,
+} from "lucide-react";
+
+export const statsData = [
+  {
+    title: "Total Students",
+    value: "400",
+    change: "+4%",
+    description: "from last month",
+    icon: Users,
+  },
+  {
+    title: "Total Teachers",
+    value: "55",
+    change: "+6%",
+    description: "from last month",
+    icon: UserRound,
+  },
+  {
+    title: "Attendance",
+    value: "90%",
+    change: "+2%",
+    description: "from last month",
+    icon: GraduationCap,
+  },
+  {
+    title: "Fee Collection",
+    value: "75%",
+    change: "+5%",
+    description: "from last month",
+    icon: Wallet,
+  },
+];
+
 export const attendanceData = [
   { month: "Jan", attendance: 82.5 },
   { month: "Feb", attendance: 81.0 },

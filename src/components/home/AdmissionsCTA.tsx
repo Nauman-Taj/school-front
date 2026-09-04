@@ -15,7 +15,7 @@ export default function AdmissionsCTA() {
                 />
             </div>
 
-            <div className="absolute inset-0 bg-[#01796f]/20" />
+            <div className="absolute inset-0 bg-[#01796f]/40" />
 
             <div className="relative mx-auto max-w-[1200px] px-6 py-20 sm:py-24">
 
