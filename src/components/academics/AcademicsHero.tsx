@@ -26,6 +26,7 @@ export default function AcademicsHero() {
             src="/images/school-1.png"
             alt="Academic learning at Garrison Grammar School"
             fill
+            loading="eager"
             priority
             sizes="(max-width: 1024px) 100vw, 50vw"
             className="object-cover"

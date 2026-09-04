@@ -1,5 +1,6 @@
 "use client";
 
+import { feeData } from "@/data/dashboard";
 import {
   Pie,
   PieChart,
@@ -7,18 +8,6 @@ import {
   Tooltip,
 } from "recharts";
 
-const data = [
-  {
-    name: "Collected",
-    value: 82.4,
-    fill: "#01796f",
-  },
-  {
-    name: "Remaining",
-    value: 17.6,
-    fill: "#e5e7eb",
-  },
-];
 
 export default function FeeChart() {
   return (
@@ -37,7 +26,7 @@ export default function FeeChart() {
         <ResponsiveContainer width="100%" height="100%">
           <PieChart>
             <Pie
-              data={data}
+              data={feeData}
               dataKey="value"
               nameKey="name"
               innerRadius={70}

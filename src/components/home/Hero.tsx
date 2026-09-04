@@ -63,6 +63,7 @@ export default function Hero() {
                                 src={banner.image}
                                 alt={banner.title}
                                 fill
+                                loading="eager"
                                 priority={index === 0}
                                 className="object-cover"
                             />

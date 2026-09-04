@@ -1,19 +1,5 @@
 import { CalendarDays } from "lucide-react";
-
-const events = [
-  {
-    title: "Parent-Teacher Meeting",
-    date: "Sep 06, 2026",
-  },
-  {
-    title: "Mid-Term Examinations",
-    date: "Sep 14, 2026",
-  },
-  {
-    title: "School Sports Day",
-    date: "Sep 20, 2026",
-  },
-];
+import { eventsData } from "@/data/dashboard";
 
 export default function UpcomingEvents() {
   return (
@@ -28,7 +14,7 @@ export default function UpcomingEvents() {
       </div>
 
       <div className="space-y-4">
-        {events.map((event) => (
+        {eventsData.map((event) => (
           <div
             key={event.title}
             className="flex items-center gap-4 rounded-xl bg-gray-50 p-4"

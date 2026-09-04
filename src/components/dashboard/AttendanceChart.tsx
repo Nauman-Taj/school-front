@@ -1,5 +1,5 @@
 "use client";
-
+import { attendanceData } from "@/data/dashboard";
 import {
   Line,
   LineChart,
@@ -9,17 +9,6 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-
-const data = [
-  { month: "Jan", attendance: 82.5 },
-  { month: "Feb", attendance: 81.0 },
-  { month: "Mar", attendance: 83.5 },
-  { month: "Apr", attendance: 82.0 },
-  { month: "May", attendance: 84.5 },
-  { month: "Jun", attendance: 83.0 },
-  { month: "Jul", attendance: 89.0 },
-  { month: "Aug", attendance: 90.0 },
-];
 
 
 export default function AttendanceChart() {
@@ -37,7 +26,7 @@ export default function AttendanceChart() {
 
       <div className="h-72">
         <ResponsiveContainer width="100%" height="100%">
-          <LineChart data={data}>
+          <LineChart data={attendanceData}>
             <CartesianGrid strokeDasharray="3 3" vertical={false} />
 
             <XAxis

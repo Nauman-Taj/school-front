@@ -69,6 +69,7 @@ export default function AcademicPrograms() {
                   src={program.image}
                   alt={program.title}
                   fill
+                  loading="eager"
                   sizes="(max-width: 768px) 100vw, 50vw"
                   className="object-cover transition-transform duration-700 "
                 />

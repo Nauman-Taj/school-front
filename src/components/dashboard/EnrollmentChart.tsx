@@ -1,5 +1,6 @@
 "use client";
 
+import { enrollmentData } from "@/data/dashboard";
 import {
   Bar,
   BarChart,
@@ -9,17 +10,6 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-
-const data = [
-  { month: "Jan", students: 270 },
-  { month: "Feb", students: 265 },
-  { month: "Mar", students: 280 },
-  { month: "Apr", students: 310 },
-  { month: "May", students: 310 },
-  { month: "Jun", students: 350 },
-  { month: "Jul", students: 370 },
-  { month: "Aug", students: 400 },
-];
 
 export default function EnrollmentChart() {
   return (
@@ -35,7 +25,7 @@ export default function EnrollmentChart() {
 
       <div className="h-72">
         <ResponsiveContainer width="100%" height="100%">
-          <BarChart data={data}>
+          <BarChart data={enrollmentData}>
             <CartesianGrid strokeDasharray="3 3" vertical={false} />
 
             <XAxis
