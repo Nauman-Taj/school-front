@@ -4,16 +4,19 @@ import {
   Mail,
   Pencil,
   Phone,
+  Trash2,
 } from "lucide-react";
 
 import { Student } from "@/types/student";
 
 type StudentCardProps = {
   student: Student;
+  onDelete: (id: number, name: string) => void;
 };
 
 export default function StudentCard({
   student,
+  onDelete,
 }: StudentCardProps) {
   return (
     <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
@@ -96,6 +99,15 @@ export default function StudentCard({
         >
           <Pencil size={17} strokeWidth={1.8} />
         </Link>
+
+        <button
+          type="button"
+          onClick={() => onDelete(student.id, student.name)}
+          className="flex items-center justify-center rounded-full border border-gray-200 px-3 py-2.5 text-gray-500 transition hover:border-red-200 hover:bg-red-50 hover:text-red-600"
+          aria-label={`Delete ${student.name}`}
+        >
+          <Trash2 size={17} strokeWidth={1.8} />
+        </button>
       </div>
     </div>
   );

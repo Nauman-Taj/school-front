@@ -1,4 +1,6 @@
 "use client";
+import Link from "next/link";
+import { ArrowLeft } from "lucide-react";
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -23,9 +25,9 @@ export default function StudentForm({
     phone: student?.phone ?? "",
     status: student?.status ?? "Active",
   });
-  
+
   const isEditMode = Boolean(student);
-  
+
   const [loading, setLoading] = useState(false);
 
   const handleChange = (
@@ -49,12 +51,13 @@ export default function StudentForm({
     }, 700);
   };
 
-  return (
+  return (      
     <form
       onSubmit={handleSubmit}
       className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm sm:p-8"
     >
       <div className="grid gap-5 sm:grid-cols-2">
+
         {/* Student Name */}
         <div>
           <label

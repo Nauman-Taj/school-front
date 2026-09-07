@@ -7,13 +7,27 @@ import {
   Pencil,
   Search,
   UserPlus,
+  Trash2,
 } from "lucide-react";
 
-import { students } from "@/data/students";
+import { students as initialStudents } from "@/data/students";
 import StudentCard from "@/components/students/StudentCard";
 
 export default function StudentTable() {
+  const [students, setStudents] = useState(initialStudents);
   const [search, setSearch] = useState("");
+
+  const handleDelete = (id: number, name: string) => {
+    const confirmed = window.confirm(
+      `Are you sure you want to delete ${name}?`
+    );
+
+    if (!confirmed) return;
+
+    setStudents((currentStudents) =>
+      currentStudents.filter((student) => student.id !== id)
+    );
+  };
 
   const filteredStudents = students.filter((student) => {
     const query = search.toLowerCase().trim();
@@ -33,7 +47,7 @@ export default function StudentTable() {
       {/* Header */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">
+          <h2 className="text-2xl font-semibold text-gray-900">
             Students
           </h2>
 
@@ -44,7 +58,7 @@ export default function StudentTable() {
 
         <Link
           href="/dashboard/students/add"
-          className="inline-flex items-center justify-center gap-2 rounded-full bg-[#01796f] px-4 py-2.5 text-sm font-medium text-white transition hover:bg-[#01665d]"
+          className="inline-flex w-fit items-center gap-2 rounded-full bg-[#01796f] px-4 py-2.5 text-sm font-medium text-white transition hover:bg-[#01665d]"
         >
           <UserPlus size={17} />
           Add Student
@@ -77,7 +91,7 @@ export default function StudentTable() {
                   Student
                 </th>
 
-                <th className="ps-6 pe-6 py-3.5 text-sm font-semibold text-gray-700">
+                <th className="px-6 py-3.5 text-sm font-semibold text-gray-700">
                   Roll No.
                 </th>
 
@@ -97,7 +111,7 @@ export default function StudentTable() {
                   Status
                 </th>
 
-                <th className="px-6 py-3.5 text-right text-sm font-semibold text-gray-700">
+                <th className="px-6 py-3.5 text-center text-sm font-semibold text-gray-700">
                   Actions
                 </th>
               </tr>
@@ -112,18 +126,12 @@ export default function StudentTable() {
                   <td className="px-6 py-3.5">
                     <div className="flex items-center gap-3">
                       <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#01796f]/10 text-[#01796f]">
-                        <UserRound
-                          size={19}
-                          strokeWidth={1.8}
-                        />
+                        <UserRound size={19} strokeWidth={1.8} />
                       </div>
 
-                      <div>
-                        <p className="font-medium text-gray-900">
-                          {student.name}
-                        </p>
-
-                      </div>
+                      <p className="font-medium text-gray-900">
+                        {student.name}
+                      </p>
                     </div>
                   </td>
 
@@ -147,26 +155,24 @@ export default function StudentTable() {
 
                   <td className="px-6 py-3.5">
                     <span
-                      className={`rounded-full px-2.5 py-1 text-xs font-medium ${student.status === "Active"
-                        ? "bg-green-50 text-green-700"
-                        : "bg-gray-100 text-gray-600"
-                        }`}
+                      className={`rounded-full px-2.5 py-1 text-xs font-medium ${
+                        student.status === "Active"
+                          ? "bg-green-50 text-green-700"
+                          : "bg-gray-100 text-gray-600"
+                      }`}
                     >
                       {student.status}
                     </span>
                   </td>
 
                   <td className="px-6 py-3.5">
-                    <div className="flex justify-end gap-2">
+                    <div className="flex justify-center gap-2">
                       <Link
                         href={`/dashboard/students/${student.id}`}
                         className="flex h-9 w-9 items-center justify-center rounded-lg text-gray-500 transition hover:bg-[#01796f]/10 hover:text-[#01796f]"
                         aria-label={`View ${student.name}`}
                       >
-                        <UserRound
-                          size={17}
-                          strokeWidth={1.8}
-                        />
+                        <UserRound size={17} strokeWidth={1.8} />
                       </Link>
 
                       <Link
@@ -174,11 +180,19 @@ export default function StudentTable() {
                         className="flex h-9 w-9 items-center justify-center rounded-lg text-gray-500 transition hover:bg-[#01796f]/10 hover:text-[#01796f]"
                         aria-label={`Edit ${student.name}`}
                       >
-                        <Pencil
-                          size={17}
-                          strokeWidth={1.8}
-                        />
+                        <Pencil size={17} strokeWidth={1.8} />
                       </Link>
+
+                      <button
+                        type="button"
+                        onClick={() =>
+                          handleDelete(student.id, student.name)
+                        }
+                        className="flex h-9 w-9 items-center justify-center rounded-lg text-gray-500 transition hover:bg-red-50 hover:text-red-600"
+                        aria-label={`Delete ${student.name}`}
+                      >
+                        <Trash2 size={17} strokeWidth={1.8} />
+                      </button>
                     </div>
                   </td>
                 </tr>
@@ -200,7 +214,8 @@ export default function StudentTable() {
 
         <div className="border-t border-gray-100 px-6 py-3.5 text-sm text-gray-500">
           Showing {filteredStudents.length} student
-          {filteredStudents.length !== 1 ? "s" : ""} out of {students.length}
+          {filteredStudents.length !== 1 ? "s" : ""} out of{" "}
+          {students.length}
         </div>
       </div>
 
@@ -210,6 +225,7 @@ export default function StudentTable() {
           <StudentCard
             key={student.id}
             student={student}
+            onDelete={handleDelete}
           />
         ))}
 
