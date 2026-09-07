@@ -13,7 +13,7 @@ export default function TeacherTable() {
     const [teachers, setTeachers] = useState(initialTeachers);
   const [search, setSearch] = useState("");
 
- const handleDelete = (id: number, name: string) => {
+ const handleDelete = (id: string, name: string) => {
     const confirmed = window.confirm(
       `Are you sure you want to delete ${name}?`
     );
@@ -198,6 +198,7 @@ export default function TeacherTable() {
           <TeacherCard
             key={teacher.id}
             teacher={teacher}
+            onDelete={handleDelete}
           />
         ))}
       </div>
