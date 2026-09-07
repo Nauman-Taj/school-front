@@ -6,11 +6,24 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 
-import { teachers } from "@/data/teachers";
+import { teachers as initialTeachers } from "@/data/teachers";
 import TeacherCard from "./TeacherCard";
 
 export default function TeacherTable() {
+    const [teachers, setTeachers] = useState(initialTeachers);
   const [search, setSearch] = useState("");
+
+ const handleDelete = (id: number, name: string) => {
+    const confirmed = window.confirm(
+      `Are you sure you want to delete ${name}?`
+    );
+
+    if (!confirmed) return;
+
+    setTeachers((currentTeachers) =>
+      currentTeachers.filter((teacher) => teacher.id !== id)
+    );
+  };
 
   const filteredTeachers = teachers.filter((teacher) => {
     const searchTerm = search.toLowerCase();
