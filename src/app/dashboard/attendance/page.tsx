@@ -1,3 +1,5 @@
-export default function Page() {
-  return <div>Coming soon</div>;
+import AttendancePage from "@/components/attendance/AttendancePage";
+
+export default function AttendanceRoute() {
+  return <AttendancePage />;
 }
