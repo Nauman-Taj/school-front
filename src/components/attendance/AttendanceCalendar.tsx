@@ -60,7 +60,7 @@ export default function AttendanceCalendar() {
     <div className="rounded-2xl border border-gray-200 bg-white p-5">
 
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-3">
           <div className="rounded-xl bg-[#e6f4f2] p-3 text-[#01796f]">
             <CalendarDays size={20} />
@@ -70,14 +70,10 @@ export default function AttendanceCalendar() {
             <h2 className="font-semibold text-gray-900">
               Attendance Calendar
             </h2>
-
-            {/* <p className="text-sm text-gray-500">
-              Select a date to view attendance.
-            </p> */}
           </div>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center justify-between sm:justify-end">
           <button
             onClick={() => changeMonth(-1)}
             className="rounded-lg border border-gray-200 p-2 hover:bg-gray-50"
@@ -147,15 +143,15 @@ export default function AttendanceCalendar() {
                 key={day}
                 onClick={() => setSelectedDate(dateString)}
                 className={`relative min-h-[85px] border-t border-r border-gray-100 p-2 text-left transition ${selected
-                    ? "bg-[#e6f4f2]"
-                    : "hover:bg-gray-50"
+                  ? "bg-[#e6f4f2]"
+                  : "hover:bg-gray-50"
                   }`}
               >
                 {/* Date */}
                 <span
                   className={`flex h-7 w-7 items-center justify-center rounded-full text-sm ${selected
-                      ? "bg-[#01796f] font-semibold text-white"
-                      : "text-gray-700"
+                    ? "bg-[#01796f] font-semibold text-white"
+                    : "text-gray-700"
                     }`}
                 >
                   {day}
@@ -197,9 +193,6 @@ export default function AttendanceCalendar() {
               {selectedDate || "Select a date"}
             </h3>
 
-            {/* <p className="text-xs text-gray-500">
-              Attendance records
-            </p> */}
           </div>
 
           {selectedDate && (
@@ -247,13 +240,6 @@ export default function AttendanceCalendar() {
           </div>
         )}
       </div>
-
-      {/* Legend */}
-      {/* <div className="mt-5 flex gap-5 border-t border-gray-100 pt-4 text-xs text-gray-600">
-        <span>🟢 Present</span>
-        <span>🟡 Late</span>
-        <span>🔴 Absent</span>
-      </div> */}
 
     </div>
   );
