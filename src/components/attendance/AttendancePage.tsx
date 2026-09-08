@@ -2,6 +2,10 @@ import Link from "next/link";
 import {
   GraduationCap,
   Users,
+  CheckCircle2,
+  XCircle,
+  Clock3,
+  TrendingUp,
 } from "lucide-react";
 
 import AttendanceCalendar from "@/components/attendance/AttendanceCalendar";
@@ -14,21 +18,29 @@ export default function AttendancePage() {
       title: "Present",
       value: "360",
       description: "Students & teachers",
+      icon: CheckCircle2,
+
     },
     {
       title: "Absent",
       value: "40",
       description: "Students & teachers",
+      icon: XCircle,
+
     },
     {
       title: "Late",
       value: "15",
       description: "Students & teachers",
+      icon: Clock3,
+
     },
     {
       title: "Attendance Rate",
       value: "90%",
       description: "Overall attendance",
+      icon: TrendingUp,
+
     },
   ];
 
@@ -48,11 +60,16 @@ export default function AttendancePage() {
 
       {/* Stats */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {stats.map((stat) => (
-          <div
-            key={stat.title}
-            className="rounded-2xl border border-gray-200 bg-white p-5"
-          >
+  {stats.map((stat) => {
+    const Icon = stat.icon;
+
+    return (
+      <div
+        key={stat.title}
+        className="rounded-2xl border border-gray-200 bg-white p-5"
+      >
+        <div className="flex items-start justify-between">
+          <div>
             <p className="text-sm font-medium text-gray-500">
               {stat.title}
             </p>
@@ -60,13 +77,20 @@ export default function AttendancePage() {
             <h2 className="mt-2 text-2xl font-bold text-gray-900">
               {stat.value}
             </h2>
-
-            <p className="mt-3 text-sm text-gray-500">
-              {stat.description}
-            </p>
           </div>
-        ))}
+
+          <div className="rounded-xl bg-[#e6f4f2] p-2.5 text-[#01796f]">
+            <Icon size={20} />
+          </div>
+        </div>
+
+        <p className="mt-3 text-sm text-gray-500">
+          {stat.description}
+        </p>
       </div>
+    );
+  })}
+</div>
 
       {/* Attendance Type */}
       <div>
