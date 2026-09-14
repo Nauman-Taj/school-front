@@ -54,7 +54,7 @@ export default function StudentForm({
   return (      
     <form
       onSubmit={handleSubmit}
-      className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm sm:p-8"
+      className="rounded-2xl max-w-5xl border border-gray-100 bg-white p-6 shadow-sm sm:p-8"
     >
       <div className="grid gap-5 sm:grid-cols-2">
 

@@ -80,7 +80,7 @@ export default function TeacherForm({
       {/* Form */}
       <form
         onSubmit={handleSubmit}
-        className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm"
+        className="rounded-2xl max-w-5xl border border-gray-200 bg-white p-6 shadow-sm"
       >
         <div className="grid gap-5 sm:grid-cols-2">
           {/* Full Name */}

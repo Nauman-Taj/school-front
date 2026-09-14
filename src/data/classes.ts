@@ -1,0 +1,68 @@
+import { SchoolClass } from "@/types/class";
+
+export const classes: SchoolClass[] = [
+  {
+    id: 1,
+    name: "10",
+    section: "A",
+    teacher: "Ayesha Khan",
+    room: "101",
+    status: "Active",
+  },
+  {
+    id: 2,
+    name: "10",
+    section: "B",
+    teacher: "Hassan Ali",
+    room: "102",
+    status: "Active",
+  },
+  {
+    id: 3,
+    name: "9",
+    section: "A",
+    teacher: "Fatima Noor",
+    room: "103",
+    status: "Active",
+  },
+  {
+    id: 4,
+    name: "9",
+    section: "B",
+    teacher: "Bilal Raza",
+    room: "104",
+    status: "Active",
+  },
+  {
+    id: 5,
+    name: "8",
+    section: "A",
+    teacher: "Sara Ahmad",
+    room: "201",
+    status: "Active",
+  },
+  {
+    id: 6,
+    name: "8",
+    section: "B",
+    teacher: "Muhammad Usman",
+    room: "202",
+    status: "Active",
+  },
+  {
+    id: 7,
+    name: "5",
+    section: "A",
+    teacher: "Zainab Malik",
+    room: "203",
+    status: "Active",
+  },
+  {
+    id: 8,
+    name: "5",
+    section: "B",
+    teacher: "Omar Farooq",
+    room: "204",
+    status: "Active",
+  },
+];
