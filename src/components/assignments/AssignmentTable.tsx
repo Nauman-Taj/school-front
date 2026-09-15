@@ -67,7 +67,7 @@ export default function AssignmentTable() {
 
         <Link
           href="/dashboard/assignments/add"
-          className="inline-flex items-center justify-center gap-2 rounded-full bg-[#01796F] px-4 py-2.5 text-sm font-medium text-white transition hover:bg-[#015f58]"
+          className="inline-flex w-fit items-center justify-center gap-2 rounded-full bg-[#01796F] px-4 py-2.5 text-sm font-medium text-white transition hover:bg-[#015f58]"
         >
           <Plus size={17} />
           Add Assignment
