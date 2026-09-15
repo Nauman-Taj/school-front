@@ -3,7 +3,7 @@ import {
   ArrowLeft,
   Pencil,
   BookOpen,
-  Hash,
+  CaseSensitive,
   GraduationCap,
   UserRound,
 } from "lucide-react";
@@ -81,7 +81,7 @@ export default function SubjectProfile({
           {/* Code */}
           <div className="flex items-start gap-3">
             <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#e6f4f2] text-[#01796F]">
-              <Hash size={17} />
+              <CaseSensitive size={17} />
             </div>
 
             <div>

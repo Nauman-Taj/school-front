@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import {
   ArrowLeft,
+  CaseSensitive,
   BookOpen,
   GraduationCap,
   UserRound,
@@ -92,10 +93,10 @@ export default function SubjectForm({
             </label>
 
             <div className="relative">
-              {/* <Hash
+              <CaseSensitive
                 size={17}
                 className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
-              /> */}
+              />
 
               <input
                 id="code"
@@ -104,7 +105,7 @@ export default function SubjectForm({
                 defaultValue={subject?.code || ""}
                 placeholder="e.g. ISL"
                 required
-                className="w-full rounded-xl border border-gray-200 py-2.5 pl-3 pr-4 text-sm text-gray-900 outline-none transition placeholder:text-gray-400 focus:border-[#01796F] focus:ring-2 focus:ring-[#01796F]/10"
+                className="w-full rounded-xl border border-gray-200 py-2.5 pl-10 pr-4 text-sm text-gray-900 outline-none transition placeholder:text-gray-400 focus:border-[#01796F] focus:ring-2 focus:ring-[#01796F]/10"
               />
             </div>
           </div>
