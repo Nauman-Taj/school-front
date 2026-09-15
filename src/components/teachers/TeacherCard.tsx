@@ -94,7 +94,7 @@ export default function TeacherCard({
         <button
           type="button"
           onClick={() => onDelete(teacher.id, teacher.name)}
-          className="flex items-center justify-center rounded-full border border-gray-200 px-3 py-2.5 text-gray-500 transition hover:border-red-200 hover:bg-red-50 hover:text-red-600"
+          className="flex items-center justify-center rounded-xl  border-gray-200 px-3 py-2.5 text-gray-500 transition hover:border-red-200 hover:bg-red-50 hover:text-red-600"
           aria-label={`Delete ${teacher.name}`}
         >
           <Trash2 size={17} strokeWidth={1.8} />
