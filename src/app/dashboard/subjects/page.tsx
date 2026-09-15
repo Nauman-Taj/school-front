@@ -1,3 +1,5 @@
-export default function Page() {
-  return <div>Coming soon</div>;
+import SubjectTable from "@/components/subjects/SubjectTable";
+
+export default function SubjectsPage() {
+  return <SubjectTable />;
 }
