@@ -77,7 +77,7 @@ export default function SubjectTable() {
       </div>
 
       {/* Table */}
-      <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white">
+      <div className="hidden overflow-hidden rounded-2xl border border-gray-200 bg-white md:block">
         <div className="overflow-x-auto">
           <table className="w-full min-w-[750px]">
             <thead>

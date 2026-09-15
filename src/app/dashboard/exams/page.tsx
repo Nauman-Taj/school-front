@@ -1,3 +1,5 @@
-export default function Page() {
-  return <div>Coming soon</div>;
+import ExamTable from "@/components/exams/ExamTable";
+
+export default function ExamsPage() {
+  return <ExamTable />;
 }

@@ -5,15 +5,15 @@ import {
   ArrowLeft,
   BookOpen,
   CalendarDays,
-  ClipboardList,
+  ClipboardCheck,
   GraduationCap,
   UserRound,
 } from "lucide-react";
 
-import { Assignment } from "@/types/assignment";
+import { Exam } from "@/types/exam";
 
-type AssignmentFormProps = {
-  assignment?: Assignment;
+type ExamFormProps = {
+  exam?: Exam;
   isEdit?: boolean;
 };
 
@@ -48,19 +48,17 @@ const teachers = [
   "Omar Farooq",
 ];
 
-const statuses = ["Pending", "Submitted", "Overdue"];
-
-export default function AssignmentForm({
-  assignment,
+export default function ExamForm({
+  exam,
   isEdit = false,
-}: AssignmentFormProps) {
+}: ExamFormProps) {
   const router = useRouter();
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     // Backend/API will be added here later.
-    router.push("/dashboard/assignments");
+    router.push("/dashboard/exams");
   };
 
   return (
@@ -68,24 +66,24 @@ export default function AssignmentForm({
       {/* Back */}
       <button
         type="button"
-        onClick={() => router.push("/dashboard/assignments")}
+        onClick={() => router.push("/dashboard/exams")}
         className="inline-flex items-center gap-2 text-sm font-medium text-gray-500 transition hover:text-[#01796F]"
       >
         <ArrowLeft size={17} />
-        Back to Assignments
+        Back to Exams
       </button>
 
       {/* Header */}
       <div>
         <h1 className="text-2xl font-bold text-gray-900">
-          {isEdit ? "Edit Assignment" : "Add Assignment"}
+          {isEdit ? "Edit Exam" : "Add Exam"}
         </h1>
 
-        {/* <p className="mt-1 text-sm text-gray-500">
+        <p className="mt-1 text-sm text-gray-500">
           {isEdit
-            ? "Update the assignment details."
-            : "Create a new assignment for a class."}
-        </p> */}
+            ? "Update the examination details."
+            : "Create a new examination."}
+        </p>
       </div>
 
       {/* Form */}
@@ -94,27 +92,27 @@ export default function AssignmentForm({
         className="rounded-2xl max-w-5xl border border-gray-200 bg-white p-6"
       >
         <div className="grid gap-5 sm:grid-cols-2">
-          {/* Title */}
+          {/* Exam Name */}
           <div className="sm:col-span-2">
             <label
-              htmlFor="title"
+              htmlFor="name"
               className="mb-2 block text-sm font-medium text-gray-700"
             >
-              Assignment Title
+              Exam Name
             </label>
 
             <div className="relative">
-              <ClipboardList
+              <ClipboardCheck
                 size={18}
                 className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
               />
 
               <input
-                id="title"
-                name="title"
+                id="name"
+                name="name"
                 type="text"
-                defaultValue={assignment?.title}
-                placeholder="Enter assignment title"
+                defaultValue={exam?.name}
+                placeholder="Enter exam name"
                 required
                 className="w-full rounded-xl border border-gray-200 py-3 pl-10 pr-4 text-sm outline-none transition focus:border-[#01796F] focus:ring-2 focus:ring-[#01796F]/10"
               />
@@ -139,7 +137,7 @@ export default function AssignmentForm({
               <select
                 id="subject"
                 name="subject"
-                defaultValue={assignment?.subject ?? ""}
+                defaultValue={exam?.subject ?? ""}
                 required
                 className="w-full appearance-none rounded-xl border border-gray-200 bg-white py-3 pl-10 pr-4 text-sm outline-none transition focus:border-[#01796F] focus:ring-2 focus:ring-[#01796F]/10"
               >
@@ -172,7 +170,7 @@ export default function AssignmentForm({
               <select
                 id="className"
                 name="className"
-                defaultValue={assignment?.className ?? ""}
+                defaultValue={exam?.className ?? ""}
                 required
                 className="w-full appearance-none rounded-xl border border-gray-200 bg-white py-3 pl-10 pr-4 text-sm outline-none transition focus:border-[#01796F] focus:ring-2 focus:ring-[#01796F]/10"
               >
@@ -205,7 +203,7 @@ export default function AssignmentForm({
               <select
                 id="teacher"
                 name="teacher"
-                defaultValue={assignment?.teacher ?? ""}
+                defaultValue={exam?.teacher ?? ""}
                 required
                 className="w-full appearance-none rounded-xl border border-gray-200 bg-white py-3 pl-10 pr-4 text-sm outline-none transition focus:border-[#01796F] focus:ring-2 focus:ring-[#01796F]/10"
               >
@@ -220,13 +218,13 @@ export default function AssignmentForm({
             </div>
           </div>
 
-          {/* Due Date */}
+          {/* Exam Date */}
           <div>
             <label
-              htmlFor="dueDate"
+              htmlFor="examDate"
               className="mb-2 block text-sm font-medium text-gray-700"
             >
-              Due Date
+              Exam Date
             </label>
 
             <div className="relative">
@@ -236,14 +234,35 @@ export default function AssignmentForm({
               />
 
               <input
-                id="dueDate"
-                name="dueDate"
+                id="examDate"
+                name="examDate"
                 type="date"
-                defaultValue={assignment?.dueDate}
+                defaultValue={exam?.examDate}
                 required
                 className="w-full rounded-xl border border-gray-200 py-3 pl-10 pr-4 text-sm outline-none transition focus:border-[#01796F] focus:ring-2 focus:ring-[#01796F]/10"
               />
             </div>
+          </div>
+
+          {/* Total Marks */}
+          <div>
+            <label
+              htmlFor="totalMarks"
+              className="mb-2 block text-sm font-medium text-gray-700"
+            >
+              Total Marks
+            </label>
+
+            <input
+              id="totalMarks"
+              name="totalMarks"
+              type="number"
+              min="1"
+              defaultValue={exam?.totalMarks ?? 100}
+              placeholder="Enter total marks"
+              required
+              className="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm outline-none transition focus:border-[#01796F] focus:ring-2 focus:ring-[#01796F]/10"
+            />
           </div>
 
           {/* Status */}
@@ -258,12 +277,11 @@ export default function AssignmentForm({
             <select
               id="status"
               name="status"
-              defaultValue={assignment?.status ?? "Pending"}
+              defaultValue={exam?.status ?? "Upcoming"}
               className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm outline-none transition focus:border-[#01796F] focus:ring-2 focus:ring-[#01796F]/10"
             >
-              {statuses.map((status) => (
-                <option key={status}>{status}</option>
-              ))}
+              <option>Upcoming</option>
+              <option>Completed</option>
             </select>
           </div>
         </div>
@@ -272,17 +290,17 @@ export default function AssignmentForm({
         <div className="mt-6 flex flex-col-reverse gap-3 border-t border-gray-100 pt-6 sm:flex-row sm:justify-end">
           <button
             type="button"
-            onClick={() => router.push("/dashboard/assignments")}
-            className="rounded-full border border-gray-200 px-5 py-2.5 text-sm font-medium text-gray-600 transition hover:bg-gray-50"
+            onClick={() => router.push("/dashboard/exams")}
+            className="rounded-xl border border-gray-200 px-5 py-2.5 text-sm font-medium text-gray-600 transition hover:bg-gray-50"
           >
             Cancel
           </button>
 
           <button
             type="submit"
-            className="rounded-full bg-[#01796F] px-5 py-2.5 text-sm font-medium text-white transition hover:bg-[#015f58]"
+            className="rounded-xl bg-[#01796F] px-5 py-2.5 text-sm font-medium text-white transition hover:bg-[#015f58]"
           >
-            {isEdit ? "Update Assignment" : "Add Assignment"}
+            {isEdit ? "Update Exam" : "Add Exam"}
           </button>
         </div>
       </form>
