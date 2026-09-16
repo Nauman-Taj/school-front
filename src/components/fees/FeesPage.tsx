@@ -1,121 +1,117 @@
-export default function Page() {
-  return <div>Coming soon</div>;
+"use client";
+
+import {
+    CircleDollarSign,
+    Clock3,
+    Plus,
+    CreditCard,
+    AlertCircle,
+} from "lucide-react";
+
+import Link from "next/link";
+import { fees } from "@/data/fees";
+import FeeTable from "./FeeTable";
+
+export default function FeesPage() {
+    const totalFees = fees.reduce(
+        (total, fee) => total + fee.amount,
+        0
+    );
+
+    const paidFees = fees
+        .filter((fee) => fee.status === "Paid")
+        .reduce((total, fee) => total + fee.amount, 0);
+
+    const pendingFees = fees
+        .filter((fee) => fee.status === "Pending")
+        .reduce((total, fee) => total + fee.amount, 0);
+
+    const overdueFees = fees
+        .filter((fee) => fee.status === "Overdue")
+        .reduce((total, fee) => total + fee.amount, 0);
+
+    const stats = [
+        {
+            title: "Total Fees",
+            value: `Rs. ${totalFees.toLocaleString()}`,
+            icon: CircleDollarSign,
+            description: "Total fee amount",
+        },
+        {
+            title: "Collected",
+            value: `Rs. ${paidFees.toLocaleString()}`,
+            icon: CreditCard,
+            description: "Fees collected",
+        },
+        {
+            title: "Pending",
+            value: `Rs. ${pendingFees.toLocaleString()}`,
+            icon: Clock3,
+            description: "Awaiting payment",
+        },
+        {
+            title: "Overdue",
+            value: `Rs. ${overdueFees.toLocaleString()}`,
+            icon: AlertCircle,
+            description: "Past due payments",
+        },
+    ];
+
+    return (
+        <div className="space-y-5">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+
+                <div>
+                    <h1 className="text-2xl font-bold text-gray-900">
+                        Fees
+                    </h1>
+
+                    <p className="mt-1 text-sm text-gray-500">
+                        Manage and track student fee payments.
+                    </p>
+                </div>
+                <Link
+                    href="/dashboard/fees/add"
+                    className="inline-flex w-fit items-center gap-2 rounded-full bg-[#01796f] px-4 py-2.5 text-sm font-medium text-white transition hover:bg-[#01665d]"
+                >
+                    <Plus size={17} />
+                    Add Fee
+                </Link>
+            </div>
+
+            {/* Stats */}
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                {stats.map((stat) => {
+                    const Icon = stat.icon;
+
+                    return (
+                        <div
+                            key={stat.title}
+                            className="rounded-2xl border border-gray-200 bg-white p-5"
+                        >
+                            <div className="flex items-start justify-between">
+                                <div>
+                                    <p className="text-sm font-medium text-gray-500">
+                                        {stat.title}
+                                    </p>
+
+                                    <h2 className="mt-2 text-2xl font-bold text-gray-900">
+                                        {stat.value}
+                                    </h2>
+                                </div>
+                                <div className="rounded-xl bg-[#e6f4f2] p-2.5 text-[#01796f]">
+                                    <Icon size={20} />
+                                </div>
+                            </div>
+                            <p className="mt-3 text-sm text-gray-500">
+                                {stat.description}
+                            </p>
+                        </div>
+                    );
+                })}
+            </div>
+
+            <FeeTable />
+        </div>
+    );
 }
-
-// "use client";
-
-// import {
-//     CircleDollarSign,
-//     Clock3,
-//     Plus,
-//     CreditCard,
-//     AlertCircle,
-// } from "lucide-react";
-
-// import Link from "next/link";
-// import { fees } from "@/data/fees";
-// import FeeTable from "./FeeTable";
-
-// export default function FeesPage() {
-//     const totalFees = fees.reduce(
-//         (total, fee) => total + fee.amount,
-//         0
-//     );
-
-//     const paidFees = fees
-//         .filter((fee) => fee.status === "Paid")
-//         .reduce((total, fee) => total + fee.amount, 0);
-
-//     const pendingFees = fees
-//         .filter((fee) => fee.status === "Pending")
-//         .reduce((total, fee) => total + fee.amount, 0);
-
-//     const overdueFees = fees
-//         .filter((fee) => fee.status === "Overdue")
-//         .reduce((total, fee) => total + fee.amount, 0);
-
-//     const stats = [
-//         {
-//             title: "Total Fees",
-//             value: `Rs. ${totalFees.toLocaleString()}`,
-//             icon: CircleDollarSign,
-//             description: "Total fee amount",
-//         },
-//         {
-//             title: "Collected",
-//             value: `Rs. ${paidFees.toLocaleString()}`,
-//             icon: CreditCard,
-//             description: "Fees collected",
-//         },
-//         {
-//             title: "Pending",
-//             value: `Rs. ${pendingFees.toLocaleString()}`,
-//             icon: Clock3,
-//             description: "Awaiting payment",
-//         },
-//         {
-//             title: "Overdue",
-//             value: `Rs. ${overdueFees.toLocaleString()}`,
-//             icon: AlertCircle,
-//             description: "Past due payments",
-//         },
-//     ];
-
-//     return (
-//         <div className="space-y-5">
-//             <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-
-//                 <div>
-//                     <h1 className="text-2xl font-bold text-gray-900">
-//                         Fees
-//                     </h1>
-
-//                     <p className="mt-1 text-sm text-gray-500">
-//                         Manage and track student fee payments.
-//                     </p>
-//                 </div>
-//                 <Link
-//                     href="/dashboard/fees/add"
-//                     className="inline-flex w-fit items-center gap-2 rounded-full bg-[#01796f] px-4 py-2.5 text-sm font-medium text-white transition hover:bg-[#01665d]"
-//                 >
-//                     <Plus size={17} />
-//                     Add Fee
-//                 </Link>
-//             </div>
-
-//             {/* Stats */}
-//             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-//                 {stats.map((stat) => {
-//                     const Icon = stat.icon;
-
-//                     return (
-//                         <div
-//                             key={stat.title}
-//                             className="rounded-2xl border border-gray-200 bg-white p-5"
-//                         >
-//                             <div className="flex items-start justify-between">
-//                                 <div>
-//                                     <p className="text-sm font-medium text-gray-500">
-//                                         {stat.title}
-//                                     </p>
-
-//                                     <h2 className="mt-2 text-2xl font-bold text-gray-900">
-//                                         {stat.value}
-//                                     </h2>
-//                                 </div>
-//                                 <div className="rounded-xl bg-[#e6f4f2] p-2.5 text-[#01796f]">
-//                                     <Icon size={20} />
-//                                 </div>
-//                             </div>
-//                             <p className="mt-3 text-sm text-gray-500">
-//                                 {stat.description}
-//                             </p>
-//                         </div>
-//                     );
-//                 })}
-//             </div>
-
-//             <FeeTable />
-//         </div>
-//     );
-// }
