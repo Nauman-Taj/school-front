@@ -62,7 +62,7 @@ export default function ExamForm({
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-5">
       {/* Back */}
       <button
         type="button"
@@ -79,11 +79,11 @@ export default function ExamForm({
           {isEdit ? "Edit Exam" : "Add Exam"}
         </h1>
 
-        <p className="mt-1 text-sm text-gray-500">
+        {/* <p className="mt-1 text-sm text-gray-500">
           {isEdit
             ? "Update the examination details."
             : "Create a new examination."}
-        </p>
+        </p> */}
       </div>
 
       {/* Form */}
@@ -291,14 +291,14 @@ export default function ExamForm({
           <button
             type="button"
             onClick={() => router.push("/dashboard/exams")}
-            className="rounded-xl border border-gray-200 px-5 py-2.5 text-sm font-medium text-gray-600 transition hover:bg-gray-50"
+            className="rounded-full border border-gray-200 px-5 py-2.5 text-sm font-medium text-gray-600 transition hover:bg-gray-50"
           >
             Cancel
           </button>
 
           <button
             type="submit"
-            className="rounded-xl bg-[#01796F] px-5 py-2.5 text-sm font-medium text-white transition hover:bg-[#015f58]"
+            className="rounded-full bg-[#01796F] px-5 py-2.5 text-sm font-medium text-white transition hover:bg-[#015f58]"
           >
             {isEdit ? "Update Exam" : "Add Exam"}
           </button>

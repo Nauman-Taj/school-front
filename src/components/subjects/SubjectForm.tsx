@@ -29,7 +29,7 @@ export default function SubjectForm({
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-5">
       {/* Back */}
       <button
         type="button"
@@ -55,7 +55,7 @@ export default function SubjectForm({
 
       {/* Form */}
       <div className="rounded-2xl max-w-5xl border border-gray-200 bg-white p-6">
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <form onSubmit={handleSubmit} className="space-y-5">
           {/* Subject Name */}
           <div>
             <label

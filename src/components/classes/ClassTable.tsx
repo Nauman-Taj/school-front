@@ -44,7 +44,7 @@ export default function ClassTable() {
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-5">
 
       {/* Search */}
       <div className="relative">

@@ -22,7 +22,7 @@ const statusStyles = {
 
 export default function ExamProfile({ exam }: ExamProfileProps) {
   return (
-    <div className="space-y-6">
+    <div className="space-y-5">
       {/* Back */}
       <Link
         href="/dashboard/exams"
@@ -53,7 +53,7 @@ export default function ExamProfile({ exam }: ExamProfileProps) {
 
           <Link
             href={`/dashboard/exams/${exam.id}/edit`}
-            className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#01796F] px-4 py-2.5 text-sm font-medium text-white transition hover:bg-[#015f58]"
+            className="inline-flex items-center justify-center gap-2 rounded-full bg-[#01796F] px-4 py-2.5 text-sm font-medium text-white transition hover:bg-[#015f58]"
           >
             <Pencil size={17} />
             Edit Exam

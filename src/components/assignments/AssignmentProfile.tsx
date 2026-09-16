@@ -25,7 +25,7 @@ export default function AssignmentProfile({
   assignment,
 }: AssignmentProfileProps) {
   return (
-    <div className="space-y-6">
+    <div className="space-y-5">
       {/* Back */}
       <Link
         href="/dashboard/assignments"

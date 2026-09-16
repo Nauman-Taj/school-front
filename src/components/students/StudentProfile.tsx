@@ -17,7 +17,7 @@ export default function StudentProfile({
   student,
 }: StudentProfileProps) {
   return (
-    <div className="space-y-6">
+    <div className="space-y-5">
 
       {/* Back */}
       <Link

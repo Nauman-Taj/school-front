@@ -18,7 +18,7 @@ export default function SubjectProfile({
   subject,
 }: SubjectProfileProps) {
   return (
-    <div className="space-y-6">
+    <div className="space-y-5">
       {/* Back */}
       <Link
         href="/dashboard/subjects"

@@ -27,7 +27,7 @@ export default function TeacherDetails({
     return null;
   }
   return (
-    <div className="space-y-6">
+    <div className="space-y-5">
 
       {/* Back */}
       <Link
