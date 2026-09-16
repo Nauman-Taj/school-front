@@ -3,7 +3,7 @@ import { SchoolClass } from "@/types/class";
 export const classes: SchoolClass[] = [
   {
     id: 1,
-    name: "10",
+    name: "Grade 10",
     section: "A",
     teacher: "Ayesha Khan",
     room: "101",
@@ -11,7 +11,7 @@ export const classes: SchoolClass[] = [
   },
   {
     id: 2,
-    name: "10",
+    name: "Grade 10",
     section: "B",
     teacher: "Hassan Ali",
     room: "102",
@@ -19,7 +19,7 @@ export const classes: SchoolClass[] = [
   },
   {
     id: 3,
-    name: "9",
+    name: "Grade 9",
     section: "A",
     teacher: "Fatima Noor",
     room: "103",
@@ -27,7 +27,7 @@ export const classes: SchoolClass[] = [
   },
   {
     id: 4,
-    name: "9",
+    name: "Grade 9",
     section: "B",
     teacher: "Bilal Raza",
     room: "104",
@@ -35,7 +35,7 @@ export const classes: SchoolClass[] = [
   },
   {
     id: 5,
-    name: "8",
+    name: "Grade 8",
     section: "A",
     teacher: "Sara Ahmad",
     room: "201",
@@ -43,7 +43,7 @@ export const classes: SchoolClass[] = [
   },
   {
     id: 6,
-    name: "8",
+    name: "Grade 8",
     section: "B",
     teacher: "Muhammad Usman",
     room: "202",
@@ -51,7 +51,7 @@ export const classes: SchoolClass[] = [
   },
   {
     id: 7,
-    name: "5",
+    name: "Grade 5",
     section: "A",
     teacher: "Zainab Malik",
     room: "203",
@@ -59,7 +59,7 @@ export const classes: SchoolClass[] = [
   },
   {
     id: 8,
-    name: "5",
+    name: "Grade 5",
     section: "B",
     teacher: "Omar Farooq",
     room: "204",

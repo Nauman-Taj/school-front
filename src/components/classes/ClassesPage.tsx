@@ -109,21 +109,7 @@ export default function ClassesPage() {
         })}
       </div>
 
-      {/* Classes */}
-      <div>
-        <div className="mb-4">
-          <h2 className="text-lg font-semibold text-gray-900">
-            Class List
-          </h2>
-
-          {/* <p className="mt-1 text-sm text-gray-500">
-            View and manage all school classes.
-          </p> */}
-        </div>
-
-        <ClassTable />
-      </div>
-
+      <ClassTable />
     </div>
   );
 }

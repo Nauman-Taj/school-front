@@ -106,7 +106,7 @@ export default function ClassTable() {
                 >
                   {/* Class */}
                   <td className="px-5 py-4 font-medium text-gray-900">
-                    Grade {schoolClass.name}
+                    {schoolClass.name}
                   </td>
 
                   {/* Section */}
@@ -188,7 +188,7 @@ export default function ClassTable() {
             <div className="flex items-start justify-between">
               <div>
                 <h3 className="font-semibold text-gray-900">
-                  Grade {schoolClass.name} - {schoolClass.section}
+                  {schoolClass.name} - {schoolClass.section}
                 </h3>
 
                 <p className="mt-1 text-sm text-gray-500">

@@ -1,3 +1,5 @@
-export default function Page() {
-  return <div>Coming soon</div>;
+import FeesPage from "@/components/fees/FeesPage";
+
+export default function FeesPageRoute() {
+  return <FeesPage />;
 }
