@@ -1,0 +1,58 @@
+import { Transport } from "@/types/transport";
+
+export const transport: Transport[] = [
+  {
+    id: 1,
+    vehicleNumber: "GGS-101",
+    vehicleType: "School Bus",
+    driver: "Muhammad Ali",
+    route: "Cantt - School",
+    capacity: 40,
+    status: "Active",
+  },
+  {
+    id: 2,
+    vehicleNumber: "GGS-102",
+    vehicleType: "School Bus",
+    driver: "Ahmed Raza",
+    route: "Bosan Road - School",
+    capacity: 45,
+    status: "Active",
+  },
+  {
+    id: 3,
+    vehicleNumber: "GGS-103",
+    vehicleType: "Coaster",
+    driver: "Usman Khan",
+    route: "Gulgasht - School",
+    capacity: 30,
+    status: "Maintenance",
+  },
+  {
+    id: 4,
+    vehicleNumber: "GGS-104",
+    vehicleType: "School Van",
+    driver: "Bilal Ahmad",
+    route: "Shah Rukn-e-Alam - School",
+    capacity: 15,
+    status: "Active",
+  },
+  {
+    id: 5,
+    vehicleNumber: "GGS-105",
+    vehicleType: "School Van",
+    driver: "Hassan Raza",
+    route: "Mumtazabad - School",
+    capacity: 15,
+    status: "Inactive",
+  },
+  {
+    id: 6,
+    vehicleNumber: "GGS-106",
+    vehicleType: "Coaster",
+    driver: "Sajid Hussain",
+    route: "Vehari Road - School",
+    capacity: 30,
+    status: "Active",
+  },
+];
