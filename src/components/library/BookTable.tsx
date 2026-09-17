@@ -202,7 +202,7 @@ export default function BookTable() {
             </div>
 
             {/* Actions */}
-            <div className="mt-4 flex justify-end border-t border-gray-100 pt-3">
+            <div className="mt-4 flex justify-center border-t border-gray-100 pt-3">
               <BookActions
                 bookId={book.id}
                 onDelete={handleDelete}
