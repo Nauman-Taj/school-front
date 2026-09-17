@@ -1,3 +1,5 @@
-export default function Page() {
-  return <div>Coming soon</div>;
+import NotificationList from "@/components/notifications/NotificationList";
+
+export default function NotificationsPage() {
+  return <NotificationList />;
 }
