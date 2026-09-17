@@ -180,7 +180,7 @@ export default function AnnouncementTable() {
                             </div>
                         </div>
 
-                        <div className="mt-4 flex justify-end border-t border-gray-100 pt-3">
+                        <div className="mt-4 flex justify-center border-t border-gray-100 pt-3">
                             <AnnouncementActions
                                 id={item.id}
                                 onDelete={handleDelete}
