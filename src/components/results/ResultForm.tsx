@@ -103,7 +103,7 @@ export default function ResultForm({ result }: ResultFormProps) {
 
       <form
         onSubmit={handleSubmit}
-        className="rounded-2xl border border-gray-200 bg-white p-6"
+        className="rounded-2xl max-w-5xl border border-gray-200 bg-white p-6"
       >
         <div className="grid gap-5 sm:grid-cols-2">
           {/* Student */}

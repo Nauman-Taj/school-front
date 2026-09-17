@@ -1,3 +1,5 @@
-export default function Page() {
-  return <div>Coming soon</div>;
+import LibraryPage from "@/components/library/LibraryPage";
+
+export default function LibraryRoute() {
+  return <LibraryPage />;
 }
