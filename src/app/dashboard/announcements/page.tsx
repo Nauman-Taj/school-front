@@ -1,20 +1,5 @@
-import AnnouncementList from "@/components/announcements/AnnouncementList";
+import AnnouncementsPage from "@/components/announcements/AnnouncementsPage";
 
-export default function AnnouncementsPage() {
-  return (
-    <main className="space-y-8">
-
-      <div>
-        <h1 className="text-2xl font-bold text-gray-900 sm:text-3xl">
-          Announcements
-        </h1>
-
-        <p className="mt-1 text-sm text-gray-500 sm:text-base">
-          Here are the latest announcements.
-        </p>
-      </div>
-
-      <AnnouncementList />
-    </main>
-  );
+export default function AnnouncementsRoute() {
+  return <AnnouncementsPage />;
 }

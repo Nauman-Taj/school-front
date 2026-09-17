@@ -7,45 +7,36 @@ import {
     Eye,
     Pencil,
     Trash2,
-    Bus,
+    Megaphone,
 } from "lucide-react";
 
-import { transport } from "@/data/transport";
-import { Transport } from "@/types/transport";
+import { announcements } from "@/data/announcements";
+import { Announcement } from "@/types/announcement";
 
-export default function TransportTable() {
-    const [vehicleList, setVehicleList] =
-        useState<Transport[]>(transport);
+export default function AnnouncementTable() {
+    const [announcementList, setAnnouncementList] =
+        useState<Announcement[]>(announcements);
 
     const [search, setSearch] = useState("");
 
-    const filteredVehicles = vehicleList.filter(
-        (vehicle) =>
-            vehicle.vehicleNumber
-                .toLowerCase()
-                .includes(search.toLowerCase()) ||
-            vehicle.vehicleType
-                .toLowerCase()
-                .includes(search.toLowerCase()) ||
-            vehicle.driver
-                .toLowerCase()
-                .includes(search.toLowerCase()) ||
-            vehicle.route
-                .toLowerCase()
-                .includes(search.toLowerCase())
+    const filteredAnnouncements = announcementList.filter(
+        (item) =>
+            item.title.toLowerCase().includes(search.toLowerCase()) ||
+            item.audience.toLowerCase().includes(search.toLowerCase()) ||
+            item.description.toLowerCase().includes(search.toLowerCase())
     );
 
     const handleDelete = (id: number) => {
-        const confirmed = window.confirm(
-            "Are you sure you want to delete this vehicle?"
-        );
+    const confirmed = window.confirm(
+      "Are you sure you want to delete this announcement?"
+    );
 
-        if (!confirmed) return;
+    if (!confirmed) return;
 
-        setVehicleList((current) =>
-            current.filter((vehicle) => vehicle.id !== id)
-        );
-    };
+    setAnnouncementList((current) =>
+      current.filter((item) => item.id !== id)
+    );
+  };
 
     return (
         <div className="space-y-5">
@@ -58,33 +49,29 @@ export default function TransportTable() {
 
                 <input
                     type="text"
-                    placeholder="Search vehicles"
+                    placeholder="Search announcements"
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
                     className="w-full rounded-full border border-gray-200 bg-white py-3 pl-11 pr-4 text-sm text-gray-900 outline-none transition placeholder:text-gray-400 focus:border-[#01796F] focus:ring-2 focus:ring-[#01796F]/10"
                 />
             </div>
 
-            {/* Desktop Table */}
+            {/* Desktop */}
             <div className="hidden overflow-hidden rounded-2xl border border-gray-200 bg-white md:block">
                 <div className="overflow-x-auto">
-                    <table className="w-full min-w-[850px] text-left">
+                    <table className="w-full min-w-[800px] text-left">
                         <thead className="border-b border-gray-200 bg-gray-50">
                             <tr>
                                 <th className="px-6 py-4 text-sm font-semibold text-gray-600">
-                                    Vehicle
+                                    Announcement
                                 </th>
 
                                 <th className="px-6 py-4 text-sm font-semibold text-gray-600">
-                                    Driver
+                                    Audience
                                 </th>
 
                                 <th className="px-6 py-4 text-sm font-semibold text-gray-600">
-                                    Route
-                                </th>
-
-                                <th className="px-6 py-4 text-sm font-semibold text-gray-600">
-                                    Capacity
+                                    Date
                                 </th>
 
                                 <th className="px-6 py-4 text-sm font-semibold text-gray-600">
@@ -98,48 +85,44 @@ export default function TransportTable() {
                         </thead>
 
                         <tbody className="divide-y divide-gray-100">
-                            {filteredVehicles.map((vehicle) => (
+                            {filteredAnnouncements.map((item) => (
                                 <tr
-                                    key={vehicle.id}
+                                    key={item.id}
                                     className="hover:bg-gray-50"
                                 >
                                     <td className="px-6 py-4">
                                         <div className="flex items-center gap-3">
                                             <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#e6f4f2] text-[#01796F]">
-                                                <Bus size={19} />
+                                                <Megaphone size={19} />
                                             </div>
 
                                             <div>
                                                 <p className="font-medium text-gray-900">
-                                                    {vehicle.vehicleNumber}
+                                                    {item.title}
                                                 </p>
 
-                                                <p className="text-sm text-gray-500">
-                                                    {vehicle.vehicleType}
+                                                <p className="mt-1 max-w-md truncate text-sm text-gray-500">
+                                                    {item.description}
                                                 </p>
                                             </div>
                                         </div>
                                     </td>
 
                                     <td className="px-6 py-4 text-sm text-gray-600">
-                                        {vehicle.driver}
+                                        {item.audience}
                                     </td>
 
                                     <td className="px-6 py-4 text-sm text-gray-600">
-                                        {vehicle.route}
-                                    </td>
-
-                                    <td className="px-6 py-4 text-sm text-gray-600">
-                                        {vehicle.capacity} seats
+                                        {item.date}
                                     </td>
 
                                     <td className="px-6 py-4">
-                                        <StatusBadge status={vehicle.status} />
+                                        <StatusBadge status={item.status} />
                                     </td>
 
                                     <td className="px-6 py-4">
-                                        <VehicleActions
-                                            vehicleId={vehicle.id}
+                                        <AnnouncementActions
+                                            id={item.id}
                                             onDelete={handleDelete}
                                         />
                                     </td>
@@ -150,66 +133,56 @@ export default function TransportTable() {
                 </div>
             </div>
 
-            {/* Mobile Cards */}
+            {/* Mobile */}
             <div className="space-y-4 md:hidden">
-                {filteredVehicles.map((vehicle) => (
+                {filteredAnnouncements.map((item) => (
                     <div
-                        key={vehicle.id}
+                        key={item.id}
                         className="rounded-2xl border border-gray-200 bg-white p-4"
                     >
                         <div className="flex items-start gap-3">
                             <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[#e6f4f2] text-[#01796F]">
-                                <Bus size={20} />
+                                <Megaphone size={20} />
                             </div>
 
                             <div className="min-w-0 flex-1">
                                 <h3 className="font-semibold text-gray-900">
-                                    {vehicle.vehicleNumber}
+                                    {item.title}
                                 </h3>
 
                                 <p className="mt-1 text-sm text-gray-500">
-                                    {vehicle.vehicleType}
+                                    {item.description}
                                 </p>
                             </div>
 
-                            <StatusBadge status={vehicle.status} />
+                            <StatusBadge status={item.status} />
                         </div>
 
                         <div className="mt-4 grid grid-cols-2 gap-3 border-t border-gray-100 pt-4">
                             <div>
                                 <p className="text-xs text-gray-400">
-                                    Driver
+                                    Audience
                                 </p>
 
                                 <p className="mt-1 text-sm font-medium text-gray-700">
-                                    {vehicle.driver}
+                                    {item.audience}
                                 </p>
                             </div>
 
                             <div>
                                 <p className="text-xs text-gray-400">
-                                    Capacity
+                                    Date
                                 </p>
 
                                 <p className="mt-1 text-sm font-medium text-gray-700">
-                                    {vehicle.capacity} seats
-                                </p>
-                            </div>
-
-                            <div className="col-span-2">
-                                <p className="text-xs text-gray-400">
-                                    Route
-                                </p>
-
-                                <p className="mt-1 text-sm font-medium text-gray-700">
-                                    {vehicle.route}
+                                    {item.date}
                                 </p>
                             </div>
                         </div>
 
                         <div className="mt-4 flex justify-end border-t border-gray-100 pt-3">
-                            <VehicleActions
-                                vehicleId={vehicle.id}
+                            <AnnouncementActions
+                                id={item.id}
                                 onDelete={handleDelete}
                             />
                         </div>
@@ -217,9 +190,9 @@ export default function TransportTable() {
                 ))}
             </div>
 
-            {filteredVehicles.length === 0 && (
+            {filteredAnnouncements.length === 0 && (
                 <div className="rounded-2xl border border-gray-200 bg-white px-6 py-12 text-center text-sm text-gray-500">
-                    No vehicles found.
+                    No announcements found.
                 </div>
             )}
         </div>
@@ -229,15 +202,13 @@ export default function TransportTable() {
 function StatusBadge({
     status,
 }: {
-    status: Transport["status"];
+    status: Announcement["status"];
 }) {
     return (
         <span
-            className={`inline-flex rounded-full px-3 py-1 text-xs font-medium ${status === "Active"
-                ? "bg-green-50 text-green-600"
-                : status === "Maintenance"
-                    ? "bg-yellow-50 text-yellow-600"
-                    : "bg-red-50 text-red-600"
+            className={`inline-flex rounded-full px-3 py-1 text-xs font-medium ${status === "Published"
+                    ? "bg-green-50 text-green-600"
+                    : "bg-yellow-50 text-yellow-600"
                 }`}
         >
             {status}
@@ -245,31 +216,31 @@ function StatusBadge({
     );
 }
 
-function VehicleActions({
-    vehicleId,
+function AnnouncementActions({
+    id,
     onDelete,
 }: {
-    vehicleId: number;
+    id: number;
     onDelete: (id: number) => void;
 }) {
     return (
         <div className="flex items-center justify-center gap-2">
             <Link
-                href={`/dashboard/transport/${vehicleId}`}
+                href={`/dashboard/announcements/${id}`}
                 className="rounded-lg p-2 text-gray-500 transition hover:bg-[#01796F]/10 hover:text-[#01796F]"
             >
                 <Eye size={17} />
             </Link>
 
             <Link
-                href={`/dashboard/transport/${vehicleId}/edit`}
+                href={`/dashboard/announcements/${id}/edit`}
                 className="rounded-lg p-2 text-gray-500 transition hover:bg-[#01796F]/10 hover:text-[#01796F]"
             >
                 <Pencil size={17} />
             </Link>
 
             <button
-                onClick={() => onDelete(vehicleId)}
+                onClick={() => onDelete(id)}
                 className="rounded-lg p-2 text-gray-500 transition hover:bg-red-50 hover:text-red-500"
             >
                 <Trash2 size={17} />
