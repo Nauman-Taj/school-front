@@ -14,7 +14,7 @@ export const transport: Transport[] = [
     id: 2,
     vehicleNumber: "GGS-102",
     vehicleType: "School Bus",
-    driver: "Ahmed Raza",
+    driver: "Ahmad Raza",
     route: "Bosan Road - School",
     capacity: 45,
     status: "Active",

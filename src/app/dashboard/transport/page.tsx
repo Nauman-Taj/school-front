@@ -1,3 +1,5 @@
-export default function Page() {
-  return <div>Coming soon</div>;
+import TransportPage from "@/components/transport/TransportPage";
+
+export default function TransportRoute() {
+  return <TransportPage />;
 }
