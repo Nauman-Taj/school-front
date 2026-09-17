@@ -17,15 +17,25 @@ export default function AnnouncementProfile({
   announcement,
 }: AnnouncementProfileProps) {
   return (
-    <div className="space-y-6">
+    <div className="space-y-5">
+      <Link
+        href="/dashboard/announcements"
+        className="inline-flex items-center gap-2 text-sm font-medium text-gray-500 transition hover:text-[#01796F]"
+      >
+        <ArrowLeft size={17} />
+        Back to Announcements
+      </Link>
+
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <Link
-          href="/dashboard/announcements"
-          className="inline-flex items-center gap-2 text-sm font-medium text-gray-500 transition hover:text-[#01796F]"
-        >
-          <ArrowLeft size={17} />
-          Back to Announcements
-        </Link>
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">
+            Announcement Details
+          </h1>
+
+          {/* <p className="mt-1 text-sm text-gray-500">
+            View announcement information.
+          </p> */}
+        </div>
 
         <Link
           href={`/dashboard/announcements/${announcement.id}/edit`}
@@ -36,15 +46,6 @@ export default function AnnouncementProfile({
         </Link>
       </div>
 
-      <div>
-        <h1 className="text-2xl font-bold text-gray-900">
-          Announcement Details
-        </h1>
-
-        <p className="mt-1 text-sm text-gray-500">
-          View announcement information.
-        </p>
-      </div>
 
       <div className="rounded-2xl border border-gray-200 bg-white p-5 sm:p-6">
         <div className="flex flex-col gap-4 border-b border-gray-100 pb-6 sm:flex-row sm:items-center">
@@ -113,11 +114,10 @@ function StatusBadge({
 }) {
   return (
     <span
-      className={`inline-flex w-fit rounded-full px-3 py-1 text-xs font-medium ${
-        status === "Published"
-          ? "bg-green-50 text-green-600"
-          : "bg-yellow-50 text-yellow-600"
-      }`}
+      className={`inline-flex w-fit rounded-full px-3 py-1 text-xs font-medium ${status === "Published"
+        ? "bg-green-50 text-green-600"
+        : "bg-yellow-50 text-yellow-600"
+        }`}
     >
       {status}
     </span>

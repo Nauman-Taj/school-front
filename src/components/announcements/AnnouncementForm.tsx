@@ -11,17 +11,40 @@ type AnnouncementFormProps = {
   announcement?: Announcement;
 };
 
+function formatDateForInput(date: string) {
+  const [day, month, year] = date.split(" ");
+
+  const months: Record<string, string> = {
+    Jan: "01",
+    Feb: "02",
+    Mar: "03",
+    Apr: "04",
+    May: "05",
+    Jun: "06",
+    Jul: "07",
+    Aug: "08",
+    Sep: "09",
+    Oct: "10",
+    Nov: "11",
+    Dec: "12",
+  };
+
+  return `${year}-${months[month]}-${day.padStart(2, "0")}`;
+}
+
 export default function AnnouncementForm({
   mode = "add",
   announcement,
 }: AnnouncementFormProps) {
   const [formData, setFormData] = useState({
-    title: announcement?.title ?? "",
-    description: announcement?.description ?? "",
-    audience: announcement?.audience ?? "",
-    date: announcement?.date ?? "",
-    status: announcement?.status ?? "Draft",
-  });
+  title: announcement?.title ?? "",
+  description: announcement?.description ?? "",
+  audience: announcement?.audience ?? "",
+  date: announcement?.date
+    ? formatDateForInput(announcement.date)
+    : "",
+  status: announcement?.status ?? "Draft",
+});
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
@@ -39,7 +62,7 @@ export default function AnnouncementForm({
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-5">
       <Link
         href="/dashboard/announcements"
         className="inline-flex items-center gap-2 text-sm font-medium text-gray-500 transition hover:text-[#01796F]"
@@ -55,11 +78,11 @@ export default function AnnouncementForm({
             : "Add Announcement"}
         </h1>
 
-        <p className="mt-1 text-sm text-gray-500">
+        {/* <p className="mt-1 text-sm text-gray-500">
           {mode === "edit"
             ? "Update the announcement information."
             : "Create a new school announcement."}
-        </p>
+        </p> */}
       </div>
 
       <form
@@ -157,14 +180,14 @@ export default function AnnouncementForm({
         <div className="mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
           <Link
             href="/dashboard/announcements"
-            className="inline-flex items-center justify-center rounded-xl border border-gray-200 px-5 py-2.5 text-sm font-medium text-gray-600 transition hover:bg-gray-50"
+            className="inline-flex items-center justify-center rounded-full border border-gray-200 px-5 py-2.5 text-sm font-medium text-gray-600 transition hover:bg-gray-50"
           >
             Cancel
           </Link>
 
           <button
             type="submit"
-            className="rounded-xl bg-[#01796F] px-5 py-2.5 text-sm font-medium text-white transition hover:bg-[#015f58]"
+            className="rounded-full bg-[#01796F] px-5 py-2.5 text-sm font-medium text-white transition hover:bg-[#015f58]"
           >
             {mode === "edit"
               ? "Update Announcement"

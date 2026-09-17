@@ -27,16 +27,16 @@ export default function AnnouncementTable() {
     );
 
     const handleDelete = (id: number) => {
-    const confirmed = window.confirm(
-      "Are you sure you want to delete this announcement?"
-    );
+        const confirmed = window.confirm(
+            "Are you sure you want to delete this announcement?"
+        );
 
-    if (!confirmed) return;
+        if (!confirmed) return;
 
-    setAnnouncementList((current) =>
-      current.filter((item) => item.id !== id)
-    );
-  };
+        setAnnouncementList((current) =>
+            current.filter((item) => item.id !== id)
+        );
+    };
 
     return (
         <div className="space-y-5">
@@ -92,12 +92,12 @@ export default function AnnouncementTable() {
                                 >
                                     <td className="px-6 py-4">
                                         <div className="flex items-center gap-3">
-                                            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#e6f4f2] text-[#01796F]">
+                                            <div className="flex shrink-0 items-center justify-center rounded-xl text-[#01796F]">
                                                 <Megaphone size={19} />
                                             </div>
 
                                             <div>
-                                                <p className="font-medium text-gray-900">
+                                                <p className="font-medium text- text-gray-900">
                                                     {item.title}
                                                 </p>
 
@@ -207,8 +207,8 @@ function StatusBadge({
     return (
         <span
             className={`inline-flex rounded-full px-3 py-1 text-xs font-medium ${status === "Published"
-                    ? "bg-green-50 text-green-600"
-                    : "bg-yellow-50 text-yellow-600"
+                ? "bg-green-50 text-green-600"
+                : "bg-yellow-50 text-yellow-600"
                 }`}
         >
             {status}

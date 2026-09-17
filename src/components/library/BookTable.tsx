@@ -99,8 +99,8 @@ export default function BookTable() {
                 >
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-3">
-                      <div className="flex  shrink-0 items-center justify-center rounded-xl bg-[#e6f4f2] text-[#01796F]">
-                        <BookOpen size={17} />
+                      <div className="flex  shrink-0 items-center justify-center rounded-xl text-[#01796F]">
+                        <BookOpen size={19} />
                       </div>
 
                       <span className="font-medium text-sm text-gray-900">
