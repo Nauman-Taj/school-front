@@ -207,7 +207,7 @@ export default function TransportTable() {
                             </div>
                         </div>
 
-                        <div className="mt-4 flex justify-end border-t border-gray-100 pt-3">
+                        <div className="mt-4 flex justify-center border-t border-gray-100 pt-3">
                             <VehicleActions
                                 vehicleId={vehicle.id}
                                 onDelete={handleDelete}
