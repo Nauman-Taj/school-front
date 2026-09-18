@@ -125,7 +125,7 @@ export default function UserSettings() {
           onClick={() => setShowConfirm(true)}
           className="inline-flex items-center gap-2 rounded-full bg-[#01796f] px-5 py-2.5 text-sm font-medium text-white transition hover:bg-[#01665d]"
         >
-          <Save size={17} />
+          {/* <Save size={17} /> */}
           Save Changes
         </button>
       </div>
