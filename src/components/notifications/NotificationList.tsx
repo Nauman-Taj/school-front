@@ -84,7 +84,7 @@ export default function NotificationList() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-5">
       {/* Header */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
@@ -108,7 +108,7 @@ export default function NotificationList() {
         {unreadCount > 0 && (
           <button
             onClick={markAllAsRead}
-            className="flex items-center justify-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 transition hover:border-[#01796f] hover:text-[#01796f]"
+            className="flex items-center justify-center gap-2 rounded-full border border-gray-200 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 transition hover:border-[#01796f] hover:text-[#01796f]"
           >
             <CheckCheck size={17} />
             Mark all as read
@@ -120,25 +120,25 @@ export default function NotificationList() {
       <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
         <div className="relative flex-1">
           <Search
-            size={18}
+            size={17}
             className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
           />
 
           <input
             type="text"
-            placeholder="Search notifications..."
+            placeholder="Search notifications"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full rounded-xl border border-gray-200 bg-white py-3 pl-11 pr-4 text-sm outline-none transition focus:border-[#01796f] focus:ring-1 focus:ring-[#01796f]"
+            className="w-full rounded-full border border-gray-200 bg-white py-3 pl-11 pr-4 text-sm text-gray-900 outline-none transition placeholder:text-gray-400 focus:border-[#01796f] focus:ring-2 focus:ring-[#01796f]/10"
           />
         </div>
 
-        <div className="flex rounded-xl border border-gray-200 bg-white p-1">
+        <div className="flex rounded-full border border-gray-200 bg-white p-1">
           {(["All", "Unread", "Read"] as Filter[]).map((item) => (
             <button
               key={item}
               onClick={() => setFilter(item)}
-              className={`rounded-lg px-4 py-2 text-sm font-medium transition ${
+              className={`rounded-full px-4 py-2 text-sm font-medium transition ${
                 filter === item
                   ? "bg-[#01796f] text-white"
                   : "text-gray-500 hover:text-[#01796f]"
