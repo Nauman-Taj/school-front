@@ -106,7 +106,7 @@ export default function NotificationPage() {
         </div>
 
         {unreadCount > 0 && (
-          <div className="flex justify-end sm:block">
+          <div className="flex justify-center sm:block">
             <button
               onClick={markAllAsRead}
               className="flex w-fit items-center justify-center gap-2 rounded-full border border-gray-200 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 transition hover:border-[#01796f] hover:text-[#01796f]"
@@ -135,7 +135,7 @@ export default function NotificationPage() {
           />
         </div>
 
-        <div className="flex w-full justify-end lg:w-fit">
+        <div className="flex w-full justify-center lg:w-fit">
           <div className="flex rounded-full w-fit border border-gray-200 bg-white p-1">
             {(["All", "Unread", "Read"] as Filter[]).map((item) => (
               <button
