@@ -5,7 +5,6 @@ import {
   ShieldCheck,
   KeyRound,
   UserCheck,
-  Save,
 } from "lucide-react";
 
 import { userSettings } from "@/data/settings";
@@ -24,7 +23,7 @@ export default function UserSettings() {
   );
 
   return (
-    <section className="rounded-2xl border border-gray-200 bg-white p-5 sm:p-6">
+    <section className="rounded-2xl max-w-5xl border border-gray-200 bg-white p-5 sm:p-6">
       <div className="mb-6">
         <div className="flex items-center gap-3">
           <div className="rounded-xl bg-[#e6f4f2] p-2.5 text-[#01796f]">
@@ -36,9 +35,9 @@ export default function UserSettings() {
               User Settings
             </h2>
 
-            <p className="text-sm text-gray-500">
+            {/* <p className="text-sm text-gray-500">
               Manage roles, permissions, and account security.
-            </p>
+            </p> */}
           </div>
         </div>
       </div>
@@ -53,7 +52,7 @@ export default function UserSettings() {
           <select
             value={role}
             onChange={(e) => setRole(e.target.value)}
-            className="w-full rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm outline-none transition focus:border-[#01796f] focus:ring-2 focus:ring-[#01796f]/10"
+            className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm outline-none transition focus:border-[#01796f] focus:ring-2 focus:ring-[#01796f]/10"
           >
             <option>Administrator</option>
             <option>Principal</option>
@@ -72,7 +71,7 @@ export default function UserSettings() {
           <select
             value={permission}
             onChange={(e) => setPermission(e.target.value)}
-            className="w-full rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm outline-none transition focus:border-[#01796f] focus:ring-2 focus:ring-[#01796f]/10"
+            className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm outline-none transition focus:border-[#01796f] focus:ring-2 focus:ring-[#01796f]/10"
           >
             <option>Full Access</option>
             <option>Manage Students</option>
@@ -92,7 +91,7 @@ export default function UserSettings() {
           <select
             value={passwordPolicy}
             onChange={(e) => setPasswordPolicy(e.target.value)}
-            className="w-full rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm outline-none transition focus:border-[#01796f] focus:ring-2 focus:ring-[#01796f]/10"
+            className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm outline-none transition focus:border-[#01796f] focus:ring-2 focus:ring-[#01796f]/10"
           >
             <option>Strong Password</option>
             <option>Medium Password</option>
@@ -110,7 +109,7 @@ export default function UserSettings() {
           <select
             value={accountStatus}
             onChange={(e) => setAccountStatus(e.target.value)}
-            className="w-full rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm outline-none transition focus:border-[#01796f] focus:ring-2 focus:ring-[#01796f]/10"
+            className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm outline-none transition focus:border-[#01796f] focus:ring-2 focus:ring-[#01796f]/10"
           >
             <option>Active</option>
             <option>Inactive</option>
@@ -123,9 +122,7 @@ export default function UserSettings() {
         <button
           type="button"
           onClick={() => setShowConfirm(true)}
-          className="inline-flex items-center gap-2 rounded-full bg-[#01796f] px-5 py-2.5 text-sm font-medium text-white transition hover:bg-[#01665d]"
-        >
-          {/* <Save size={17} /> */}
+          className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-[#01796f] px-5 py-3 text-sm font-medium text-white transition hover:bg-[#01665d] sm:w-auto"        >
           Save Changes
         </button>
       </div>

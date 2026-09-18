@@ -87,7 +87,7 @@ export default function AnnouncementForm({
 
       <form
         onSubmit={handleSubmit}
-        className="rounded-2xl border border-gray-200 bg-white p-5 sm:p-6"
+        className="rounded-2xl max-w-5xl border border-gray-200 bg-white p-5 sm:p-6"
       >
         <div className="grid gap-5 md:grid-cols-2">
           <div className="md:col-span-2">

@@ -133,20 +133,21 @@ export default function NotificationPage() {
           />
         </div>
 
-        <div className="flex rounded-full border border-gray-200 bg-white p-1">
-          {(["All", "Unread", "Read"] as Filter[]).map((item) => (
-            <button
-              key={item}
-              onClick={() => setFilter(item)}
-              className={`rounded-full px-4 py-2 text-sm font-medium transition ${
-                filter === item
+        <div className="flex w-full justify-center lg:w-fit">
+          <div className="flex rounded-full w-fit border border-gray-200 bg-white p-1">
+            {(["All", "Unread", "Read"] as Filter[]).map((item) => (
+              <button
+                key={item}
+                onClick={() => setFilter(item)}
+                className={`rounded-full  px-4 py-2 text-sm font-medium transition ${filter === item
                   ? "bg-[#01796f] text-white"
                   : "text-gray-500 hover:text-[#01796f]"
-              }`}
-            >
-              {item}
-            </button>
-          ))}
+                  }`}
+              >
+                {item}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 
@@ -159,11 +160,10 @@ export default function NotificationPage() {
           return (
             <div
               key={notification.id}
-              className={`rounded-2xl border bg-white p-4 transition sm:p-5 ${
-                notification.read
-                  ? "border-gray-200"
-                  : "border-[#01796f]/20 bg-[#e6f4f2]/30"
-              }`}
+              className={`rounded-2xl border bg-white p-4 transition sm:p-5 ${notification.read
+                ? "border-gray-200"
+                : "border-[#01796f]/20 bg-[#e6f4f2]/30"
+                }`}
             >
               <div className="flex gap-4">
                 <div

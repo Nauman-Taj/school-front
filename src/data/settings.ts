@@ -10,7 +10,7 @@ export const schoolSettings: SchoolSettings = {
   address: "Multan, Punjab, Pakistan",
   phone: "+92 300 5454544",
   email: "info@garrisonschool.edu.pk",
-  website: "https://garrisonschool.edu.pk",
+  website: "https://www.garrisonschool.edu.pk",
   academicYear: "2026-2027",
   principalName: "Mr. Shafiq Ur Rehman",
 };

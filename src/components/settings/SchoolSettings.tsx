@@ -10,7 +10,6 @@ import {
   CalendarDays,
   UserRound,
   Upload,
-  Save,
 } from "lucide-react";
 
 import { schoolSettings } from "@/data/settings";
@@ -44,7 +43,7 @@ export default function SchoolSettings() {
   };
 
   return (
-    <section className="rounded-2xl border border-gray-200 bg-white p-5 sm:p-6">
+    <section className="rounded-2xl max-w-5xl border border-gray-200 bg-white p-5 sm:p-6">
       {/* Header */}
       <div className="mb-6">
         <div className="flex items-center gap-3">
@@ -82,7 +81,7 @@ export default function SchoolSettings() {
               type="text"
               value={schoolName}
               onChange={(e) => setSchoolName(e.target.value)}
-              className="w-full rounded-xl border border-gray-200 px-10 py-2.5 text-sm outline-none transition focus:border-[#01796f] focus:ring-2 focus:ring-[#01796f]/10"
+              className="w-full rounded-xl border border-gray-200 px-10 py-3 text-sm outline-none transition focus:border-[#01796f] focus:ring-2 focus:ring-[#01796f]/10"
             />
           </div>
         </div>
@@ -103,7 +102,7 @@ export default function SchoolSettings() {
               type="text"
               value={address}
               onChange={(e) => setAddress(e.target.value)}
-              className="w-full rounded-xl border border-gray-200 px-10 py-2.5 text-sm outline-none transition focus:border-[#01796f] focus:ring-2 focus:ring-[#01796f]/10"
+              className="w-full rounded-xl border border-gray-200 px-10 py-3 text-sm outline-none transition focus:border-[#01796f] focus:ring-2 focus:ring-[#01796f]/10"
             />
           </div>
         </div>
@@ -124,7 +123,7 @@ export default function SchoolSettings() {
               type="text"
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
-              className="w-full rounded-xl border border-gray-200 px-10 py-2.5 text-sm outline-none transition focus:border-[#01796f] focus:ring-2 focus:ring-[#01796f]/10"
+              className="w-full rounded-xl border border-gray-200 px-10 py-3 text-sm outline-none transition focus:border-[#01796f] focus:ring-2 focus:ring-[#01796f]/10"
             />
           </div>
         </div>
@@ -145,7 +144,7 @@ export default function SchoolSettings() {
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full rounded-xl border border-gray-200 px-10 py-2.5 text-sm outline-none transition focus:border-[#01796f] focus:ring-2 focus:ring-[#01796f]/10"
+              className="w-full rounded-xl border border-gray-200 px-10 py-3 text-sm outline-none transition focus:border-[#01796f] focus:ring-2 focus:ring-[#01796f]/10"
             />
           </div>
         </div>
@@ -166,7 +165,7 @@ export default function SchoolSettings() {
               type="text"
               value={website}
               onChange={(e) => setWebsite(e.target.value)}
-              className="w-full rounded-xl border border-gray-200 px-10 py-2.5 text-sm outline-none transition focus:border-[#01796f] focus:ring-2 focus:ring-[#01796f]/10"
+              className="w-full rounded-xl border border-gray-200 px-10 py-3 text-sm outline-none transition focus:border-[#01796f] focus:ring-2 focus:ring-[#01796f]/10"
             />
           </div>
         </div>
@@ -186,7 +185,7 @@ export default function SchoolSettings() {
             <select
               value={academicYear}
               onChange={(e) => setAcademicYear(e.target.value)}
-              className="w-full appearance-none rounded-xl border border-gray-200 bg-white px-10 py-2.5 text-sm outline-none transition focus:border-[#01796f] focus:ring-2 focus:ring-[#01796f]/10"
+              className="w-full appearance-none rounded-xl border border-gray-200 bg-white px-10 py-3 text-sm outline-none transition focus:border-[#01796f] focus:ring-2 focus:ring-[#01796f]/10"
             >
               <option>2026-2027</option>
               <option>2025-2026</option>
@@ -211,7 +210,7 @@ export default function SchoolSettings() {
               type="text"
               value={principalName}
               onChange={(e) => setPrincipalName(e.target.value)}
-              className="w-full rounded-xl border border-gray-200 px-10 py-2.5 text-sm outline-none transition focus:border-[#01796f] focus:ring-2 focus:ring-[#01796f]/10"
+              className="w-full rounded-xl border border-gray-200 px-10 py-3 text-sm outline-none transition focus:border-[#01796f] focus:ring-2 focus:ring-[#01796f]/10"
             />
           </div>
         </div>
@@ -229,7 +228,7 @@ export default function SchoolSettings() {
               className="h-12 w-12 rounded-xl border border-gray-200 object-cover"
             />
 
-            <label className="inline-flex cursor-pointer items-center gap-2 rounded-xl border border-gray-200 px-4 py-2.5 text-sm font-medium text-gray-700 transition hover:bg-gray-50">
+            <label className="inline-flex cursor-pointer items-center gap-2 rounded-xl border border-gray-200 px-4 py-3 text-sm font-medium text-gray-700 transition hover:bg-gray-50">
               <Upload size={17} />
               Upload Logo
 
@@ -249,9 +248,7 @@ export default function SchoolSettings() {
         <button
           type="button"
           onClick={() => setShowConfirm(true)}
-          className="inline-flex items-center gap-2 rounded-full bg-[#01796f] px-5 py-2.5 text-sm font-medium text-white transition hover:bg-[#01665d]"
-        >
-          {/* <Save size={17} /> */}
+          className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-[#01796f] px-5 py-3 text-sm font-medium text-white transition hover:bg-[#01665d] sm:w-auto"        >
           Save Changes
         </button>
       </div>

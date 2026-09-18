@@ -8,7 +8,6 @@ import {
   Award,
   CalendarDays,
   Clock3,
-  Save,
 } from "lucide-react";
 
 import { academicSettings } from "@/data/settings";
@@ -27,7 +26,7 @@ export default function AcademicSettings() {
   const [term, setTerm] = useState(academicSettings.term);
 
   return (
-    <section className="rounded-2xl border border-gray-200 bg-white p-5 sm:p-6">
+    <section className="rounded-2xl max-w-5xl border border-gray-200 bg-white p-5 sm:p-6">
       <div className="mb-6">
         <div className="flex items-center gap-3">
           <div className="rounded-xl bg-[#e6f4f2] p-2.5 text-[#01796f]">
@@ -57,7 +56,7 @@ export default function AcademicSettings() {
           <select
             value={classes}
             onChange={(e) => setClasses(e.target.value)}
-            className="w-full rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm outline-none transition focus:border-[#01796f] focus:ring-2 focus:ring-[#01796f]/10"
+            className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm outline-none transition focus:border-[#01796f] focus:ring-2 focus:ring-[#01796f]/10"
           >
             <option>Primary</option>
             <option>Middle</option>
@@ -75,7 +74,7 @@ export default function AcademicSettings() {
           <select
             value={sections}
             onChange={(e) => setSections(e.target.value)}
-            className="w-full rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm outline-none transition focus:border-[#01796f] focus:ring-2 focus:ring-[#01796f]/10"
+            className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm outline-none transition focus:border-[#01796f] focus:ring-2 focus:ring-[#01796f]/10"
           >
             <option>A</option>
             <option>B</option>
@@ -93,7 +92,7 @@ export default function AcademicSettings() {
           <select
             value={subjects}
             onChange={(e) => setSubjects(e.target.value)}
-            className="w-full rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm outline-none transition focus:border-[#01796f] focus:ring-2 focus:ring-[#01796f]/10"
+            className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm outline-none transition focus:border-[#01796f] focus:ring-2 focus:ring-[#01796f]/10"
           >
             <option>English, Mathematics, Science</option>
             <option>English, Mathematics, Computer</option>
@@ -111,7 +110,7 @@ export default function AcademicSettings() {
           <select
             value={gradingSystem}
             onChange={(e) => setGradingSystem(e.target.value)}
-            className="w-full rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm outline-none transition focus:border-[#01796f] focus:ring-2 focus:ring-[#01796f]/10"
+            className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm outline-none transition focus:border-[#01796f] focus:ring-2 focus:ring-[#01796f]/10"
           >
             <option>Percentage</option>
             <option>Grade A-F</option>
@@ -129,7 +128,7 @@ export default function AcademicSettings() {
           <select
             value={academicYear}
             onChange={(e) => setAcademicYear(e.target.value)}
-            className="w-full rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm outline-none transition focus:border-[#01796f] focus:ring-2 focus:ring-[#01796f]/10"
+            className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm outline-none transition focus:border-[#01796f] focus:ring-2 focus:ring-[#01796f]/10"
           >
             <option>2026-2027</option>
             <option>2025-2026</option>
@@ -147,7 +146,7 @@ export default function AcademicSettings() {
           <select
             value={term}
             onChange={(e) => setTerm(e.target.value)}
-            className="w-full rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm outline-none transition focus:border-[#01796f] focus:ring-2 focus:ring-[#01796f]/10"
+            className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm outline-none transition focus:border-[#01796f] focus:ring-2 focus:ring-[#01796f]/10"
           >
             <option>Term 1</option>
             <option>Term 2</option>
@@ -160,9 +159,7 @@ export default function AcademicSettings() {
         <button
           type="button"
           onClick={() => setShowConfirm(true)}
-          className="inline-flex items-center gap-2 rounded-full bg-[#01796f] px-5 py-2.5 text-sm font-medium text-white transition hover:bg-[#01665d]"
-        >
-          {/* <Save size={17} /> */}
+          className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-[#01796f] px-5 py-3 text-sm font-medium text-white transition hover:bg-[#01665d] sm:w-auto"        >
           Save Changes
         </button>
       </div>
