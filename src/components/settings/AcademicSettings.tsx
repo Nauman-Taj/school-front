@@ -14,6 +14,7 @@ import {
 import { academicSettings } from "@/data/settings";
 
 export default function AcademicSettings() {
+  const [showConfirm, setShowConfirm] = useState(false);
   const [classes, setClasses] = useState(academicSettings.classes);
   const [sections, setSections] = useState(academicSettings.sections);
   const [subjects, setSubjects] = useState(academicSettings.subjects);
@@ -38,9 +39,9 @@ export default function AcademicSettings() {
               Academic Settings
             </h2>
 
-            <p className="text-sm text-gray-500">
+            {/* <p className="text-sm text-gray-500">
               Manage classes, subjects, grading, and academic periods.
-            </p>
+            </p> */}
           </div>
         </div>
       </div>
@@ -94,9 +95,6 @@ export default function AcademicSettings() {
             onChange={(e) => setSubjects(e.target.value)}
             className="w-full rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm outline-none transition focus:border-[#01796f] focus:ring-2 focus:ring-[#01796f]/10"
           >
-            <option>
-              English, Mathematics, Science, Computer
-            </option>
             <option>English, Mathematics, Science</option>
             <option>English, Mathematics, Computer</option>
             <option>All Core Subjects</option>
@@ -161,12 +159,46 @@ export default function AcademicSettings() {
       <div className="mt-6 flex justify-end">
         <button
           type="button"
+          onClick={() => setShowConfirm(true)}
           className="inline-flex items-center gap-2 rounded-full bg-[#01796f] px-5 py-2.5 text-sm font-medium text-white transition hover:bg-[#01665d]"
         >
           <Save size={17} />
           Save Changes
         </button>
       </div>
+      {showConfirm && (
+        <div className="fixed inset-0 z-50 flex items-start justify-center pt-10 bg-black/40 px-4">
+          <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl">
+            <h3 className="text-lg font-semibold text-gray-900">
+              Save Changes?
+            </h3>
+
+            <p className="mt-2 text-sm text-gray-500">
+              Are you sure you want to save these academic settings?
+            </p>
+
+            <div className="mt-6 flex justify-end gap-3">
+              <button
+                type="button"
+                onClick={() => setShowConfirm(false)}
+                className="rounded-full border border-gray-200 px-4 py-2.5 text-sm font-medium text-gray-700 transition hover:bg-gray-50"
+              >
+                Cancel
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  setShowConfirm(false);
+                }}
+                className="rounded-full bg-[#01796f] px-4 py-2.5 text-sm font-medium text-white transition hover:bg-[#01665d]"
+              >
+                Save Changes
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </section>
   );
 }

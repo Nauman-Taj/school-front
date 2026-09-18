@@ -11,6 +11,7 @@ import {
 import { userSettings } from "@/data/settings";
 
 export default function UserSettings() {
+  const [showConfirm, setShowConfirm] = useState(false);
   const [role, setRole] = useState(userSettings.role);
   const [permission, setPermission] = useState(
     userSettings.permission
@@ -121,12 +122,46 @@ export default function UserSettings() {
       <div className="mt-6 flex justify-end">
         <button
           type="button"
+          onClick={() => setShowConfirm(true)}
           className="inline-flex items-center gap-2 rounded-full bg-[#01796f] px-5 py-2.5 text-sm font-medium text-white transition hover:bg-[#01665d]"
         >
           <Save size={17} />
           Save Changes
         </button>
       </div>
+      {showConfirm && (
+        <div className="fixed inset-0 z-50 flex items-start justify-center pt-10 bg-black/40 px-4">
+          <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl">
+            <h3 className="text-lg font-semibold text-gray-900">
+              Save Changes?
+            </h3>
+
+            <p className="mt-2 text-sm text-gray-500">
+              Are you sure you want to save these user settings?
+            </p>
+
+            <div className="mt-6 flex justify-end gap-3">
+              <button
+                type="button"
+                onClick={() => setShowConfirm(false)}
+                className="rounded-full border border-gray-200 px-4 py-2.5 text-sm font-medium text-gray-700 transition hover:bg-gray-50"
+              >
+                Cancel
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  setShowConfirm(false);
+                }}
+                className="rounded-full bg-[#01796f] px-4 py-2.5 text-sm font-medium text-white transition hover:bg-[#01665d]"
+              >
+                Save Changes
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </section>
   );
 }
