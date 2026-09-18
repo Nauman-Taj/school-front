@@ -135,7 +135,7 @@ export default function NotificationPage() {
           />
         </div>
 
-        <div className="flex w-full justify-center lg:w-fit">
+        <div className="flex w-full justify-end lg:w-fit">
           <div className="flex rounded-full w-fit border border-gray-200 bg-white p-1">
             {(["All", "Unread", "Read"] as Filter[]).map((item) => (
               <button
