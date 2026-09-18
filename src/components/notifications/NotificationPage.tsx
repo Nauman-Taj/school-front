@@ -106,13 +106,15 @@ export default function NotificationPage() {
         </div>
 
         {unreadCount > 0 && (
-          <button
-            onClick={markAllAsRead}
-            className="flex items-center justify-center gap-2 rounded-full border border-gray-200 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 transition hover:border-[#01796f] hover:text-[#01796f]"
-          >
-            <CheckCheck size={17} />
-            Mark all as read
-          </button>
+          <div className="flex justify-center sm:block">
+            <button
+              onClick={markAllAsRead}
+              className="flex w-fit items-center justify-center gap-2 rounded-full border border-gray-200 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 transition hover:border-[#01796f] hover:text-[#01796f]"
+            >
+              <CheckCheck size={17} />
+              Mark all as read
+            </button>
+          </div>
         )}
       </div>
 
