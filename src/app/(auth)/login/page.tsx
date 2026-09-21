@@ -80,7 +80,7 @@ export default function LoginPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="Enter your Email"
-                className="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm text-gray-900 outline-none transition focus:border-[#01796f] focus:ring-2 focus:ring-[#01796f]/10"
+                className="w-full rounded-full border border-gray-200 px-4 py-3 text-sm text-gray-900 outline-none transition focus:border-[#01796f] focus:ring-2 focus:ring-[#01796f]/10"
                 required
               />
             </div>
@@ -101,7 +101,7 @@ export default function LoginPage() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="Enter your password"
-                  className="w-full rounded-xl border border-gray-200 px-4 py-3 pr-12 text-sm text-gray-900 outline-none transition focus:border-[#01796f] focus:ring-2 focus:ring-[#01796f]/10"
+                  className="w-full rounded-full border border-gray-200 px-4 py-3 pr-12 text-sm text-gray-900 outline-none transition focus:border-[#01796f] focus:ring-2 focus:ring-[#01796f]/10"
                   required
                 />
 
@@ -144,7 +144,7 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full rounded-xl bg-[#01796f] px-4 py-3 text-sm font-semibold text-white transition hover:bg-[#015f58] focus:outline-none focus:ring-2 focus:ring-[#01796f]/30 disabled:cursor-not-allowed disabled:opacity-70"
+              className="w-full rounded-full bg-[#01796f] px-4 py-3 text-sm font-semibold text-white transition hover:bg-[#015f58] focus:outline-none focus:ring-2 focus:ring-[#01796f]/30 disabled:cursor-not-allowed disabled:opacity-70"
             >
               {loading ? "Signing in..." : "Sign in"}
             </button>
