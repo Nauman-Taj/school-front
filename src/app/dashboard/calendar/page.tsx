@@ -1,3 +1,5 @@
-export default function Page() {
-  return <div>Coming soon</div>;
+import CalendarPage from "@/components/calendar/CalendarPage";
+
+export default function CalendarPageRoute() {
+  return <CalendarPage />;
 }

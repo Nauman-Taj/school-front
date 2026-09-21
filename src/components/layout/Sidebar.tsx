@@ -5,6 +5,7 @@ import Image from "next/image";
 import {
   LayoutDashboard,
   Users,
+  UsersRound,
   UserRoundCog,
   ClipboardCheck,
   GraduationCap,
@@ -24,6 +25,7 @@ const menuItems = [
   { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
   { name: "Students", href: "/dashboard/students", icon: Users },
   { name: "Teachers", href: "/dashboard/teachers", icon: UserRoundCog },
+  { name: "Parents", href: "/dashboard/parents", icon: UsersRound },
   { name: "Attendance", href: "/dashboard/attendance", icon: ClipboardCheck },
   { name: "Classes", href: "/dashboard/classes", icon: GraduationCap },
   { name: "Subjects", href: "/dashboard/subjects", icon: BookOpen },
@@ -34,8 +36,10 @@ const menuItems = [
   { name: "Fees", href: "/dashboard/fees", icon: Wallet },
   { name: "Library", href: "/dashboard/library", icon: Library },
   { name: "Transport", href: "/dashboard/transport", icon: Bus },
+  { name: "School Calendar", href: "/dashboard/calendar", icon: CalendarDays },
   { name: "Announcements", href: "/dashboard/announcements", icon: Megaphone },
   { name: "Notifications", href: "/dashboard/notifications", icon: Bell },
+  { name: "Reports", href: "/dashboard/reports", icon: FileText },
   { name: "Settings", href: "/dashboard/settings", icon: Settings },
 ];
 
@@ -62,9 +66,9 @@ export default function Sidebar() {
           href="/"
           className="flex items-center gap-3"
         >
-        <div className="text-lg font-bold pl-2 text-[#015f58]">
-          <p>Garrison School</p>
-        </div>
+          <div className="text-lg font-bold pl-2 text-[#015f58]">
+            <p>Garrison School</p>
+          </div>
         </Link>
       </div>
 

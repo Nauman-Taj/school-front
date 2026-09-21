@@ -1,3 +1,5 @@
-export default function Page() {
-  return <div>Coming soon</div>;
+import ParentsPage from "@/components/parents/ParentsPage";
+
+export default function ParentsPageRoute() {
+  return <ParentsPage />;
 }
