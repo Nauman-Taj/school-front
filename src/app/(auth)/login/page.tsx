@@ -5,12 +5,15 @@ import { Eye, EyeOff } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 
+import { users } from "@/data/users";
+
 export default function LoginPage() {
   const router = useRouter();
 
   const [showPassword, setShowPassword] = useState(false);
-  const [email, setEmail] = useState("");
+  const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
+  const [rememberMe, setRememberMe] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -20,18 +23,63 @@ export default function LoginPage() {
     setError("");
     setLoading(true);
 
-    const Email = "admin@garrisonschool.edu.pk";
-    const Password = "nauman360";
-
     setTimeout(() => {
-      if (email === Email && password === Password) {
+      const normalizedIdentifier = identifier.toLowerCase().trim();
 
-        localStorage.setItem("isLoggedIn", "true");
+      const user = users.find(
+        (currentUser) =>
+          (currentUser.email.toLowerCase() === normalizedIdentifier ||
+            currentUser.username.toLowerCase() === normalizedIdentifier) &&
+          currentUser.password === password
+      );
 
-        router.push("/dashboard");
-      } else {
-        setError("Invalid email or password.");
+      if (!user) {
+        setError("Invalid email/username or password.");
         setLoading(false);
+        return;
+      }
+
+      if (user.status === "Inactive") {
+        setError(
+          "Your account is inactive. Please contact the administrator."
+        );
+        setLoading(false);
+        return;
+      }
+
+      const session = {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        username: user.username,
+        role: user.role,
+        loginTime: new Date().toISOString(),
+      };
+
+      // Clear any previous session first
+      localStorage.removeItem("auth-session");
+      sessionStorage.removeItem("auth-session");
+
+      // Save the new session
+      if (rememberMe) {
+        localStorage.setItem(
+          "auth-session",
+          JSON.stringify(session)
+        );
+      } else {
+        sessionStorage.setItem(
+          "auth-session",
+          JSON.stringify(session)
+        );
+      }
+
+      localStorage.setItem("isLoggedIn", "true");
+
+      // Redirect based on role
+      if (user.role === "Parent") {
+        router.replace("/parent/dashboard");
+      } else {
+        router.replace("/dashboard");
       }
     }, 700);
   };
@@ -39,8 +87,7 @@ export default function LoginPage() {
   return (
     <main className="flex min-h-screen items-center justify-center bg-[#f6f8f8] px-4 py-8">
       <div className="grid w-full max-w-md justify-center">
-
-        
+        {/* Logo */}
         <div className="mb-8 text-center">
           <Image
             src="/images/school.jpg"
@@ -55,37 +102,40 @@ export default function LoginPage() {
           </h1>
         </div>
 
-        
+        {/* Login Card */}
         <div className="w-full rounded-2xl border border-gray-100 bg-white p-6 shadow-sm sm:p-8">
           <div className="mb-6">
             <h2 className="text-xl font-semibold text-gray-900">
               Welcome
             </h2>
+
+            {/* <p className="mt-1 text-sm text-gray-500">
+              Sign in to your account
+            </p> */}
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-5">
-
-            
+            {/* Email / Username */}
             <div>
               <label
-                htmlFor="email"
+                htmlFor="identifier"
                 className="mb-2 block text-sm font-medium text-gray-700"
               >
-                Email
+                Email / Username
               </label>
 
               <input
-                id="email"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="Enter your Email"
+                id="identifier"
+                type="text"
+                value={identifier}
+                onChange={(e) => setIdentifier(e.target.value)}
+                placeholder="Enter your email or username"
                 className="w-full rounded-full border border-gray-200 px-4 py-3 text-sm text-gray-900 outline-none transition focus:border-[#01796f] focus:ring-2 focus:ring-[#01796f]/10"
                 required
               />
             </div>
 
-            
+            {/* Password */}
             <div>
               <label
                 htmlFor="password"
@@ -107,7 +157,9 @@ export default function LoginPage() {
 
                 <button
                   type="button"
-                  onClick={() => setShowPassword(!showPassword)}
+                  onClick={() =>
+                    setShowPassword(!showPassword)
+                  }
                   className="absolute right-3 top-1/2 -translate-y-1/2 rounded-lg p-1.5 text-gray-400 hover:text-[#01796f]"
                   aria-label={
                     showPassword
@@ -124,8 +176,23 @@ export default function LoginPage() {
               </div>
             </div>
 
-            
-            <div className="flex justify-end">
+            {/* Remember Me / Forgot Password */}
+            <div className="flex items-center justify-between gap-3">
+              <label className="flex cursor-pointer items-center gap-2">
+                <input
+                  type="checkbox"
+                  checked={rememberMe}
+                  onChange={(e) =>
+                    setRememberMe(e.target.checked)
+                  }
+                  className="h-4 w-4 rounded border-gray-300 accent-[#01796f]"
+                />
+
+                <span className="text-sm text-gray-600">
+                  Remember me
+                </span>
+              </label>
+
               <button
                 type="button"
                 className="text-sm font-medium text-[#01796f] hover:text-[#015f58]"
@@ -134,13 +201,14 @@ export default function LoginPage() {
               </button>
             </div>
 
-            
+            {/* Error */}
             {error && (
               <p className="text-sm text-red-500">
                 {error}
               </p>
             )}
 
+            {/* Login Button */}
             <button
               type="submit"
               disabled={loading}
@@ -148,10 +216,10 @@ export default function LoginPage() {
             >
               {loading ? "Signing in..." : "Sign in"}
             </button>
-
           </form>
         </div>
       </div>
     </main>
   );
 }
+

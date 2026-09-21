@@ -39,11 +39,10 @@ export default function StudentCard({
         </div>
 
         <span
-          className={`rounded-full px-2.5 py-1 text-xs font-medium ${
-            student.status === "Active"
-              ? "bg-green-50 text-green-700"
-              : "bg-gray-100 text-gray-600"
-          }`}
+          className={`rounded-full px-2.5 py-1 text-xs font-medium ${student.status === "Active"
+            ? "bg-green-50 text-green-700"
+            : "bg-gray-100 text-gray-600"
+            }`}
         >
           {student.status}
         </span>
@@ -99,14 +98,14 @@ export default function StudentCard({
           <Pencil size={17} strokeWidth={1.8} />
         </Link>
 
-          <button
-            type="button"
-            onClick={() => onDelete(student.id, student.name)}
-            className="flex items-center justify-center rounded-lg  border-gray-200 px-3 py-2.5 text-gray-500 transition hover:border-red-200 hover:bg-red-50 hover:text-red-600"
-            aria-label={`Delete ${student.name}`}
-          >
-            <Trash2 size={17} strokeWidth={1.8} />
-          </button>
+        <button
+          type="button"
+          onClick={() => onDelete(student.id, student.name)}
+          className="flex items-center justify-center rounded-lg  border-gray-200 px-3 py-2.5 text-gray-500 transition hover:border-red-200 hover:bg-red-50 hover:text-red-600"
+          aria-label={`Delete ${student.name}`}
+        >
+          <Trash2 size={17} strokeWidth={1.8} />
+        </button>
       </div>
     </div>
   );

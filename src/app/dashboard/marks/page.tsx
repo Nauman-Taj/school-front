@@ -1,3 +1,5 @@
-export default function Page() {
-  return <div>Coming soon</div>;
+import MarksPage from "@/components/marks/MarksPage";
+
+export default function Marks() {
+  return <MarksPage />;
 }
