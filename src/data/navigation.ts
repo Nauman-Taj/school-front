@@ -189,11 +189,6 @@ export const navigationByRole: Record<UserRole, NavigationItem[]> = {
       icon: LayoutDashboard,
     },
     {
-      label: "Profile",
-      href: "/dashboard/profile",
-      icon: UserRound,
-    },
-    {
       label: "Subjects",
       href: "/dashboard/subjects",
       icon: BookOpen,
@@ -237,6 +232,11 @@ export const navigationByRole: Record<UserRole, NavigationItem[]> = {
       label: "Announcements",
       href: "/dashboard/announcements",
       icon: Megaphone,
+    },
+    {
+      label: "Profile",
+      href: "/dashboard/profile",
+      icon: UserRound,
     },
   ],
 
