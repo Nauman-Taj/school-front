@@ -39,13 +39,13 @@ export default function NewsSection() {
             </h2>
           </div>
 
-          <Link
+          {/* <Link
             href="/news"
             className="inline-flex shrink-0 items-center gap-2 text-sm font-semibold text-[#01796f] transition hover:text-[#015f58]"
           >
             View all news
             <ArrowRight size={17} />
-          </Link>
+          </Link> */}
 
         </div>
 
@@ -77,7 +77,7 @@ export default function NewsSection() {
               </p>
 
 
-              <Link
+              {/* <Link
                 href="/news"
                 className="group mt-5 inline-flex items-center gap-2 text-sm font-semibold text-[#01796f] transition hover:text-[#015f58]"
               >
@@ -86,7 +86,7 @@ export default function NewsSection() {
                   size={16}
                   className="transition-transform group-hover:translate-x-1"
                 />
-              </Link>
+              </Link> */}
 
             </article>
           ))}

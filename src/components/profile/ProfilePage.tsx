@@ -90,7 +90,7 @@ export default function ProfilePage() {
 
           <div className="mt-6 space-y-4 border-t border-gray-100 pt-5">
             <div className="flex items-center gap-3">
-              <Mail size={18} className="text-gray-400" />
+              <Mail size={17} className="text-gray-400" />
               <div>
                 <p className="text-xs text-gray-400">Email</p>
                 <p className="text-sm font-medium text-gray-700">
@@ -100,7 +100,7 @@ export default function ProfilePage() {
             </div>
 
             <div className="flex items-center gap-3">
-              <ShieldCheck size={18} className="text-gray-400" />
+              <ShieldCheck size={17} className="text-gray-400" />
               <div>
                 <p className="text-xs text-gray-400">Role</p>
                 <p className="text-sm font-medium text-gray-700">
@@ -136,7 +136,7 @@ export default function ProfilePage() {
 
                 <div className="relative">
                   <UserRound
-                    size={18}
+                    size={17}
                     className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
                   />
 
@@ -158,7 +158,7 @@ export default function ProfilePage() {
 
                 <div className="relative">
                   <Mail
-                    size={18}
+                    size={17}
                     className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
                   />
 
@@ -180,7 +180,7 @@ export default function ProfilePage() {
 
                 <div className="relative">
                   <Phone
-                    size={18}
+                    size={17}
                     className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
                   />
 
@@ -203,7 +203,7 @@ export default function ProfilePage() {
 
                 <div className="relative">
                   <ShieldCheck
-                    size={18}
+                    size={17}
                     className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
                   />
 
@@ -226,7 +226,7 @@ export default function ProfilePage() {
 
                 <div className="relative">
                   <Lock
-                    size={18}
+                    size={17}
                     className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
                   />
 
@@ -234,7 +234,7 @@ export default function ProfilePage() {
                     type="password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    placeholder="Leave blank to keep current password"
+                    placeholder="Enter your new password"
                     className="w-full rounded-xl border border-gray-200 bg-gray-50 py-3 pl-10 pr-4 text-sm outline-none transition focus:border-[#01796F] focus:ring-2 focus:ring-[#01796F]/10"
                   />
                 </div>

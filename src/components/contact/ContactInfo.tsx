@@ -17,9 +17,9 @@ const contactDetails = [
   {
     icon: Mail,
     title: "Email Us",
-    text: "info@garrisonschool.com",
+    text: "info@garrisonschool.edu.pk",
     detail: "We'd be happy to hear from you.",
-    href: "mailto:info@linkkiodabaya.com",
+    href: "mailto:info@garrisonschool.edu.pk",
   },
 ];
 

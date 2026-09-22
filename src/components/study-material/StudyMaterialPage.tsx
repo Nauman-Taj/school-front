@@ -1,14 +1,28 @@
 "use client";
 
-import { BookOpen, FileText, Video, ClipboardList } from "lucide-react";
+import Link from "next/link";
+import {
+  BookOpen,
+  FileText,
+  Video,
+  ClipboardList,
+  Plus,
+} from "lucide-react";
+
 import { studyMaterial } from "@/data/studyMaterial";
 import StudyMaterialTable from "./StudyMaterialTable";
 
 export default function StudyMaterialPage() {
   const total = studyMaterial.length;
-  const pdfs = studyMaterial.filter((item) => item.type === "PDF").length;
-  const notes = studyMaterial.filter((item) => item.type === "Notes").length;
-  const videos = studyMaterial.filter((item) => item.type === "Video").length;
+  const pdfs = studyMaterial.filter(
+    (item) => item.type === "PDF"
+  ).length;
+  const notes = studyMaterial.filter(
+    (item) => item.type === "Notes"
+  ).length;
+  const videos = studyMaterial.filter(
+    (item) => item.type === "Video"
+  ).length;
 
   const stats = [
     {
@@ -36,14 +50,24 @@ export default function StudyMaterialPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div>
-        <h1 className="text-2xl font-bold text-gray-800">
-          Study Material
-        </h1>
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-800">
+            Study Material
+          </h1>
 
-        <p className="mt-1 text-sm text-gray-500">
-          Manage and access educational learning materials
-        </p>
+          <p className="mt-1 text-sm text-gray-500">
+            Manage and access educational learning materials
+          </p>
+        </div>
+
+        <Link
+          href="/dashboard/study-material/add"
+          className="inline-flex w-fit items-center gap-2 rounded-full bg-[#01796F] px-4 py-2.5 text-sm font-medium text-white transition hover:bg-[#015f58]"
+        >
+          <Plus size={17} />
+          Add Material
+        </Link>
       </div>
 
       {/* Stats */}

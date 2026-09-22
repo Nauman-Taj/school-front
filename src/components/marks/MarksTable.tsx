@@ -38,11 +38,11 @@ export default function MarksTable() {
         const percentage =
           item.totalMarks > 0
             ? Number(
-                (
-                  (obtainedMarks / item.totalMarks) *
-                  100
-                ).toFixed(1)
-              )
+              (
+                (obtainedMarks / item.totalMarks) *
+                100
+              ).toFixed(1)
+            )
             : 0;
 
         let grade = "F";
@@ -86,23 +86,23 @@ export default function MarksTable() {
             Student Marks
           </h2>
 
-          <p className="mt-1 text-sm text-gray-500">
+          {/* <p className="mt-1 text-sm text-gray-500">
             Enter and update marks for students
-          </p>
+          </p> */}
         </div>
 
         <div className="relative w-full sm:w-80">
           <Search
-            size={18}
-            className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+            size={17}
+            className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
           />
 
           <input
             type="text"
-            placeholder="Search student, class or subject..."
+            placeholder="Search student, class or subject"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full rounded-xl border border-gray-200 bg-gray-50 py-2.5 pl-10 pr-4 text-sm outline-none focus:border-[#01796F] focus:ring-2 focus:ring-[#01796F]/10"
+            className="w-full rounded-full border border-gray-200 bg-white py-3 pl-11 pr-4 text-sm text-gray-900 outline-none transition placeholder:text-gray-400 focus:border-[#01796F] focus:ring-2 focus:ring-[#01796F]/10"
           />
         </div>
       </div>
@@ -239,7 +239,7 @@ export default function MarksTable() {
                         <button
                           type="button"
                           onClick={() => handleSave(item.id)}
-                          className="rounded-lg p-2 text-[#01796F] hover:bg-[#e6f4f2]"
+                          className="flex h-9 w-9 items-center justify-center rounded-lg text-[#01796F] transition hover:bg-[#e6f4f2] hover:text-[#01796f]"
                           title="Save"
                         >
                           <Save size={17} />
@@ -250,7 +250,7 @@ export default function MarksTable() {
                           onClick={() =>
                             setEditingId(item.id)
                           }
-                          className="rounded-lg p-2 text-blue-600 hover:bg-blue-50"
+                          className="flex h-9 w-9 items-center justify-center rounded-lg text-gray-500 transition hover:bg-[#e6f4f2] hover:text-[#01796f]"
                           title="Edit Marks"
                         >
                           <Pencil size={17} />
@@ -379,12 +379,12 @@ export default function MarksTable() {
                       ? handleSave(item.id)
                       : setEditingId(item.id)
                   }
-                  className="rounded-lg p-2 text-[#01796F] hover:bg-[#e6f4f2]"
+                  className="flex h-9 w-9 items-center justify-center rounded-lg text-[#01796F] transition hover:bg-[#e6f4f2] hover:text-[#01796f]"
                 >
                   {isEditing ? (
-                    <Save size={18} />
+                    <Save size={17} />
                   ) : (
-                    <Pencil size={18} />
+                    <Pencil size={17} />
                   )}
                 </button>
               </div>
