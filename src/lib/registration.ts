@@ -1,10 +1,8 @@
 import { RegistrationData } from "@/types/registration";
-import { addUser } from "@/lib/users";
+import { addUser, getUsers } from "@/lib/users";
 
 export const registerUser = (form: RegistrationData) => {
-  const users = JSON.parse(
-    localStorage.getItem("school-users") || "[]"
-  );
+  const users = getUsers();
 
   const emailExists = users.some(
     (user: { email: string }) =>
@@ -19,9 +17,9 @@ export const registerUser = (form: RegistrationData) => {
   }
 
   const username = form.username
-  .trim()
-  .toLowerCase();
-  
+    .trim()
+    .toLowerCase();
+
   const usernameExists = users.some(
     (user: { username: string }) =>
       user.username.toLowerCase() === username
@@ -47,9 +45,16 @@ export const registerUser = (form: RegistrationData) => {
   });
 
   if (form.role === "Student") {
-    const students = JSON.parse(
-      localStorage.getItem("registered-students") || "[]"
-    );
+    let students;
+
+    try {
+      students = JSON.parse(
+        localStorage.getItem("registered-students") || "[]"
+      );
+    } catch {
+      students = [];
+      localStorage.removeItem("registered-students");
+    }
 
     students.push({
       id: userId,
@@ -78,9 +83,16 @@ export const registerUser = (form: RegistrationData) => {
   }
 
   if (form.role === "Teacher") {
-    const teachers = JSON.parse(
-      localStorage.getItem("registered-teachers") || "[]"
-    );
+    let teachers;
+
+    try {
+      teachers = JSON.parse(
+        localStorage.getItem("registered-teachers") || "[]"
+      );
+    } catch {
+      teachers = [];
+      localStorage.removeItem("registered-teachers");
+    }
 
     teachers.push({
       id: userId,
@@ -112,3 +124,4 @@ export const registerUser = (form: RegistrationData) => {
     message: `${form.role} account created successfully.`,
   };
 };
+

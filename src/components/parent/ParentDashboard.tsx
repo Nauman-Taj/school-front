@@ -92,7 +92,7 @@ export default function ParentDashboard() {
             {/* Parent Information + Child Selector */}
             <div className="grid gap-4 lg:grid-cols-[1fr_280px]">
                 <div className="rounded-2xl border border-gray-200 bg-white p-5">
-                    <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-4 mt-2">
                         <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[#e6f4f2] text-[#01796F]">
                             <UserRound size={23} />
                         </div>
@@ -106,9 +106,9 @@ export default function ParentDashboard() {
                                 {parent.email}
                             </p>
 
-                            <p className="mt-1 text-sm text-gray-500">
+                            {/* <p className="mt-1 text-sm text-gray-500">
                                 {parent.phone}
-                            </p>
+                            </p> */}
                         </div>
                     </div>
                 </div>
@@ -140,9 +140,9 @@ export default function ParentDashboard() {
             <div className="rounded-2xl border border-gray-200 bg-white p-5">
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                     <div>
-                        <p className="text-sm text-gray-500">
+                        {/* <p className="text-sm text-gray-500">
                             Selected Child
-                        </p>
+                        </p> */}
 
                         <h2 className="mt-1 text-xl font-bold text-gray-800">
                             {childData.childName}

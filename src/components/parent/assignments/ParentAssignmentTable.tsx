@@ -1,9 +1,11 @@
 "use client";
 
+import { useState } from "react";
 import {
   CheckCircle2,
   Clock3,
   Eye,
+  Search,
   XCircle,
 } from "lucide-react";
 
@@ -31,8 +33,39 @@ const statusStyles = {
 export default function ParentAssignmentTable({
   assignments,
 }: ParentAssignmentTableProps) {
+  const [search, setSearch] = useState("");
+
+  const filteredAssignments = assignments.filter((assignment) => {
+    const searchTerm = search.toLowerCase();
+
+    return (
+      assignment.title.toLowerCase().includes(searchTerm) ||
+      assignment.childName.toLowerCase().includes(searchTerm) ||
+      assignment.subject.toLowerCase().includes(searchTerm) ||
+      assignment.teacher.toLowerCase().includes(searchTerm) ||
+      assignment.dueDate.toLowerCase().includes(searchTerm) ||
+      assignment.status.toLowerCase().includes(searchTerm)
+    );
+  });
+
   return (
-    <>
+    <div className="space-y-5">
+      {/* Search */}
+      <div className="relative">
+        <Search
+          size={17}
+          className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
+        />
+
+        <input
+          type="text"
+          placeholder="Search assignments"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          className="w-full rounded-full border border-gray-200 bg-white py-3 pl-11 pr-4 text-sm text-gray-900 outline-none transition placeholder:text-gray-400 focus:border-[#01796F] focus:ring-2 focus:ring-[#01796F]/10"
+        />
+      </div>
+
       {/* Desktop */}
       <div className="hidden overflow-x-auto rounded-2xl border border-gray-200 bg-white md:block">
         <table className="w-full text-sm">
@@ -52,7 +85,7 @@ export default function ParentAssignmentTable({
           </thead>
 
           <tbody>
-            {assignments.map((assignment) => {
+            {filteredAssignments.map((assignment) => {
               const status = statusStyles[assignment.status];
               const Icon = status.icon;
 
@@ -65,6 +98,7 @@ export default function ParentAssignmentTable({
                     <p className="font-medium text-gray-900">
                       {assignment.title}
                     </p>
+
                     <p className="mt-1 text-xs text-gray-500">
                       {assignment.childName}
                     </p>
@@ -114,13 +148,24 @@ export default function ParentAssignmentTable({
                 </tr>
               );
             })}
+
+            {filteredAssignments.length === 0 && (
+              <tr>
+                <td
+                  colSpan={6}
+                  className="px-6 py-8 text-center text-sm text-gray-500"
+                >
+                  No assignments found.
+                </td>
+              </tr>
+            )}
           </tbody>
         </table>
       </div>
 
       {/* Mobile */}
       <div className="space-y-3 md:hidden">
-        {assignments.map((assignment) => {
+        {filteredAssignments.map((assignment) => {
           const status = statusStyles[assignment.status];
           const Icon = status.icon;
 
@@ -192,8 +237,13 @@ export default function ParentAssignmentTable({
             </div>
           );
         })}
+
+        {filteredAssignments.length === 0 && (
+          <div className="rounded-2xl border border-gray-200 bg-white px-4 py-8 text-center text-sm text-gray-500">
+            No assignments found.
+          </div>
+        )}
       </div>
-    </>
+    </div>
   );
 }
-

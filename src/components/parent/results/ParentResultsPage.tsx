@@ -38,11 +38,11 @@ export default function ParentResultsPage() {
   const average =
     results.length > 0
       ? Math.round(
-          results.reduce(
-            (sum, result) => sum + result.percentage,
-            0
-          ) / results.length
-        )
+        results.reduce(
+          (sum, result) => sum + result.percentage,
+          0
+        ) / results.length
+      )
       : 0;
 
   const highest = results.length
@@ -150,7 +150,7 @@ export default function ParentResultsPage() {
 
       {/* Results */}
       <div>
-        <div className="mb-4">
+        {/* <div className="mb-4">
           <h2 className="text-lg font-semibold text-gray-900">
             Examination Results
           </h2>
@@ -158,7 +158,7 @@ export default function ParentResultsPage() {
           <p className="mt-1 text-sm text-gray-500">
             Mid Term results for the selected child.
           </p>
-        </div>
+        </div> */}
 
         <ParentResultsTable results={results} />
       </div>

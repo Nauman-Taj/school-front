@@ -1,8 +1,10 @@
 "use client";
 
+import { useState } from "react";
 import {
   Check,
   Clock3,
+  Search,
   X,
 } from "lucide-react";
 
@@ -30,8 +32,37 @@ const statusStyles = {
 export default function ParentAttendanceTable({
   records,
 }: ParentAttendanceTableProps) {
+  const [search, setSearch] = useState("");
+
+  const filteredRecords = records.filter((record) => {
+    const searchTerm = search.toLowerCase();
+
+    return (
+      record.childName.toLowerCase().includes(searchTerm) ||
+      record.className.toLowerCase().includes(searchTerm) ||
+      record.date.toLowerCase().includes(searchTerm) ||
+      record.status.toLowerCase().includes(searchTerm)
+    );
+  });
+
   return (
-    <>
+    <div className="space-y-5">
+      {/* Search */}
+      <div className="relative">
+        <Search
+          size={17}
+          className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
+        />
+
+        <input
+          type="text"
+          placeholder="Search attendance"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          className="w-full rounded-full border border-gray-200 bg-white py-3 pl-11 pr-4 text-sm text-gray-900 outline-none transition placeholder:text-gray-400 focus:border-[#01796F] focus:ring-2 focus:ring-[#01796F]/10"
+        />
+      </div>
+
       {/* Desktop */}
       <div className="hidden overflow-x-auto rounded-2xl border border-gray-200 bg-white md:block">
         <table className="w-full text-sm">
@@ -45,7 +76,7 @@ export default function ParentAttendanceTable({
           </thead>
 
           <tbody>
-            {records.map((record) => {
+            {filteredRecords.map((record) => {
               const status = statusStyles[record.status];
               const Icon = status.icon;
 
@@ -84,13 +115,24 @@ export default function ParentAttendanceTable({
                 </tr>
               );
             })}
+
+            {filteredRecords.length === 0 && (
+              <tr>
+                <td
+                  colSpan={4}
+                  className="px-6 py-8 text-center text-sm text-gray-500"
+                >
+                  No attendance records found.
+                </td>
+              </tr>
+            )}
           </tbody>
         </table>
       </div>
 
       {/* Mobile */}
       <div className="space-y-3 md:hidden">
-        {records.map((record) => {
+        {filteredRecords.map((record) => {
           const status = statusStyles[record.status];
           const Icon = status.icon;
 
@@ -131,7 +173,14 @@ export default function ParentAttendanceTable({
             </div>
           );
         })}
+
+        {filteredRecords.length === 0 && (
+          <div className="rounded-2xl border border-gray-200 bg-white px-4 py-8 text-center text-sm text-gray-500">
+            No attendance records found.
+          </div>
+        )}
       </div>
-    </>
+    </div>
   );
 }
+
