@@ -10,13 +10,26 @@ import {
     Wallet,
 } from "lucide-react";
 
-import { parents } from "@/data/parents";
 import { parentDashboardData } from "@/data/parentDashboard";
+import { getCurrentParent } from "@/lib/parent";
 
 export default function ParentDashboard() {
-    // Temporary logged-in parent.
-    // Later this will come from getSession().
-    const parent = parents[0];
+    // Get the currently logged-in parent
+    const parent = getCurrentParent();
+
+    if (!parent) {
+        return (
+            <div className="rounded-2xl border border-gray-200 bg-white p-8 text-center">
+                <h2 className="text-lg font-semibold text-gray-800">
+                    Parent account not found
+                </h2>
+
+                <p className="mt-2 text-sm text-gray-500">
+                    No parent information is available for this account.
+                </p>
+            </div>
+        );
+    }
 
     const [selectedChild, setSelectedChild] = useState(
         parent.children[0]
@@ -67,14 +80,14 @@ export default function ParentDashboard() {
         <div className="space-y-5">
             {/* Header */}
             <div>
-        <h1 className="text-2xl font-bold text-gray-900 sm:text-3xl">
-          Dashboard
-        </h1>
+                <h1 className="text-2xl font-bold text-gray-900 sm:text-3xl">
+                    Dashboard
+                </h1>
 
-        <p className="mt-1 text-sm text-gray-500 sm:text-base">
-          Welcome back. Here's is your child regarding information.
-        </p>
-      </div>
+                <p className="mt-1 text-sm text-gray-500 sm:text-base">
+                    Welcome back. Here's is your child regarding information.
+                </p>
+            </div>
 
             {/* Parent Information + Child Selector */}
             <div className="grid gap-4 lg:grid-cols-[1fr_280px]">
@@ -307,3 +320,4 @@ export default function ParentDashboard() {
         </div>
     );
 }
+

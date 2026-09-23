@@ -68,7 +68,7 @@ export const parents: Parent[] = [
     phone: "+92 306 7778899",
     address: "Wapda Town, Multan",
     occupation: "Businessman",
-    children: ["Maryam Tariq", "Mariam Tariq"],
+    children: ["Maryam Tariq", "Maria Tariq"],
     status: "Inactive",
   },
   {
