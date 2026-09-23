@@ -3,7 +3,7 @@ import { User } from "@/types/user";
 export const users: User[] = [
   {
     id: 1,
-    name: "Administrator",
+    name: "Nauman Taj",
     email: "admin@garrisonschool.edu.pk",
     username: "admin",
     password: "nauman360",

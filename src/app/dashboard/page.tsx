@@ -7,7 +7,7 @@ import { statsData } from "@/data/dashboard";
 
 export default function DashboardPage() {
   return (
-    <main className="space-y-8">
+    <main className="space-y-5">
 
       <div>
         <h1 className="text-2xl font-bold text-gray-900 sm:text-3xl">

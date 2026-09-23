@@ -1,18 +1,26 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
-import { Search, Menu, User, X } from "lucide-react";
+import { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
+import {
+  Search,
+  Menu,
+  User,
+  X,
+} from "lucide-react";
 
 import { getSession, AuthSession } from "@/lib/auth";
 import { navigationByRole } from "@/data/navigation";
+import { parentNavigation } from "@/data/parentNavigation";
 
-type HeaderProps = {
+type ParentHeaderProps = {
   onMenuClick?: () => void;
 };
 
-export default function Header({ onMenuClick }: HeaderProps) {
+export default function ParentHeader({
+  onMenuClick,
+}: ParentHeaderProps) {
   const router = useRouter();
   const searchRef = useRef<HTMLDivElement>(null);
 
@@ -46,14 +54,22 @@ export default function Header({ onMenuClick }: HeaderProps) {
     };
   }, []);
 
-  const navigation = session
-    ? navigationByRole[session.role]
-    : [];
+  // Use Parent navigation for Parent users
+  const navigation =
+    session?.role === "Parent"
+      ? parentNavigation.map((item) => ({
+        label: item.title,
+        href: item.href,
+        icon: item.icon,
+      }))
+      : session
+        ? navigationByRole[session.role]
+        : [];
 
   const results = navigation.filter((item) =>
     item.label
       .toLowerCase()
-      .includes(search.toLowerCase())
+      .includes(search.trim().toLowerCase())
   );
 
   const handleSearch = (href: string) => {
@@ -66,12 +82,13 @@ export default function Header({ onMenuClick }: HeaderProps) {
     <header className="sticky top-0 z-30 h-16 border-b border-gray-200 bg-white">
       <div className="flex h-full items-center justify-between px-4 sm:px-6 lg:px-8">
 
-        {/* Left */}
+        {/* Left Side */}
         <div className="flex items-center gap-3">
+
           <button
             type="button"
             onClick={onMenuClick}
-            className="rounded-lg p-2 text-gray-600 hover:bg-gray-100 lg:hidden"
+            className="rounded-lg p-2 text-gray-600 transition hover:bg-gray-100 lg:hidden"
             aria-label="Open menu"
           >
             <Menu size={21} />
@@ -87,7 +104,7 @@ export default function Header({ onMenuClick }: HeaderProps) {
           </div>
         </div>
 
-        {/* Right */}
+        {/* Right Side */}
         <div className="flex items-center gap-2">
 
           {/* Search */}
@@ -110,6 +127,7 @@ export default function Header({ onMenuClick }: HeaderProps) {
             {searchOpen && (
               <div className="absolute right-13 top-[-10] z-50 w-72 rounded-xl border border-gray-200 bg-white p-2 shadow-lg">
 
+                {/* Search Input */}
                 <div className="flex items-center gap-2 rounded-full border border-gray-200 px-3">
                   <Search
                     size={17}
@@ -139,7 +157,8 @@ export default function Header({ onMenuClick }: HeaderProps) {
                   </button>
                 </div>
 
-                {search && (
+                {/* Results */}
+                {search.trim() && (
                   <div className="mt-2 max-h-60 overflow-y-auto">
                     {results.length > 0 ? (
                       results.map((item) => {
@@ -152,10 +171,11 @@ export default function Header({ onMenuClick }: HeaderProps) {
                             onClick={() =>
                               handleSearch(item.href)
                             }
-                            className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left text-sm text-gray-700 hover:bg-[#e6f4f2] hover:text-[#01796f]"
+                            className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left text-sm text-gray-700 transition hover:bg-[#e6f4f2] hover:text-[#01796f]"
                           >
                             <Icon size={17} />
-                            {item.label}
+
+                            <span>{item.label}</span>
                           </button>
                         );
                       })
@@ -174,11 +194,11 @@ export default function Header({ onMenuClick }: HeaderProps) {
           <div className="ml-2 flex items-center gap-3 border-l border-gray-200 pl-4">
             <div className="hidden text-right sm:block">
               <p className="text-sm font-semibold text-gray-900">
-                {session?.name || "User"}
+                {session?.name || "Parent"}
               </p>
 
               <p className="text-xs text-gray-500">
-                {session?.role || "User"}
+                {session?.role || "Parent"}
               </p>
             </div>
 
@@ -195,3 +215,4 @@ export default function Header({ onMenuClick }: HeaderProps) {
     </header>
   );
 }
+
