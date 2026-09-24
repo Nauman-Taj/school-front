@@ -1,12 +1,12 @@
 import { ParentTimetable } from "@/types/parentTimetable";
 
 export const parentTimetable: ParentTimetable[] = [
-  // Ali Asif — 4 records
+  // Ali Asif - 4 records
   {
     id: 1,
     childId: 1,
     childName: "Ali Asif",
-    className: "Grade 8-A",
+    className: "Grade 8 - A",
     day: "Monday",
     time: "08:00 AM - 08:45 AM",
     subject: "Mathematics",
@@ -17,7 +17,7 @@ export const parentTimetable: ParentTimetable[] = [
     id: 2,
     childId: 1,
     childName: "Ali Asif",
-    className: "Grade 8-A",
+    className: "Grade 8 - A",
     day: "Monday",
     time: "08:45 AM - 09:30 AM",
     subject: "English",
@@ -28,7 +28,7 @@ export const parentTimetable: ParentTimetable[] = [
     id: 3,
     childId: 1,
     childName: "Ali Asif",
-    className: "Grade 8-A",
+    className: "Grade 8 - A",
     day: "Tuesday",
     time: "08:00 AM - 08:45 AM",
     subject: "Science",
@@ -39,7 +39,7 @@ export const parentTimetable: ParentTimetable[] = [
     id: 4,
     childId: 1,
     childName: "Ali Asif",
-    className: "Grade 8-A",
+    className: "Grade 8 - A",
     day: "Tuesday",
     time: "08:45 AM - 09:30 AM",
     subject: "Computer Science",
@@ -47,12 +47,12 @@ export const parentTimetable: ParentTimetable[] = [
     room: "Computer Lab",
   },
 
-  // Hassan Asif — 4 records
+  // Hassan Asif - 4 records
   {
     id: 5,
     childId: 2,
     childName: "Hassan Asif",
-    className: "Grade 6-B",
+    className: "Grade 6 - B",
     day: "Monday",
     time: "08:00 AM - 08:45 AM",
     subject: "Science",
@@ -63,7 +63,7 @@ export const parentTimetable: ParentTimetable[] = [
     id: 6,
     childId: 2,
     childName: "Hassan Asif",
-    className: "Grade 6-B",
+    className: "Grade 6 - B",
     day: "Monday",
     time: "08:45 AM - 09:30 AM",
     subject: "Mathematics",
@@ -74,7 +74,7 @@ export const parentTimetable: ParentTimetable[] = [
     id: 7,
     childId: 2,
     childName: "Hassan Asif",
-    className: "Grade 6-B",
+    className: "Grade 6 - B",
     day: "Tuesday",
     time: "08:00 AM - 08:45 AM",
     subject: "English",
@@ -85,7 +85,7 @@ export const parentTimetable: ParentTimetable[] = [
     id: 8,
     childId: 2,
     childName: "Hassan Asif",
-    className: "Grade 6-B",
+    className: "Grade 6 - B",
     day: "Tuesday",
     time: "08:45 AM - 09:30 AM",
     subject: "Computer Science",

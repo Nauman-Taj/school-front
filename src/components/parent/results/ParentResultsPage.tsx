@@ -9,23 +9,15 @@ import {
 } from "lucide-react";
 
 import { parentResults } from "@/data/parentResults";
+import { getCurrentParentChildren } from "@/lib/parent";
 import ParentResultsTable from "./ParentResultsTable";
 
-const children = [
-  {
-    id: 1,
-    name: "Ali Asif",
-    className: "Grade 8 - A",
-  },
-  {
-    id: 2,
-    name: "Hassan Asif",
-    className: "Grade 6 - B",
-  },
-];
-
 export default function ParentResultsPage() {
-  const [selectedChild, setSelectedChild] = useState(1);
+  const children = getCurrentParentChildren();
+
+  const [selectedChild, setSelectedChild] = useState(
+    children[0]?.id ?? 0
+  );
 
   const results = useMemo(
     () =>
@@ -46,7 +38,9 @@ export default function ParentResultsPage() {
       : 0;
 
   const highest = results.length
-    ? Math.max(...results.map((result) => result.percentage))
+    ? Math.max(
+      ...results.map((result) => result.percentage)
+    )
     : 0;
 
   const passed = results.filter(
@@ -89,7 +83,8 @@ export default function ParentResultsPage() {
         </h1>
 
         <p className="mt-1 text-sm text-gray-500">
-          View your child's examination results and academic performance.
+          View your child's examination results and academic
+          performance.
         </p>
       </div>
 
@@ -112,7 +107,7 @@ export default function ParentResultsPage() {
         >
           {children.map((child) => (
             <option key={child.id} value={child.id}>
-              {child.name} — {child.className}
+              {child.name} --- {child.className}
             </option>
           ))}
         </select>
@@ -150,16 +145,6 @@ export default function ParentResultsPage() {
 
       {/* Results */}
       <div>
-        {/* <div className="mb-4">
-          <h2 className="text-lg font-semibold text-gray-900">
-            Examination Results
-          </h2>
-
-          <p className="mt-1 text-sm text-gray-500">
-            Mid Term results for the selected child.
-          </p>
-        </div> */}
-
         <ParentResultsTable results={results} />
       </div>
     </div>

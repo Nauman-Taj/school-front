@@ -1,12 +1,12 @@
 import { ParentResult } from "@/types/parentResult";
 
 export const parentResults: ParentResult[] = [
-  // Ali Asif — Grade 8-A
+  // Ali Asif -- Grade 8 - A
   {
     id: 1,
     childId: 1,
     childName: "Ali Asif",
-    className: "Grade 8-A",
+    className: "Grade 8 - A",
     subject: "Mathematics",
     totalMarks: 100,
     obtainedMarks: 86,
@@ -18,7 +18,7 @@ export const parentResults: ParentResult[] = [
     id: 2,
     childId: 1,
     childName: "Ali Asif",
-    className: "Grade 8-A",
+    className: "Grade 8 - A",
     subject: "Science",
     totalMarks: 100,
     obtainedMarks: 79,
@@ -30,7 +30,7 @@ export const parentResults: ParentResult[] = [
     id: 3,
     childId: 1,
     childName: "Ali Asif",
-    className: "Grade 8-A",
+    className: "Grade 8 - A",
     subject: "English",
     totalMarks: 100,
     obtainedMarks: 91,
@@ -42,7 +42,7 @@ export const parentResults: ParentResult[] = [
     id: 4,
     childId: 1,
     childName: "Ali Asif",
-    className: "Grade 8-A",
+    className: "Grade 8 - A",
     subject: "Computer Science",
     totalMarks: 100,
     obtainedMarks: 88,
@@ -54,7 +54,7 @@ export const parentResults: ParentResult[] = [
     id: 5,
     childId: 1,
     childName: "Ali Asif",
-    className: "Grade 8-A",
+    className: "Grade 8 - A",
     subject: "Urdu",
     totalMarks: 100,
     obtainedMarks: 74,
@@ -63,12 +63,12 @@ export const parentResults: ParentResult[] = [
     exam: "Mid Term",
   },
 
-  // Hassan Asif — Grade 6-B
+  // Hassan Asif -- Grade 6 - B
   {
     id: 6,
     childId: 2,
     childName: "Hassan Asif",
-    className: "Grade 6-B",
+    className: "Grade 6 - B",
     subject: "Mathematics",
     totalMarks: 100,
     obtainedMarks: 68,
@@ -80,7 +80,7 @@ export const parentResults: ParentResult[] = [
     id: 7,
     childId: 2,
     childName: "Hassan Asif",
-    className: "Grade 6-B",
+    className: "Grade 6 - B",
     subject: "Science",
     totalMarks: 100,
     obtainedMarks: 82,
@@ -92,7 +92,7 @@ export const parentResults: ParentResult[] = [
     id: 8,
     childId: 2,
     childName: "Hassan Asif",
-    className: "Grade 6-B",
+    className: "Grade 6 - B",
     subject: "English",
     totalMarks: 100,
     obtainedMarks: 76,
@@ -104,7 +104,7 @@ export const parentResults: ParentResult[] = [
     id: 9,
     childId: 2,
     childName: "Hassan Asif",
-    className: "Grade 6-B",
+    className: "Grade 6 - B",
     subject: "Computer Science",
     totalMarks: 100,
     obtainedMarks: 93,
@@ -116,7 +116,7 @@ export const parentResults: ParentResult[] = [
     id: 10,
     childId: 2,
     childName: "Hassan Asif",
-    className: "Grade 6-B",
+    className: "Grade 6 - B",
     subject: "Urdu",
     totalMarks: 100,
     obtainedMarks: 64,

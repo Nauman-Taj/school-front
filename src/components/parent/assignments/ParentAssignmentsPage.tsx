@@ -98,7 +98,7 @@ export default function ParentAssignmentsPage() {
         >
           {children.map((child) => (
             <option key={child.id} value={child.id}>
-              {child.name} — {child.className}
+              {child.name} --- {child.className}
             </option>
           ))}
         </select>

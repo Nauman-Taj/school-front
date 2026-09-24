@@ -129,7 +129,7 @@ export const students: Student[] = [
     status: "Active",
   },
 
-  // Grade 8-A
+  // Grade 8 - A
   {
     id: 5,
     name: "Abdullah Khan",

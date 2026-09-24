@@ -1,12 +1,12 @@
 import { ParentAssignment } from "@/types/parentAssignment";
 
 export const parentAssignments: ParentAssignment[] = [
-  // Ali Asif — Grade 8-A
+  // Ali Asif -- Grade 8 - A
   {
     id: 1,
     childId: 1,
     childName: "Ali Asif",
-    className: "Grade 8-A",
+    className: "Grade 8 - A",
     subject: "Mathematics",
     title: "Linear Equations Practice",
     teacher: "Ayesha Khan",
@@ -17,7 +17,7 @@ export const parentAssignments: ParentAssignment[] = [
     id: 2,
     childId: 1,
     childName: "Ali Asif",
-    className: "Grade 8-A",
+    className: "Grade 8 - A",
     subject: "Science",
     title: "Human Digestive System Project",
     teacher: "Hassan Ali",
@@ -28,7 +28,7 @@ export const parentAssignments: ParentAssignment[] = [
     id: 3,
     childId: 1,
     childName: "Ali Asif",
-    className: "Grade 8-A",
+    className: "Grade 8 - A",
     subject: "English",
     title: "Argumentative Essay Writing",
     teacher: "Fatima Noor",
@@ -39,7 +39,7 @@ export const parentAssignments: ParentAssignment[] = [
     id: 4,
     childId: 1,
     childName: "Ali Asif",
-    className: "Grade 8-A",
+    className: "Grade 8 - A",
     subject: "Computer Science",
     title: "HTML and CSS Web Page",
     teacher: "Bilal Raza",
@@ -47,12 +47,12 @@ export const parentAssignments: ParentAssignment[] = [
     status: "Overdue",
   },
 
-  // Hassan Asif — Grade 6-B
+  // Hassan Asif -- Grade 6 - B
   {
     id: 5,
     childId: 2,
     childName: "Hassan Asif",
-    className: "Grade 6-B",
+    className: "Grade 6 - B",
     subject: "Mathematics",
     title: "Fractions and Decimals Worksheet",
     teacher: "Ayesha Khan",
@@ -63,7 +63,7 @@ export const parentAssignments: ParentAssignment[] = [
     id: 6,
     childId: 2,
     childName: "Hassan Asif",
-    className: "Grade 6-B",
+    className: "Grade 6 - B",
     subject: "Science",
     title: "Plant Life Cycle Report",
     teacher: "Hassan Ali",
@@ -74,7 +74,7 @@ export const parentAssignments: ParentAssignment[] = [
     id: 7,
     childId: 2,
     childName: "Hassan Asif",
-    className: "Grade 6-B",
+    className: "Grade 6 - B",
     subject: "English",
     title: "Reading Comprehension",
     teacher: "Fatima Noor",
@@ -85,7 +85,7 @@ export const parentAssignments: ParentAssignment[] = [
     id: 8,
     childId: 2,
     childName: "Hassan Asif",
-    className: "Grade 6-B",
+    className: "Grade 6 - B",
     subject: "Computer Science",
     title: "Introduction to Algorithms",
     teacher: "Bilal Raza",

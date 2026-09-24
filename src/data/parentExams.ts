@@ -1,12 +1,12 @@
 import { ParentExam } from "@/types/parentExam";
 
 export const parentExams: ParentExam[] = [
-  // Ali Asif — Total: 4 | Upcoming: 3 | Completed: 1
+  // Ali Asif - Total: 4 | Upcoming: 3 | Completed: 1
   {
     id: 1,
     childId: 1,
     childName: "Ali Asif",
-    className: "Grade 8-A",
+    className: "Grade 8 - A",
     examName: "Mid Term Examination",
     subject: "Mathematics",
     date: "2026-10-05",
@@ -18,7 +18,7 @@ export const parentExams: ParentExam[] = [
     id: 2,
     childId: 1,
     childName: "Ali Asif",
-    className: "Grade 8-A",
+    className: "Grade 8 - A",
     examName: "Mid Term Examination",
     subject: "English",
     date: "2026-10-06",
@@ -30,7 +30,7 @@ export const parentExams: ParentExam[] = [
     id: 3,
     childId: 1,
     childName: "Ali Asif",
-    className: "Grade 8-A",
+    className: "Grade 8 - A",
     examName: "Science Assessment",
     subject: "Science",
     date: "2026-10-08",
@@ -42,7 +42,7 @@ export const parentExams: ParentExam[] = [
     id: 4,
     childId: 1,
     childName: "Ali Asif",
-    className: "Grade 8-A",
+    className: "Grade 8 - A",
     examName: "Computer Assessment",
     subject: "Computer Science",
     date: "2026-09-15",
@@ -51,12 +51,12 @@ export const parentExams: ParentExam[] = [
     status: "Completed",
   },
 
-  // Hassan Asif — Total: 6 | Upcoming: 2 | Completed: 4
+  // Hassan Asif - Total: 6 | Upcoming: 2 | Completed: 4
   {
     id: 5,
     childId: 2,
     childName: "Hassan Asif",
-    className: "Grade 6-B",
+    className: "Grade 6 - B",
     examName: "First Term Examination",
     subject: "Physics",
     date: "2026-10-12",
@@ -68,7 +68,7 @@ export const parentExams: ParentExam[] = [
     id: 6,
     childId: 2,
     childName: "Hassan Asif",
-    className: "Grade 6-B",
+    className: "Grade 6 - B",
     examName: "First Term Examination",
     subject: "Mathematics",
     date: "2026-10-14",
@@ -80,7 +80,7 @@ export const parentExams: ParentExam[] = [
     id: 7,
     childId: 2,
     childName: "Hassan Asif",
-    className: "Grade 6-B",
+    className: "Grade 6 - B",
     examName: "English Assessment",
     subject: "English",
     date: "2026-09-16",
@@ -92,7 +92,7 @@ export const parentExams: ParentExam[] = [
     id: 8,
     childId: 2,
     childName: "Hassan Asif",
-    className: "Grade 6-B",
+    className: "Grade 6 - B",
     examName: "Computer Science Test",
     subject: "Computer Science",
     date: "2026-09-18",
@@ -104,7 +104,7 @@ export const parentExams: ParentExam[] = [
     id: 9,
     childId: 2,
     childName: "Hassan Asif",
-    className: "Grade 6-B",
+    className: "Grade 6 - B",
     examName: "Monthly Assessment",
     subject: "History",
     date: "2026-09-10",
@@ -116,7 +116,7 @@ export const parentExams: ParentExam[] = [
     id: 10,
     childId: 2,
     childName: "Hassan Asif",
-    className: "Grade 6-B",
+    className: "Grade 6 - B",
     examName: "Science Quiz",
     subject: "Science",
     date: "2026-09-12",
