@@ -62,6 +62,18 @@ export const parentResults: ParentResult[] = [
     grade: "B",
     exam: "Mid Term",
   },
+  {
+    id: 6,
+    childId: 1,
+    childName: "Ali Asif",
+    className: "Grade 8 - A",
+    subject: "Islamiyat",
+    totalMarks: 100,
+    obtainedMarks: 87,
+    percentage: 87,
+    grade: "A",
+    exam: "Mid Term",
+  },
 
   // Hassan Asif -- Grade 6 - B
   {

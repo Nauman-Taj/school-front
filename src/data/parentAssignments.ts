@@ -92,4 +92,15 @@ export const parentAssignments: ParentAssignment[] = [
     dueDate: "2026-09-27",
     status: "Pending",
   },
+  {
+    id: 9,
+    childId: 2,
+    childName: "Hassan Asif",
+    className: "Grade 6 - B",
+    subject: "Islamiyat",
+    title: "Basic Pillars of Islam",
+    teacher: "Zainab Malik",
+    dueDate: "2026-09-27",
+    status: "Submitted",
+  },
 ];
