@@ -129,7 +129,7 @@ export default function ParentHeader({
               <div
                 className="
                   absolute
-                  right-[-20px]
+                  right-[-60px]
                   top-[-10px]
                   z-50
                   w-[calc(100vw-2rem)]
