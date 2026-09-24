@@ -69,16 +69,16 @@ export default function ParentAssignmentTable({
       {/* Desktop */}
       <div className="hidden overflow-x-auto rounded-2xl border border-gray-200 bg-white md:block">
         <table className="w-full text-sm">
-          <thead>
+          <thead className="bg-gray-50">
             <tr className="border-b border-gray-200 text-left text-gray-500">
-              <th className="px-6 py-4 font-medium">Assignment</th>
-              <th className="px-6 py-4 font-medium">Subject</th>
-              <th className="px-6 py-4 font-medium">Teacher</th>
-              <th className="px-6 py-4 font-medium">Due Date</th>
-              <th className="px-6 py-4 text-center font-medium">
+              <th className="px-6 py-4 font-semibold text-gray-600">Assignment</th>
+              <th className="px-6 py-4 font-semibold text-gray-600">Subject</th>
+              <th className="px-6 py-4 font-semibold text-gray-600">Teacher</th>
+              <th className="px-6 py-4 font-semibold text-gray-600">Due Date</th>
+              <th className="px-6 py-4 text-center font-semibold text-gray-600">
                 Status
               </th>
-              <th className="px-6 py-4 text-center font-medium">
+              <th className="px-6 py-4 text-center font-semibold text-gray-600">
                 Action
               </th>
             </tr>

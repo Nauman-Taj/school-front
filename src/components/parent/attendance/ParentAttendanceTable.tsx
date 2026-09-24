@@ -66,12 +66,12 @@ export default function ParentAttendanceTable({
       {/* Desktop */}
       <div className="hidden overflow-x-auto rounded-2xl border border-gray-200 bg-white md:block">
         <table className="w-full text-sm">
-          <thead>
+          <thead className="bg-gray-50">
             <tr className="border-b border-gray-200 text-left text-gray-500">
-              <th className="px-6 py-4 font-medium">Date</th>
-              <th className="px-6 py-4 font-medium">Child</th>
-              <th className="px-6 py-4 font-medium">Class</th>
-              <th className="px-6 py-4 font-medium">Status</th>
+              <th className="px-6 py-4 font-semibold text-gray-600">Date</th>
+              <th className="px-6 py-4 font-semibold text-gray-600">Child</th>
+              <th className="px-6 py-4 font-semibold text-gray-600">Class</th>
+              <th className="px-6 py-4 font-semibold text-gray-600">Status</th>
             </tr>
           </thead>
 

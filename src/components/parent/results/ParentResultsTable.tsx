@@ -48,13 +48,13 @@ export default function ParentResultsTable({
       {/* Desktop */}
       <div className="hidden overflow-x-auto rounded-2xl border border-gray-200 bg-white md:block">
         <table className="w-full text-sm">
-          <thead>
+          <thead className="bg-gray-50">
             <tr className="border-b border-gray-200 text-left text-gray-500">
-              <th className="px-6 py-4 font-medium">Subject</th>
-              <th className="px-6 py-4 font-medium">Exam</th>
-              <th className="px-6 py-4 font-medium">Marks</th>
-              <th className="px-6 py-4 font-medium">Percentage</th>
-              <th className="px-6 py-4 text-center font-medium">
+              <th className="px-6 py-4 font-semibold text-gray-600">Subject</th>
+              <th className="px-6 py-4 font-semibold text-gray-600">Exam</th>
+              <th className="px-6 py-4 font-semibold text-gray-600">Marks</th>
+              <th className="px-6 py-4 font-semibold text-gray-600">Percentage</th>
+              <th className="px-6 py-4 text-center font-semibold text-gray-600">
                 Grade
               </th>
             </tr>
