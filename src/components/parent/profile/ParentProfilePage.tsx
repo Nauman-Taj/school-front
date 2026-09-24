@@ -116,7 +116,7 @@ export default function ParentProfilePage() {
                 </h1>
 
                 <p className="mt-1 text-sm text-gray-500">
-                    View and manage your parent account information.
+                    View and manage your account information.
                 </p>
             </div>
 
