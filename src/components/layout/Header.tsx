@@ -108,12 +108,28 @@ export default function Header({ onMenuClick }: HeaderProps) {
             </button>
 
             {searchOpen && (
-              <div className="absolute right-13 top-[-10] z-50 w-72 rounded-xl border border-gray-200 bg-white p-2 shadow-lg">
-
+              <div
+                className="
+                  absolute
+                  right-[-50px]
+                  top-[-10px]
+                  z-50
+                  w-[calc(100vw-2rem)]
+                  max-w-72
+                  translate-y-16
+                  rounded-xl
+                  border
+                  border-gray-200
+                  bg-white
+                  p-2
+                  shadow-lg
+                "
+              >
+                {/* Search Input */}
                 <div className="flex items-center gap-2 rounded-full border border-gray-200 px-3">
                   <Search
                     size={17}
-                    className="text-gray-400"
+                    className="shrink-0 text-gray-400"
                   />
 
                   <input
@@ -123,7 +139,7 @@ export default function Header({ onMenuClick }: HeaderProps) {
                       setSearch(e.target.value)
                     }
                     placeholder="Search"
-                    className="w-full py-2.5 text-sm outline-none"
+                    className="w-full min-w-0 py-2.5 text-sm outline-none"
                   />
 
                   <button
@@ -132,14 +148,15 @@ export default function Header({ onMenuClick }: HeaderProps) {
                       setSearch("");
                       setSearchOpen(false);
                     }}
-                    className="text-gray-400 hover:text-gray-700"
+                    className="shrink-0 text-gray-400 hover:text-gray-700"
                     aria-label="Close search"
                   >
                     <X size={17} />
                   </button>
                 </div>
 
-                {search && (
+                {/* Results */}
+                {search.trim() && (
                   <div className="mt-2 max-h-60 overflow-y-auto">
                     {results.length > 0 ? (
                       results.map((item) => {
@@ -152,10 +169,11 @@ export default function Header({ onMenuClick }: HeaderProps) {
                             onClick={() =>
                               handleSearch(item.href)
                             }
-                            className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left text-sm text-gray-700 hover:bg-[#e6f4f2] hover:text-[#01796f]"
+                            className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left text-sm text-gray-700 transition hover:bg-[#e6f4f2] hover:text-[#01796f]"
                           >
                             <Icon size={17} />
-                            {item.label}
+
+                            <span>{item.label}</span>
                           </button>
                         );
                       })
