@@ -229,7 +229,7 @@ export default function ParentAssignmentTable({
                     `Assignment: ${assignment.title}\nSubject: ${assignment.subject}\nTeacher: ${assignment.teacher}`
                   )
                 }
-                className="mt-4 flex w-full items-center justify-center gap-2 rounded-lg border border-gray-200 py-2 text-sm font-medium text-gray-700 transition hover:bg-[#e6f4f2] hover:text-[#01796f]"
+                className="mt-4 flex w-full items-center justify-center gap-2 rounded-full  border-gray-200 py-2 px-2 text-sm font-medium text-gray-700 transition hover:bg-[#e6f4f2] hover:text-[#01796f]"
               >
                 <Eye size={16} />
                 View Assignment
