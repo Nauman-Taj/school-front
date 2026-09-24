@@ -40,7 +40,7 @@ export const parentDashboardData: ParentChildDashboard[] = [
   {
     childName: "Hassan Asif",
     className: "Grade 6",
-    section: "A",
+    section: "B",
     rollNo: "GGS-014",
 
     attendance: {
