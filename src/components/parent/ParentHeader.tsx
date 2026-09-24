@@ -62,10 +62,10 @@ export default function ParentHeader({
   const navigation =
     session?.role === "Parent"
       ? parentNavigation.map((item) => ({
-          label: item.title,
-          href: item.href,
-          icon: item.icon,
-        }))
+        label: item.title,
+        href: item.href,
+        icon: item.icon,
+      }))
       : session
         ? navigationByRole[session.role]
         : [];
@@ -129,7 +129,7 @@ export default function ParentHeader({
               <div
                 className="
                   absolute
-                  right-0
+                  right-[-20px]
                   top-[-10px]
                   z-50
                   w-[calc(100vw-2rem)]
