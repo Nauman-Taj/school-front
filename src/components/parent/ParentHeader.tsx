@@ -24,7 +24,8 @@ export default function ParentHeader({
   const router = useRouter();
   const searchRef = useRef<HTMLDivElement>(null);
 
-  const [session, setSession] = useState<AuthSession | null>(null);
+  const [session, setSession] =
+    useState<AuthSession | null>(null);
   const [searchOpen, setSearchOpen] = useState(false);
   const [search, setSearch] = useState("");
 
@@ -44,7 +45,10 @@ export default function ParentHeader({
       }
     };
 
-    document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener(
+      "mousedown",
+      handleClickOutside
+    );
 
     return () => {
       document.removeEventListener(
@@ -58,10 +62,10 @@ export default function ParentHeader({
   const navigation =
     session?.role === "Parent"
       ? parentNavigation.map((item) => ({
-        label: item.title,
-        href: item.href,
-        icon: item.icon,
-      }))
+          label: item.title,
+          href: item.href,
+          icon: item.icon,
+        }))
       : session
         ? navigationByRole[session.role]
         : [];
@@ -81,10 +85,8 @@ export default function ParentHeader({
   return (
     <header className="sticky top-0 z-30 h-16 border-b border-gray-200 bg-white">
       <div className="flex h-full items-center justify-between px-4 sm:px-6 lg:px-8">
-
         {/* Left Side */}
         <div className="flex items-center gap-3">
-
           <button
             type="button"
             onClick={onMenuClick}
@@ -106,7 +108,6 @@ export default function ParentHeader({
 
         {/* Right Side */}
         <div className="flex items-center gap-2">
-
           {/* Search */}
           <div
             ref={searchRef}
@@ -125,13 +126,28 @@ export default function ParentHeader({
             </button>
 
             {searchOpen && (
-              <div className="absolute right-13 top-[-10] z-50 w-72 rounded-xl border border-gray-200 bg-white p-2 shadow-lg">
-
+              <div
+                className="
+                  absolute
+                  right-0
+                  top-[-10px]
+                  z-50
+                  w-[calc(100vw-2rem)]
+                  max-w-72
+                  translate-y-16
+                  rounded-xl
+                  border
+                  border-gray-200
+                  bg-white
+                  p-2
+                  shadow-lg
+                "
+              >
                 {/* Search Input */}
                 <div className="flex items-center gap-2 rounded-full border border-gray-200 px-3">
                   <Search
                     size={17}
-                    className="text-gray-400"
+                    className="shrink-0 text-gray-400"
                   />
 
                   <input
@@ -141,7 +157,7 @@ export default function ParentHeader({
                       setSearch(e.target.value)
                     }
                     placeholder="Search"
-                    className="w-full py-2.5 text-sm outline-none"
+                    className="w-full min-w-0 py-2.5 text-sm outline-none"
                   />
 
                   <button
@@ -150,7 +166,7 @@ export default function ParentHeader({
                       setSearch("");
                       setSearchOpen(false);
                     }}
-                    className="text-gray-400 hover:text-gray-700"
+                    className="shrink-0 text-gray-400 hover:text-gray-700"
                     aria-label="Close search"
                   >
                     <X size={17} />
@@ -209,10 +225,8 @@ export default function ParentHeader({
               />
             </div>
           </div>
-
         </div>
       </div>
     </header>
   );
 }
-
