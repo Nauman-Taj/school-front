@@ -5,6 +5,7 @@ import Footer from "@/components/home/Footer";
 import AdmissionsHero from "@/components/admissions/AdmissionsHero";
 import AdmissionProcess from "@/components/admissions/AdmissionProcess";
 import AdmissionsInfo from "@/components/admissions/AdmissionsInfo";
+import AdmissionForm from "@/components/admissions/AdmissionForm";
 import AdmissionsCTA from "@/components/admissions/AdmissionsCTA";
 
 export default function AdmissionsPage() {
@@ -19,6 +20,8 @@ export default function AdmissionsPage() {
       <AdmissionProcess />
 
       <AdmissionsInfo />
+
+      <AdmissionForm />
 
       <AdmissionsCTA />
 
