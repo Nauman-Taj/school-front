@@ -1,0 +1,128 @@
+import { StudentAssignment } from "@/types/studentAssignment";
+
+export const studentAssignments: StudentAssignment[] = [
+  {
+    id: 1,
+    title: "Algebra Practice",
+    subject: "Mathematics",
+    className: "Grade 5",
+    teacher: "Ayesha Khan",
+    description:
+      "Complete the algebra exercises and show all working steps.",
+    dueDate: "2026-09-18",
+    file: "algebra-practice.pdf",
+    submission: "",
+    marks: "-",
+    teacherFeedback: "Not submitted yet.",
+    status: "Pending",
+  },
+  {
+    id: 2,
+    title: "States of Matter",
+    subject: "Science",
+    className: "Grade 6",
+    teacher: "Hassan Ali",
+    description:
+      "Explain the three states of matter with suitable examples.",
+    dueDate: "2026-09-16",
+    file: "states-of-matter.pdf",
+    submission: "states-of-matter-submission.pdf",
+    marks: "18/20",
+    teacherFeedback:
+      "Good explanation. Add a few more real-life examples.",
+    status: "Submitted",
+  },
+  {
+    id: 3,
+    title: "Essay Writing",
+    subject: "English",
+    className: "Grade 7",
+    teacher: "Fatima Noor",
+    description:
+      "Write an essay on the importance of education in our society.",
+    dueDate: "2026-09-20",
+    file: "essay-writing-guidelines.pdf",
+    submission: "",
+    marks: "-",
+    teacherFeedback: "Not submitted yet.",
+    status: "Pending",
+  },
+  {
+    id: 4,
+    title: "Computer Basics",
+    subject: "Computer Science",
+    className: "Grade 8",
+    teacher: "Bilal Raza",
+    description:
+      "Prepare a short assignment explaining the basic components of a computer.",
+    dueDate: "2026-09-14",
+    file: "computer-basics.pdf",
+    submission: "",
+    marks: "-",
+    teacherFeedback:
+      "The submission deadline has passed.",
+    status: "Overdue",
+  },
+  {
+    id: 5,
+    title: "Urdu Grammar",
+    subject: "Urdu",
+    className: "Grade 5",
+    teacher: "Sara Ahmad",
+    description:
+      "Complete the given Urdu grammar exercises from the assigned chapter.",
+    dueDate: "2026-09-19",
+    file: "urdu-grammar.pdf",
+    submission: "",
+    marks: "-",
+    teacherFeedback: "Not submitted yet.",
+    status: "Pending",
+  },
+  {
+    id: 6,
+    title: "Pakistan Movement",
+    subject: "Social Studies",
+    className: "Grade 6",
+    teacher: "Muhammad Usman",
+    description:
+      "Write about the important events and leaders of the Pakistan Movement.",
+    dueDate: "2026-09-17",
+    file: "pakistan-movement.pdf",
+    submission: "pakistan-movement-submission.pdf",
+    marks: "17/20",
+    teacherFeedback:
+      "Well researched and clearly presented.",
+    status: "Submitted",
+  },
+  {
+    id: 7,
+    title: "Islamic History",
+    subject: "Islamiyat",
+    className: "Grade 7",
+    teacher: "Zainab Malik",
+    description:
+      "Complete the questions related to the assigned Islamic history chapter.",
+    dueDate: "2026-09-21",
+    file: "islamic-history.pdf",
+    submission: "",
+    marks: "-",
+    teacherFeedback: "Not submitted yet.",
+    status: "Pending",
+  },
+  {
+    id: 8,
+    title: "Motion and Force",
+    subject: "Physics",
+    className: "Grade 9",
+    teacher: "Omar Farooq",
+    description:
+      "Solve the numerical problems related to motion and force.",
+    dueDate: "2026-09-13",
+    file: "motion-and-force.pdf",
+    submission: "",
+    marks: "-",
+    teacherFeedback:
+      "The submission deadline has passed.",
+    status: "Overdue",
+  },
+];

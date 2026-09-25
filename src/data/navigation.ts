@@ -200,7 +200,7 @@ export const navigationByRole: Record<UserRole, NavigationItem[]> = {
     },
     {
       label: "Assignments",
-      href: "/dashboard/assignments",
+      href: "/dashboard/studentassignments",
       icon: ClipboardList,
     },
     {

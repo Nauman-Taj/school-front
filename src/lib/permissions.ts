@@ -14,6 +14,7 @@ export const rolePermissions: Record<string, UserRole[]> = {
   "/dashboard/subjects": ["Admin", "Teacher", "Student"],
   "/dashboard/timetable": ["Admin", "Teacher", "Student"],
   "/dashboard/assignments": ["Admin", "Teacher", "Student"],
+  "/dashboard/studentassignments": ["Student"],
   "/dashboard/exams": ["Admin", "Teacher", "Student"],
   "/dashboard/results": ["Admin", "Teacher", "Student"],
 
