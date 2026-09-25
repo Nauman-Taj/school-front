@@ -5,6 +5,7 @@ import Footer from "@/components/home/Footer";
 import ContactHero from "@/components/contact/ContactHero";
 import ContactInfo from "@/components/contact/ContactInfo";
 import ContactForm from "@/components/contact/ContactForm";
+import ContactMap from "@/components/contact/ContactMap";
 import ContactCTA from "@/components/contact/ContactCTA";
 
 export default function ContactPage() {
@@ -17,12 +18,14 @@ export default function ContactPage() {
       <ContactHero />
 
       <section className="bg-[#f6f8f8] py-20">
-        <div className="mx-auto grid max-w-[1200px] gap-10 px-6 lg:grid-cols-[0.8fr_1.2fr]">
+        <div className="mx-auto grid max-w-[1200px] gap-10 px-6 lg:grid-cols-2">
           <ContactInfo />
 
           <ContactForm />
         </div>
       </section>
+
+      <ContactMap />
 
       <ContactCTA />
 

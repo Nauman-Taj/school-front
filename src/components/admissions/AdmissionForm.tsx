@@ -17,7 +17,7 @@ export default function AdmissionForm() {
   };
 
   return (
-    <section id="online-application" className="bg-white py-20">
+    <section id="online-application" className="bg-[#f6f8f8] py-20">
       <div className="mx-auto max-w-[1000px] px-6">
         <div className="max-w-2xl">
           <span className="text-sm font-bold uppercase tracking-wider text-[#01796f]">
@@ -62,7 +62,7 @@ export default function AdmissionForm() {
         ) : (
           <form onSubmit={handleSubmit} className="mt-10 space-y-5">
             {/* Campus Information */}
-            <div className="rounded-2xl border border-gray-200 bg-[#f6f8f8] p-6 sm:p-8">
+            <div className="rounded-2xl border border-gray-200 bg-white p-6 sm:p-8">
               <div className="flex items-center gap-3">
                 <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#e6f4f2]">
                   <FileText size={21} className="text-[#01796f]" />
@@ -85,7 +85,7 @@ export default function AdmissionForm() {
 
                 <select
                   required
-                  className="mt-2 w-full rounded-lg border border-gray-200 bg-white px-4 py-3 text-sm text-gray-700 outline-none transition focus:border-[#01796f] focus:ring-2 focus:ring-[#01796f]/10"
+                  className="mt-2 w-full rounded-lg border border-gray-200 bg-[#f6f8f8] px-4 py-3 text-sm text-gray-700 outline-none transition focus:border-[#01796f] focus:ring-2 focus:ring-[#01796f]/10"
                 >
                   <option value="">Select campus</option>
                   <option value="main">Main Campus</option>
@@ -94,7 +94,7 @@ export default function AdmissionForm() {
             </div>
 
             {/* Student Information */}
-            <div className="rounded-2xl border border-gray-200 bg-[#f6f8f8] p-6 sm:p-8">
+            <div className="rounded-2xl border border-gray-200 bg-white p-6 sm:p-8">
               <div className="flex items-center gap-3">
                 <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#e6f4f2]">
                   <UserRound size={21} className="text-[#01796f]" />
@@ -120,7 +120,7 @@ export default function AdmissionForm() {
                     required
                     type="text"
                     placeholder="Enter student's full name"
-                    className="mt-2 w-full rounded-lg border border-gray-200 bg-white px-4 py-3 text-sm outline-none transition focus:border-[#01796f] focus:ring-2 focus:ring-[#01796f]/10"
+                    className="mt-2 w-full rounded-lg border border-gray-200 bg-[#f6f8f8] px-4 py-3 text-sm outline-none transition focus:border-[#01796f] focus:ring-2 focus:ring-[#01796f]/10"
                   />
                 </div>
 
@@ -131,7 +131,7 @@ export default function AdmissionForm() {
 
                   <select
                     required
-                    className="mt-2 w-full rounded-lg border border-gray-200 bg-white px-4 py-3 text-sm text-gray-700 outline-none transition focus:border-[#01796f] focus:ring-2 focus:ring-[#01796f]/10"
+                    className="mt-2 w-full rounded-lg border border-gray-200 bg-[#f6f8f8] px-4 py-3 text-sm text-gray-700 outline-none transition focus:border-[#01796f] focus:ring-2 focus:ring-[#01796f]/10"
                   >
                     <option value="">Select class</option>
                     <option>Grade 5</option>
@@ -150,7 +150,7 @@ export default function AdmissionForm() {
 
                   <select
                     required
-                    className="mt-2 w-full rounded-lg border border-gray-200 bg-white px-4 py-3 text-sm text-gray-700 outline-none transition focus:border-[#01796f] focus:ring-2 focus:ring-[#01796f]/10"
+                    className="mt-2 w-full rounded-lg border border-gray-200 bg-[#f6f8f8] px-4 py-3 text-sm text-gray-700 outline-none transition focus:border-[#01796f] focus:ring-2 focus:ring-[#01796f]/10"
                   >
                     <option value="">Select gender</option>
                     <option>Male</option>
@@ -166,7 +166,7 @@ export default function AdmissionForm() {
                   <input
                     type="text"
                     placeholder="Enter place of birth"
-                    className="mt-2 w-full rounded-lg border border-gray-200 bg-white px-4 py-3 text-sm outline-none transition focus:border-[#01796f] focus:ring-2 focus:ring-[#01796f]/10"
+                    className="mt-2 w-full rounded-lg border border-gray-200 bg-[#f6f8f8] px-4 py-3 text-sm outline-none transition focus:border-[#01796f] focus:ring-2 focus:ring-[#01796f]/10"
                   />
                 </div>
 
@@ -178,7 +178,7 @@ export default function AdmissionForm() {
                   <input
                     required
                     type="date"
-                    className="mt-2 w-full rounded-lg border border-gray-200 bg-white px-4 py-3 text-sm outline-none transition focus:border-[#01796f] focus:ring-2 focus:ring-[#01796f]/10"
+                    className="mt-2 w-full rounded-lg border border-gray-200 bg-[#f6f8f8] px-4 py-3 text-sm outline-none transition focus:border-[#01796f] focus:ring-2 focus:ring-[#01796f]/10"
                   />
                 </div>
 
@@ -190,14 +190,14 @@ export default function AdmissionForm() {
                   <input
                     type="text"
                     placeholder="Enter previous school or institute"
-                    className="mt-2 w-full rounded-lg border border-gray-200 bg-white px-4 py-3 text-sm outline-none transition focus:border-[#01796f] focus:ring-2 focus:ring-[#01796f]/10"
+                    className="mt-2 w-full rounded-lg border border-gray-200 bg-[#f6f8f8] px-4 py-3 text-sm outline-none transition focus:border-[#01796f] focus:ring-2 focus:ring-[#01796f]/10"
                   />
                 </div>
               </div>
             </div>
 
             {/* Guardian Information */}
-            <div className="rounded-2xl border border-gray-200 bg-[#f6f8f8] p-6 sm:p-8">
+            <div className="rounded-2xl border border-gray-200 bg-white p-6 sm:p-8">
               <div>
                 <h3 className="text-xl font-bold text-gray-900">
                   Guardian Information
@@ -218,7 +218,7 @@ export default function AdmissionForm() {
                     required
                     type="text"
                     placeholder="Enter guardian's full name"
-                    className="mt-2 w-full rounded-lg border border-gray-200 bg-white px-4 py-3 text-sm outline-none transition focus:border-[#01796f] focus:ring-2 focus:ring-[#01796f]/10"
+                    className="mt-2 w-full rounded-lg border border-gray-200 bg-[#f6f8f8] px-4 py-3 text-sm outline-none transition focus:border-[#01796f] focus:ring-2 focus:ring-[#01796f]/10"
                   />
                 </div>
 
@@ -230,7 +230,7 @@ export default function AdmissionForm() {
                   <input
                     type="text"
                     placeholder="Enter profession"
-                    className="mt-2 w-full rounded-lg border border-gray-200 bg-white px-4 py-3 text-sm outline-none transition focus:border-[#01796f] focus:ring-2 focus:ring-[#01796f]/10"
+                    className="mt-2 w-full rounded-lg border border-gray-200 bg-[#f6f8f8] px-4 py-3 text-sm outline-none transition focus:border-[#01796f] focus:ring-2 focus:ring-[#01796f]/10"
                   />
                 </div>
 
@@ -243,7 +243,7 @@ export default function AdmissionForm() {
                     required
                     rows={3}
                     placeholder="Enter complete address"
-                    className="mt-2 w-full resize-none rounded-lg border border-gray-200 bg-white px-4 py-3 text-sm outline-none transition focus:border-[#01796f] focus:ring-2 focus:ring-[#01796f]/10"
+                    className="mt-2 w-full resize-none rounded-lg border border-gray-200 bg-[#f6f8f8] px-4 py-3 text-sm outline-none transition focus:border-[#01796f] focus:ring-2 focus:ring-[#01796f]/10"
                   />
                 </div>
 
@@ -256,7 +256,7 @@ export default function AdmissionForm() {
                     required
                     type="email"
                     placeholder="Enter email address"
-                    className="mt-2 w-full rounded-lg border border-gray-200 bg-white px-4 py-3 text-sm outline-none transition focus:border-[#01796f] focus:ring-2 focus:ring-[#01796f]/10"
+                    className="mt-2 w-full rounded-lg border border-gray-200 bg-[#f6f8f8] px-4 py-3 text-sm outline-none transition focus:border-[#01796f] focus:ring-2 focus:ring-[#01796f]/10"
                   />
                 </div>
 
@@ -269,14 +269,14 @@ export default function AdmissionForm() {
                     required
                     type="tel"
                     placeholder="Enter phone number"
-                    className="mt-2 w-full rounded-lg border border-gray-200 bg-white px-4 py-3 text-sm outline-none transition focus:border-[#01796f] focus:ring-2 focus:ring-[#01796f]/10"
+                    className="mt-2 w-full rounded-lg border border-gray-200 bg-[#f6f8f8] px-4 py-3 text-sm outline-none transition focus:border-[#01796f] focus:ring-2 focus:ring-[#01796f]/10"
                   />
                 </div>
               </div>
             </div>
 
             {/* Remarks */}
-            <div className="rounded-2xl border border-gray-200 bg-[#f6f8f8] p-6 sm:p-8">
+            <div className="rounded-2xl border border-gray-200 bg-white p-6 sm:p-8">
               <h3 className="text-xl font-bold text-gray-900">
                 Admission Related Remarks
               </h3>
@@ -287,8 +287,8 @@ export default function AdmissionForm() {
 
               <textarea
                 rows={5}
-                placeholder="Enter any remarks..."
-                className="mt-6 w-full resize-none rounded-lg border border-gray-200 bg-white px-4 py-3 text-sm outline-none transition focus:border-[#01796f] focus:ring-2 focus:ring-[#01796f]/10"
+                placeholder="Enter any remarks"
+                className="mt-6 w-full resize-none rounded-lg border border-gray-200 bg-[#f6f8f8] px-4 py-3 text-sm outline-none transition focus:border-[#01796f] focus:ring-2 focus:ring-[#01796f]/10"
               />
             </div>
 

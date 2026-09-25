@@ -1,6 +1,7 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import { Check } from "lucide-react";
+import { FormEvent, useEffect, useState } from "react";
 
 export default function ContactForm() {
   const [submitted, setSubmitted] = useState(false);
@@ -10,19 +11,30 @@ export default function ContactForm() {
     setSubmitted(true);
   };
 
+  useEffect(() => {
+    if (!submitted) return;
+
+    const timer = setTimeout(() => {
+      setSubmitted(false);
+    }, 2500);
+
+    return () => clearTimeout(timer);
+  }, [submitted]);
+
   return (
-    <div className="rounded-2xl border border-gray-200 bg-white p-7 shadow-sm sm:p-8">
+    <div className="self-start rounded-2xl border border-gray-200 bg-white p-6 shadow-sm sm:p-7">
       <h2 className="text-2xl font-bold text-gray-900">
         Send us a message
       </h2>
 
       {submitted && (
-        <div className="mt-5 rounded-lg bg-[#01796f]/10 px-4 py-3 text-sm font-medium text-[#01796f]">
-          Thank you! Your message has been received.
+        <div className="fixed left-1/2 top-5 z-50 flex -translate-x-1/2 items-center gap-2 rounded-xl bg-gray-900 px-5 py-3 text-sm font-medium text-white shadow-lg">
+          <Check size={17} />
+          Message sent successfully.
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="mt-7 space-y-5">
+      <form onSubmit={handleSubmit} className="mt-5 space-y-4">
         <div className="grid gap-5 sm:grid-cols-2">
           <div>
             <label
@@ -91,9 +103,9 @@ export default function ContactForm() {
             id="message"
             name="message"
             required
-            rows={5}
+            rows={7}
             className="mt-2 w-full resize-none rounded-lg border border-gray-300 px-4 py-3 text-sm outline-none transition focus:border-[#01796f] focus:ring-2 focus:ring-[#01796f]/10"
-            placeholder="Write your message..."
+            placeholder="Write your message"
           />
         </div>
 

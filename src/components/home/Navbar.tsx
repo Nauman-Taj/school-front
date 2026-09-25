@@ -41,10 +41,14 @@ const navLinks = [
                 name: "Learning Approach",
                 href: "/academics/learning-approach",
             },
+            {
+                name: "Subjects & Curriculum",
+                href: "/academics/subjects-curriculum",
+            },
         ],
     },
     {
-        name: "Admissions",
+                name: "Admissions",
         href: "/admissions",
     },
     {

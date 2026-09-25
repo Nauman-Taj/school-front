@@ -5,6 +5,7 @@ import Footer from "@/components/home/Footer";
 import AcademicsHero from "@/components/academics/AcademicsHero";
 import AcademicLevels from "@/components/academics/AcademicLevels";
 import LearningApproach from "@/components/academics/LearningApproach";
+import SubjectsCurriculum from "@/components/academics/SubjectsCurriculum";
 import AcademicsCTA from "@/components/academics/AcademicsCTA";
 
 export default function AcademicsPage() {
@@ -19,6 +20,8 @@ export default function AcademicsPage() {
       <AcademicLevels />
 
       <LearningApproach />
+
+      <SubjectsCurriculum />
 
       <AcademicsCTA />
 
