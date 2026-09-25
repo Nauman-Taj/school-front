@@ -35,7 +35,7 @@ export default function StudentAssignmentDetails({ id }: Props) {
         </h2>
 
         <Link
-          href="/dashboard/studentassignments"
+          href="/admin/studentassignments"
           className="mt-4 inline-flex rounded-lg bg-[#01796F] px-4 py-2 text-sm font-medium text-white"
         >
           Back to Assignments
@@ -51,7 +51,7 @@ export default function StudentAssignmentDetails({ id }: Props) {
     <div className="space-y-5">
       {/* Back */}
       <Link
-        href="/dashboard/studentassignments"
+        href="/admin/studentassignments"
         className="inline-flex items-center gap-2 text-sm font-medium text-gray-600 hover:text-[#01796F]"
       >
         <ArrowLeft size={18} />

@@ -14,7 +14,7 @@ import {
 export const parentNavigation = [
   {
     title: "Dashboard",
-    href: "/parent/dashboard",
+    href: "/parent",
     icon: LayoutDashboard,
   },
   {

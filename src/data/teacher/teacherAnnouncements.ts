@@ -1,0 +1,68 @@
+import { TeacherAnnouncement } from "@/types/teacher/teacherAnnouncement";
+
+export const teacherAnnouncements: TeacherAnnouncement[] = [
+  {
+    id: 1,
+    title: "Mathematics Test Reminder",
+    message: "The monthly mathematics test will be held next week.",
+    audience: "5-A",
+    date: "Sep 27, 2026",
+    status: "Active",
+  },
+  {
+    id: 2,
+    title: "Homework Submission",
+    message: "Please submit your mathematics homework on time.",
+    audience: "5-B",
+    date: "Sep 27, 2026",
+    status: "Active",
+  },
+  {
+    id: 3,
+    title: "Algebra Revision",
+    message: "Students should revise the algebra chapter.",
+    audience: "8-A",
+    date: "Sep 26, 2026",
+    status: "Active",
+  },
+  {
+    id: 4,
+    title: "Equation Practice",
+    message: "Complete the assigned equation practice questions.",
+    audience: "8-B",
+    date: "Sep 26, 2026",
+    status: "Active",
+  },
+  {
+    id: 5,
+    title: "Geometry Revision",
+    message: "Geometry revision material has been uploaded.",
+    audience: "9-A",
+    date: "Sep 25, 2026",
+    status: "Active",
+  },
+  {
+    id: 6,
+    title: "Trigonometry Reminder",
+    message: "Review the trigonometry formulas before the test.",
+    audience: "9-B",
+    date: "Sep 25, 2026",
+    status: "Active",
+  },
+  {
+    id: 7,
+    title: "Exam Preparation",
+    message: "Begin preparation for the upcoming mathematics exam.",
+    audience: "10-A",
+    date: "Sep 24, 2026",
+    status: "Active",
+  },
+  {
+    id: 8,
+    title: "Statistics Material",
+    message: "New statistics study material is available.",
+    audience: "10-B",
+    date: "Sep 24, 2026",
+    status: "Active",
+  },
+];

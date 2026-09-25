@@ -1,35 +1,77 @@
 import { UserRole } from "@/types/user";
 
 export const rolePermissions: Record<string, UserRole[]> = {
-  "/dashboard": ["Admin", "Teacher", "Student"],
+  // =========================
+  // ADMIN
+  // =========================
 
-  "/dashboard/profile": ["Admin", "Teacher", "Student"],
+  "/admin": ["Admin"],
+  "/admin/profile": ["Admin"],
 
-  "/dashboard/students": ["Admin", "Teacher"],
-  "/dashboard/teachers": ["Admin"],
-  "/dashboard/parents": ["Admin"],
+  "/admin/students": ["Admin"],
+  "/admin/teachers": ["Admin"],
+  "/admin/parents": ["Admin"],
+  "/admin/classes": ["Admin"],
+  "/admin/subjects": ["Admin"],
+  "/admin/attendance": ["Admin"],
+  "/admin/exams": ["Admin"],
+  "/admin/results": ["Admin"],
+  "/admin/assignments": ["Admin"],
+  "/admin/fees": ["Admin"],
+  "/admin/library": ["Admin"],
+  "/admin/transport": ["Admin"],
+  "/admin/calendar": ["Admin"],
+  "/admin/announcements": ["Admin"],
+  "/admin/reports": ["Admin"],
+  "/admin/settings": ["Admin"],
 
-  "/dashboard/attendance": ["Admin", "Teacher", "Student"],
-  "/dashboard/classes": ["Admin", "Teacher", "Student"],
-  "/dashboard/subjects": ["Admin", "Teacher", "Student"],
-  "/dashboard/timetable": ["Admin", "Teacher", "Student"],
-  "/dashboard/assignments": ["Admin", "Teacher", "Student"],
-  "/dashboard/studentassignments": ["Student"],
-  "/dashboard/exams": ["Admin", "Teacher", "Student"],
-  "/dashboard/results": ["Admin", "Teacher", "Student"],
+  // =========================
+  // TEACHER
+  // =========================
 
-  "/dashboard/marks": ["Teacher"],
-  "/dashboard/study-material": ["Teacher", "Student"],
+  "/teacher": ["Teacher"],
+  "/teacher/classes": ["Teacher"],
+  "/teacher/students": ["Teacher"],
+  "/teacher/attendance": ["Teacher"],
+  "/teacher/assignments": ["Teacher"],
+  "/teacher/study-material": ["Teacher"],
+  "/teacher/exams": ["Teacher"],
+  "/teacher/marks": ["Teacher"],
+  "/teacher/timetable": ["Teacher"],
+  "/teacher/announcements": ["Teacher"],
+  "/teacher/profile": ["Teacher"],
 
-  "/dashboard/fees": ["Admin", "Student"],
+  // =========================
+  // STUDENT
+  // =========================
 
-  "/dashboard/library": ["Admin", "Teacher", "Student"],
-  "/dashboard/transport": ["Admin", "Student"],
-  "/dashboard/calendar": ["Admin", "Teacher", "Student"],
-  "/dashboard/announcements": ["Admin", "Teacher", "Student"],
-  "/dashboard/notifications": ["Admin", "Teacher", "Student"],
-  "/dashboard/reports": ["Admin"],
-  "/dashboard/settings": ["Admin"],
+  "/student": ["Student"],
+  "/student/subjects": ["Student"],
+  "/student/attendance": ["Student"],
+  "/student/assignments": ["Student"],
+  "/student/study-material": ["Student"],
+  "/student/exams": ["Student"],
+  "/student/results": ["Student"],
+  "/student/timetable": ["Student"],
+  "/student/fees": ["Student"],
+  "/student/announcements": ["Student"],
+  "/student/profile": ["Student"],
+
+  // =========================
+  // PARENT
+  // =========================
+
+  "/parent": ["Parent"],
+  "/parent/children": ["Parent"],
+  "/parent/attendance": ["Parent"],
+  "/parent/assignments": ["Parent"],
+  "/parent/results": ["Parent"],
+  "/parent/fees": ["Parent"],
+  "/parent/timetable": ["Parent"],
+  "/parent/exams": ["Parent"],
+  "/parent/announcements": ["Parent"],
+  "/parent/notifications": ["Parent"],
+  "/parent/profile": ["Parent"],
 };
 
 export const hasPermission = (

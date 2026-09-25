@@ -59,7 +59,7 @@ export default function StudyMaterialForm({
             {/* Header */}
             <div>
                 <Link
-                    href="/dashboard/study-material"
+                    href="/admin/study-material"
                     className="mb-4 inline-flex items-center gap-2 text-sm text-gray-500 transition hover:text-[#01796F]"
                 >
                     <ArrowLeft size={17} />
@@ -225,8 +225,8 @@ export default function StudyMaterialForm({
                             <option value="">
                                 Select teacher
                             </option>
-                            <option value="Ayesha Khan">
-                                Ayesha Khan
+                            <option value="Anees Baloch">
+                                Anees Baloch
                             </option>
                             <option value="Hassan Ali">
                                 Hassan Ali
@@ -291,7 +291,7 @@ export default function StudyMaterialForm({
                 {/* Buttons */}
                 <div className="mt-6 flex flex-col-reverse gap-3 border-t border-gray-100 pt-6 sm:flex-row sm:justify-end">
                     <Link
-                        href="/dashboard/study-material"
+                        href="/admin/study-material"
                         className="inline-flex items-center justify-center rounded-full border border-gray-200 px-5 py-2.5 text-sm font-medium text-gray-600 transition hover:bg-gray-50"
                     >
                         Cancel

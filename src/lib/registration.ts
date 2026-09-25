@@ -119,6 +119,40 @@ export const registerUser = (form: RegistrationData) => {
     );
   }
 
+  if (form.role === "Parent") {
+    let parents;
+
+    try {
+      parents = JSON.parse(
+        localStorage.getItem("registered-parents") || "[]"
+      );
+    } catch {
+      parents = [];
+      localStorage.removeItem("registered-parents");
+    }
+
+    parents.push({
+      id: userId,
+      name: form.fullName,
+      email: form.email,
+      phone: form.phone,
+      dateOfBirth: form.dateOfBirth,
+      gender: form.gender,
+      cnic: form.cnic,
+      address: form.address,
+      occupation: form.occupation,
+      relationship: form.relationship,
+      childName: form.childName,
+      childRollNo: form.childRollNo,
+      status: "Active",
+    });
+
+    localStorage.setItem(
+      "registered-parents",
+      JSON.stringify(parents)
+    );
+  }
+
   return {
     success: true,
     message: `${form.role} account created successfully.`,

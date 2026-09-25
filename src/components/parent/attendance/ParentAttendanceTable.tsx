@@ -2,185 +2,199 @@
 
 import { useState } from "react";
 import {
-  Check,
-  Clock3,
-  Search,
-  X,
+    Check,
+    Clock3,
+    Search,
+    X,
 } from "lucide-react";
 
-import { ParentAttendanceRecord } from "@/types/parentAttendance";
+import { AttendanceRecord } from "@/types/attendance";
 
 type ParentAttendanceTableProps = {
-  records: ParentAttendanceRecord[];
+    records: AttendanceRecord[];
 };
 
 const statusStyles = {
-  Present: {
-    className: "bg-green-50 text-green-700",
-    icon: Check,
-  },
-  Absent: {
-    className: "bg-red-50 text-red-700",
-    icon: X,
-  },
-  Late: {
-    className: "bg-yellow-50 text-yellow-700",
-    icon: Clock3,
-  },
+    Present: {
+        className: "bg-green-50 text-green-700",
+        icon: Check,
+    },
+    Absent: {
+        className: "bg-red-50 text-red-700",
+        icon: X,
+    },
+    Late: {
+        className: "bg-yellow-50 text-yellow-700",
+        icon: Clock3,
+    },
+    Leave: {
+        className: "bg-blue-50 text-blue-700",
+        icon: Check,
+    },
 };
 
 export default function ParentAttendanceTable({
-  records,
+    records,
 }: ParentAttendanceTableProps) {
-  const [search, setSearch] = useState("");
+    const [search, setSearch] = useState("");
 
-  const filteredRecords = records.filter((record) => {
-    const searchTerm = search.toLowerCase();
+    const filteredRecords = records
+        .filter((record) => record.role === "Student")
+        .filter((record) => {
+            const searchTerm = search.toLowerCase();
+
+            return (
+                record.name.toLowerCase().includes(searchTerm) ||
+                record.class.toLowerCase().includes(searchTerm) ||
+                record.date.toLowerCase().includes(searchTerm) ||
+                record.status.toLowerCase().includes(searchTerm)
+            );
+        });
 
     return (
-      record.childName.toLowerCase().includes(searchTerm) ||
-      record.className.toLowerCase().includes(searchTerm) ||
-      record.date.toLowerCase().includes(searchTerm) ||
-      record.status.toLowerCase().includes(searchTerm)
-    );
-  });
+        <div className="space-y-5">
+            {/* Search */}
+            <div className="relative">
+                <Search
+                    size={17}
+                    className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
+                />
 
-  return (
-    <div className="space-y-5">
-      {/* Search */}
-      <div className="relative">
-        <Search
-          size={17}
-          className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
-        />
-
-        <input
-          type="text"
-          placeholder="Search attendance"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="w-full rounded-full border border-gray-200 bg-white py-3 pl-11 pr-4 text-sm text-gray-900 outline-none transition placeholder:text-gray-400 focus:border-[#01796F] focus:ring-2 focus:ring-[#01796F]/10"
-        />
-      </div>
-
-      {/* Desktop */}
-      <div className="hidden overflow-x-auto rounded-2xl border border-gray-200 bg-white md:block">
-        <table className="w-full text-sm">
-          <thead className="bg-gray-50">
-            <tr className="border-b border-gray-200 text-left text-gray-500">
-              <th className="px-6 py-4 font-semibold text-gray-600">Date</th>
-              <th className="px-6 py-4 font-semibold text-gray-600">Child</th>
-              <th className="px-6 py-4 font-semibold text-gray-600">Class</th>
-              <th className="px-6 py-4 font-semibold text-gray-600">Status</th>
-            </tr>
-          </thead>
-
-          <tbody>
-            {filteredRecords.map((record) => {
-              const status = statusStyles[record.status];
-              const Icon = status.icon;
-
-              return (
-                <tr
-                  key={record.id}
-                  className="border-b border-gray-100 last:border-0"
-                >
-                  <td className="px-6 py-4 text-gray-700">
-                    {new Date(record.date).toLocaleDateString(
-                      "en-GB",
-                      {
-                        day: "2-digit",
-                        month: "short",
-                        year: "numeric",
-                      }
-                    )}
-                  </td>
-
-                  <td className="px-6 py-4 font-medium text-gray-900">
-                    {record.childName}
-                  </td>
-
-                  <td className="px-6 py-4 text-gray-600">
-                    {record.className}
-                  </td>
-
-                  <td className="px-6 py-4">
-                    <span
-                      className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium ${status.className}`}
-                    >
-                      <Icon size={14} />
-                      {record.status}
-                    </span>
-                  </td>
-                </tr>
-              );
-            })}
-
-            {filteredRecords.length === 0 && (
-              <tr>
-                <td
-                  colSpan={4}
-                  className="px-6 py-8 text-center text-sm text-gray-500"
-                >
-                  No attendance records found.
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
-      </div>
-
-      {/* Mobile */}
-      <div className="space-y-3 md:hidden">
-        {filteredRecords.map((record) => {
-          const status = statusStyles[record.status];
-          const Icon = status.icon;
-
-          return (
-            <div
-              key={record.id}
-              className="rounded-2xl border border-gray-200 bg-white p-4"
-            >
-              <div className="flex items-start justify-between gap-3">
-                <div>
-                  <p className="font-semibold text-gray-900">
-                    {record.childName}
-                  </p>
-
-                  <p className="mt-1 text-sm text-gray-500">
-                    {record.className}
-                  </p>
-                </div>
-
-                <span
-                  className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium ${status.className}`}
-                >
-                  <Icon size={14} />
-                  {record.status}
-                </span>
-              </div>
-
-              <p className="mt-4 text-sm text-gray-500">
-                {new Date(record.date).toLocaleDateString(
-                  "en-GB",
-                  {
-                    day: "2-digit",
-                    month: "short",
-                    year: "numeric",
-                  }
-                )}
-              </p>
+                <input
+                    type="text"
+                    placeholder="Search attendance"
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                    className="w-full rounded-full border border-gray-200 bg-white py-3 pl-11 pr-4 text-sm text-gray-900 outline-none transition placeholder:text-gray-400 focus:border-[#01796F] focus:ring-2 focus:ring-[#01796F]/10"
+                />
             </div>
-          );
-        })}
 
-        {filteredRecords.length === 0 && (
-          <div className="rounded-2xl border border-gray-200 bg-white px-4 py-8 text-center text-sm text-gray-500">
-            No attendance records found.
-          </div>
-        )}
-      </div>
-    </div>
-  );
+            {/* Desktop */}
+            <div className="hidden overflow-x-auto rounded-2xl border border-gray-200 bg-white md:block">
+                <table className="w-full text-sm">
+                    <thead className="bg-gray-50">
+                        <tr className="border-b border-gray-200 text-left text-gray-500">
+                            <th className="px-6 py-4 font-semibold text-gray-600">
+                                Date
+                            </th>
+
+                            <th className="px-6 py-4 font-semibold text-gray-600">
+                                Student
+                            </th>
+
+                            <th className="px-6 py-4 font-semibold text-gray-600">
+                                Class
+                            </th>
+
+                            <th className="px-6 py-4 font-semibold text-gray-600">
+                                Status
+                            </th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        {filteredRecords.map((record) => {
+                            const status = statusStyles[record.status];
+                            const Icon = status.icon;
+
+                            return (
+                                <tr
+                                    key={record.id}
+                                    className="border-b border-gray-100 last:border-0"
+                                >
+                                    <td className="px-6 py-4 text-gray-700">
+                                        {new Date(
+                                            record.date
+                                        ).toLocaleDateString("en-GB", {
+                                            day: "2-digit",
+                                            month: "short",
+                                            year: "numeric",
+                                        })}
+                                    </td>
+
+                                    <td className="px-6 py-4 font-medium text-gray-900">
+                                        {record.name}
+                                    </td>
+
+                                    <td className="px-6 py-4 text-gray-600">
+                                        {record.class}
+                                    </td>
+
+                                    <td className="px-6 py-4">
+                                        <span
+                                            className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium ${status.className}`}
+                                        >
+                                            <Icon size={14} />
+                                            {record.status}
+                                        </span>
+                                    </td>
+                                </tr>
+                            );
+                        })}
+
+                        {filteredRecords.length === 0 && (
+                            <tr>
+                                <td
+                                    colSpan={4}
+                                    className="px-6 py-8 text-center text-sm text-gray-500"
+                                >
+                                    No attendance records found.
+                                </td>
+                            </tr>
+                        )}
+                    </tbody>
+                </table>
+            </div>
+
+            {/* Mobile */}
+            <div className="space-y-3 md:hidden">
+                {filteredRecords.map((record) => {
+                    const status = statusStyles[record.status];
+                    const Icon = status.icon;
+
+                    return (
+                        <div
+                            key={record.id}
+                            className="rounded-2xl border border-gray-200 bg-white p-4"
+                        >
+                            <div className="flex items-start justify-between gap-3">
+                                <div>
+                                    <p className="font-semibold text-gray-900">
+                                        {record.name}
+                                    </p>
+
+                                    <p className="mt-1 text-sm text-gray-500">
+                                        {record.class}
+                                    </p>
+                                </div>
+
+                                <span
+                                    className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium ${status.className}`}
+                                >
+                                    <Icon size={14} />
+                                    {record.status}
+                                </span>
+                            </div>
+
+                            <p className="mt-4 text-sm text-gray-500">
+                                {new Date(
+                                    record.date
+                                ).toLocaleDateString("en-GB", {
+                                    day: "2-digit",
+                                    month: "short",
+                                    year: "numeric",
+                                })}
+                            </p>
+                        </div>
+                    );
+                })}
+
+                {filteredRecords.length === 0 && (
+                    <div className="rounded-2xl border border-gray-200 bg-white px-4 py-8 text-center text-sm text-gray-500">
+                        No attendance records found.
+                    </div>
+                )}
+            </div>
+        </div>
+    );
 }
-

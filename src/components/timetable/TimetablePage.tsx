@@ -33,7 +33,7 @@ export default function TimetablePage() {
 
   const getEntry = (day: string, time: string) => {
     return filteredTimetable.find(
-      (entry) => entry.day === day && entry.time === time
+      (entry) => entry.day === day && entry.startTime === time
     );
   };
 
@@ -42,8 +42,10 @@ export default function TimetablePage() {
       {/* Header */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Timetable</h1>
-          <p className="mt-1 text-sm text-gray-500">
+          <h1 className="text-2xl font-bold text-gray-900 sm:text-3xl">
+            Timetable
+          </h1>
+          <p className="mt-1 text-sm text-gray-500 sm:text-base">
             View the weekly class schedule.
           </p>
         </div>
@@ -172,7 +174,7 @@ export default function TimetablePage() {
                         </div>
 
                         <span className="shrink-0 rounded-lg bg-[#e6f4f2] px-2.5 py-1 text-xs font-medium text-[#01796F]">
-                          {entry.time}
+                          {entry.startTime}
                         </span>
                       </div>
                     </div>

@@ -81,7 +81,12 @@ export default function MobileParentSidebar({
                   key={item.href}
                   href={item.href}
                   onClick={onClose}
-                  className="flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium text-gray-600 transition-colors hover:bg-[#01796f]/10 hover:text-[#01796f]"
+                  className={`flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition-colors text-gray-600 hover:bg-[#01796f]/10 hover:text-[#01796f]`}
+                //    ${
+                //   isActive
+                //     ? "bg-[#01796f]/10 text-[#01796f]"
+                //     : "text-gray-600 hover:bg-[#01796f]/10 hover:text-[#01796f]"
+                // }`}                
                 >
                   <Icon
                     size={19}

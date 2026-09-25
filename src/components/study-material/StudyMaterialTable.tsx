@@ -178,7 +178,7 @@ export default function StudyMaterialTable() {
 
                                         {/* Edit */}
                                         <Link
-                                            href={`/dashboard/study-material/${item.id}/edit`}
+                                            href={`/admin/study-material/${item.id}/edit`}
                                             className="flex h-9 w-9 items-center justify-center rounded-lg text-gray-500 transition hover:bg-[#01796f]/10 hover:text-[#01796f]"
                                             aria-label={`Edit ${item.title}`}
                                         >
@@ -269,7 +269,7 @@ export default function StudyMaterialTable() {
 
                                 {/* Edit */}
                                 <Link
-                                    href={`/dashboard/study-material/${item.id}/edit`}
+                                    href={`/admin/study-material/${item.id}/edit`}
                                     className="flex h-9 w-9 items-center justify-center rounded-lg text-gray-500 transition hover:bg-[#01796f]/10 hover:text-[#01796f]"
                                     aria-label={`Edit ${item.title}`}
                                 >

@@ -1,4 +1,4 @@
-export type RegistrationRole = "Student" | "Teacher";
+export type RegistrationRole = "Student" | "Teacher" | "Parent";
 
 export type RegistrationData = {
     role: RegistrationRole;
@@ -34,4 +34,10 @@ export type RegistrationData = {
     designation: string;
     subjects: string;
     joiningDate: string;
+
+    // Parent
+    occupation: string;
+    relationship: string;
+    childName: string;
+    childRollNo: string;
 };

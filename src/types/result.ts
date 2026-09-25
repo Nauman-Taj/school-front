@@ -1,16 +1,17 @@
-export type ResultStatus = "Pass" | "Fail";
-
 export type Result = {
   id: string;
-  studentName: string;
-  rollNo: string;
-  className: string;
-  exam: string;
+  studentId: number;
+  student: string;
+  examId: string;
+  subjectId: string;
   subject: string;
+  teacherId: string;
   teacher: string;
-  totalMarks: number;
+  className: string;
+  section: string;
   obtainedMarks: number;
+  totalMarks: number;
   percentage: number;
   grade: string;
-  status: ResultStatus;
+  status: "Pass" | "Fail";
 };

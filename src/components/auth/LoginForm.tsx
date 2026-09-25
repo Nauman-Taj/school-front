@@ -68,10 +68,14 @@ export default function LoginForm() {
 
     localStorage.setItem("isLoggedIn", "true");
 
-    if (user.role === "Parent") {
-      router.replace("/parent/dashboard");
-    } else {
-      router.replace("/dashboard");
+    if (user.role === "Admin") {
+      router.replace("/admin");
+    } else if (user.role === "Teacher") {
+      router.replace("/teacher");
+    } else if (user.role === "Student") {
+      router.replace("/student");
+    } else if (user.role === "Parent") {
+      router.replace("/parent");
     }
   };
 

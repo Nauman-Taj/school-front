@@ -5,6 +5,7 @@ import AboutSection from "@/components/home/AboutSection";
 import AcademicPrograms from "@/components/home/AcademicPrograms";
 import NewsSection from "@/components/home/NewsSection";
 import Statistics from "@/components/home/Statistics";
+import Testimonials from "@/components/home/Testimonials";
 import AdmissionsCTA from "@/components/home/AdmissionsCTA";
 import Footer from "@/components/home/Footer";
 
@@ -23,8 +24,10 @@ export default function Home() {
       <AcademicPrograms />
 
       <NewsSection />
-            
+
       <Statistics />
+
+      <Testimonials />
 
       <AdmissionsCTA />
 

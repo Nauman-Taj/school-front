@@ -27,7 +27,14 @@ export default function ParentLayout({
     }
 
     if (session.role !== "Parent") {
-      router.replace("/dashboard");
+      if (session.role === "Admin") {
+        router.replace("/admin");
+      } else if (session.role === "Teacher") {
+        router.replace("/teacher");
+      } else if (session.role === "Student") {
+        router.replace("/student");
+      }
+
       return;
     }
 
@@ -50,7 +57,6 @@ export default function ParentLayout({
       />
 
       <div className="flex">
-
         <ParentSidebar />
 
         <main className="min-w-0 flex-1 lg:ml-64">
@@ -62,4 +68,3 @@ export default function ParentLayout({
     </div>
   );
 }
-

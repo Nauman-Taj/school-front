@@ -1,6 +1,7 @@
 import { getSession } from "@/lib/auth";
 import { parents } from "@/data/parents";
 import { parentChildren } from "@/data/parentChildren";
+import { students } from "@/data/students";
 
 export const getCurrentParent = () => {
   const session = getSession();
@@ -23,7 +24,24 @@ export const getCurrentParentChildren = () => {
     return [];
   }
 
-  return parentChildren.filter(
-    (child) => child.parentId === parent.id
-  );
+  return parentChildren
+    .filter((child) => child.parentId === parent.id)
+    .map((child) => {
+      const student = students.find(
+        (student) => student.id === child.studentId
+      );
+
+      if (!student) {
+        return null;
+      }
+
+      return {
+        studentId: student.id,
+        name: student.name,
+        className: student.className,
+        section: student.section,
+        rollNo: student.rollNo,
+      };
+    })
+    .filter((child): child is NonNullable<typeof child> => child !== null);
 };

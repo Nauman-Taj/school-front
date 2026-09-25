@@ -3,8 +3,8 @@ import { Teacher } from "@/types/teacher";
 export const teachers: Teacher[] = [
   {
     id: "T001",
-    name: "Ayesha Khan",
-    email: "ayeshakhan@garrisonschool.edu.pk",
+    name: "Anees Baloch",
+    email: "aneesbaloch@garrisonschool.edu.pk",
     phone: "0300-1234567",
     subject: "Mathematics",
     qualification: "M.Sc Mathematics",

@@ -43,4 +43,18 @@ export const calendarEvents: CalendarEvent[] = [
     type: "School Activity",
     description: "Science projects and exhibition.",
   },
+  {
+    id: 7,
+    title: "Winter Vacation",
+    date: "2026-12-20",
+    type: "Holiday",
+    description: "Winter vacation begins for all students.",
+  },
+  {
+    id: 8,
+    title: "Annual Prize Distribution",
+    date: "2026-12-15",
+    type: "Event",
+    description: "Annual prize distribution ceremony for students.",
+  },
 ];

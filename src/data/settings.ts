@@ -23,10 +23,10 @@ export const userSettings: UserSettings = {
 };
 
 export const academicSettings: AcademicSettings = {
-  classes: "Primary, Middle, Senior",
-  sections: "A, B, C",
-  subjects: "English, Mathematics, Science, Computer",
-  gradingSystem: "Percentage, Grade A-F, GPA",
+  classes: "Primary",
+  sections: "A",
+  subjects: "Core Subjects",
+  gradingSystem: "Percentage",
   academicYear: "2026-2027",
   term: "Term 1",
 };

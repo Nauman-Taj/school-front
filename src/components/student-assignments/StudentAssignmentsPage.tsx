@@ -149,7 +149,7 @@ export default function StudentAssignmentsPage() {
                 {assignments.map((assignment) => (
                   <Link
                     key={assignment.id}
-                    href={`/dashboard/studentassignments/${assignment.id}`}
+                    href={`/admin/studentassignments/${assignment.id}`}
                     className="rounded-2xl border border-gray-200 bg-white p-5 transition hover:border-[#01796F] hover:shadow-sm"
                   >
                     <div className="flex items-start justify-between gap-3">

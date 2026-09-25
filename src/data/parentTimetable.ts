@@ -10,7 +10,7 @@ export const parentTimetable: ParentTimetable[] = [
     day: "Monday",
     time: "08:00 AM - 08:45 AM",
     subject: "Mathematics",
-    teacher: "Ayesha Khan",
+    teacher: "Anees Baloch",
     room: "Room 101",
   },
   {
@@ -67,7 +67,7 @@ export const parentTimetable: ParentTimetable[] = [
     day: "Monday",
     time: "08:45 AM - 09:30 AM",
     subject: "Mathematics",
-    teacher: "Ayesha Khan",
+    teacher: "Anees Baloch",
     room: "Room 203",
   },
   {

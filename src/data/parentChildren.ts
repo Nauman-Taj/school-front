@@ -1,81 +1,125 @@
-export type ParentChild = {
-  id: number;
-  name: string;
-  parentId: number;
-  className: string;
-};
+import { ParentChild } from "@/types/parentChild";
 
 export const parentChildren: ParentChild[] = [
   {
     id: 1,
-    name: "Ali Asif",
     parentId: 1,
-    className: "Grade 8 - A",
+    studentId: 1,
   },
   {
     id: 2,
-    name: "Hassan Asif",
     parentId: 1,
-    className: "Grade 6 - B",
+    studentId: 2,
   },
   {
     id: 3,
-    name: "Hamza Ahmad",
     parentId: 2,
-    className: "Grade 7 - A",
+    studentId: 3,
   },
   {
     id: 4,
-    name: "Ayesha Sajid",
     parentId: 3,
-    className: "Grade 5 - A",
+    studentId: 4,
   },
   {
     id: 5,
-    name: "Fatima Sajid",
     parentId: 3,
-    className: "Grade 8 - B",
+    studentId: 5,
   },
   {
     id: 6,
-    name: "Usman Imran",
     parentId: 4,
-    className: "Grade 6 - A",
+    studentId: 6,
   },
   {
     id: 7,
-    name: "Zain Bilal",
     parentId: 5,
-    className: "Grade 9 - A",
+    studentId: 7,
   },
   {
     id: 8,
-    name: "Hira Bilal",
     parentId: 5,
-    className: "Grade 5 - B",
+    studentId: 8,
   },
   {
     id: 9,
-    name: "Abdullah Kashif",
     parentId: 6,
-    className: "Grade 7 - B",
+    studentId: 9,
   },
   {
     id: 10,
-    name: "Maryam Tariq",
     parentId: 7,
-    className: "Grade 9 - B",
+    studentId: 10,
   },
   {
     id: 11,
-    name: "Maria Tariq",
     parentId: 7,
-    className: "Grade 6 - A",
+    studentId: 11,
   },
   {
     id: 12,
-    name: "Ahmad Faisal",
     parentId: 8,
-    className: "Grade 10 - A",
+    studentId: 12,
+  },
+  {
+    id: 13,
+    parentId: 9,
+    studentId: 13,
+  },
+  {
+    id: 14,
+    parentId: 10,
+    studentId: 14,
+  },
+  {
+    id: 15,
+    parentId: 11,
+    studentId: 15,
+  },
+  {
+    id: 16,
+    parentId: 12,
+    studentId: 16,
+  },
+  {
+    id: 17,
+    parentId: 13,
+    studentId: 17,
+  },
+  {
+    id: 18,
+    parentId: 14,
+    studentId: 18,
+  },
+  {
+    id: 19,
+    parentId: 15,
+    studentId: 19,
+  },
+  {
+    id: 20,
+    parentId: 16,
+    studentId: 20,
+  },
+  {
+    id: 21,
+    parentId: 17,
+    studentId: 21,
+  },
+  {
+    id: 22,
+    parentId: 18,
+    studentId: 22,
+  },
+  {
+    id: 23,
+    parentId: 19,
+    studentId: 23,
+  },
+  {
+    id: 24,
+    parentId: 20,
+    studentId: 24,
   },
 ];
+

@@ -5,6 +5,5 @@ export type Parent = {
   phone: string;
   address: string;
   occupation: string;
-  children: string[];
   status: "Active" | "Inactive";
 };

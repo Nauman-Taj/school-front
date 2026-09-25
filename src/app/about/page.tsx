@@ -4,6 +4,7 @@ import Footer from "@/components/home/Footer";
 
 import AboutHero from "@/components/about/AboutHero";
 import MissionVision from "@/components/about/MissionVision";
+import SchoolHistory from "@/components/about/SchoolHistory";
 import WhyChooseUs from "@/components/about/WhyChooseUs";
 import AboutCTA from "@/components/about/AboutCTA";
 
@@ -18,6 +19,8 @@ export default function AboutPage() {
       <AboutHero />
 
       <MissionVision />
+
+      <SchoolHistory />
 
       <WhyChooseUs />
 

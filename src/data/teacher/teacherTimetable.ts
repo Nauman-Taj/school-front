@@ -1,0 +1,68 @@
+import { TeacherTimetable } from "@/types/teacher/teacherTimetable";
+
+export const teacherTimetable: TeacherTimetable[] = [
+  {
+    id: 1,
+    day: "Monday",
+    time: "08:00 AM",
+    class: "5-A",
+    subject: "Mathematics",
+    room: "Room 101",
+  },
+  {
+    id: 2,
+    day: "Monday",
+    time: "10:00 AM",
+    class: "8-A",
+    subject: "Mathematics",
+    room: "Room 203",
+  },
+  {
+    id: 3,
+    day: "Tuesday",
+    time: "09:00 AM",
+    class: "5-B",
+    subject: "Mathematics",
+    room: "Room 102",
+  },
+  {
+    id: 4,
+    day: "Tuesday",
+    time: "12:00 PM",
+    class: "9-B",
+    subject: "Mathematics",
+    room: "Room 205",
+  },
+  {
+    id: 5,
+    day: "Wednesday",
+    time: "08:00 AM",
+    class: "5-A",
+    subject: "Mathematics",
+    room: "Room 101",
+  },
+  {
+    id: 6,
+    day: "Wednesday",
+    time: "09:00 AM",
+    class: "9-A",
+    subject: "Mathematics",
+    room: "Room 201",
+  },
+  {
+    id: 7,
+    day: "Thursday",
+    time: "01:00 PM",
+    class: "10-A",
+    subject: "Mathematics",
+    room: "Room 208",
+  },
+  {
+    id: 8,
+    day: "Friday",
+    time: "02:00 PM",
+    class: "10-B",
+    subject: "Mathematics",
+    room: "Room 209",
+  },
+];

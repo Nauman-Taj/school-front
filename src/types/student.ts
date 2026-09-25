@@ -2,7 +2,8 @@ export type Student = {
   id: number;
   name: string;
   email: string;
-  class: string;
+  className: string;
+  section: string;
   rollNo: string;
   parentName: string;
   phone: string;

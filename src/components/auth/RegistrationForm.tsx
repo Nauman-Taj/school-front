@@ -1,14 +1,10 @@
 "use client";
 
-import { addUser } from "@/lib/users";
 import Image from "next/image";
 import { registerUser } from "@/lib/registration";
 import { useState } from "react";
 import Link from "next/link";
 import {
-    UserRound,
-    GraduationCap,
-    BriefcaseBusiness,
     ArrowLeft,
     ArrowRight,
     Check,
@@ -22,6 +18,7 @@ import {
 const initialForm: RegistrationData = {
     role: "Student",
 
+    // Common
     fullName: "",
     username: "",
     email: "",
@@ -32,6 +29,7 @@ const initialForm: RegistrationData = {
     gender: "",
     address: "",
 
+    // Student
     cnicOrBForm: "",
     guardianName: "",
     guardianPhone: "",
@@ -42,6 +40,7 @@ const initialForm: RegistrationData = {
     emergencyContact: "",
     medicalInformation: "",
 
+    // Teacher
     fatherName: "",
     cnic: "",
     qualification: "",
@@ -50,6 +49,12 @@ const initialForm: RegistrationData = {
     designation: "",
     subjects: "",
     joiningDate: "",
+
+    // Parent
+    occupation: "",
+    relationship: "",
+    childName: "",
+    childRollNo: "",
 };
 
 export default function RegistrationForm() {
@@ -119,7 +124,10 @@ export default function RegistrationForm() {
             <div className="mx-auto max-w-4xl">
                 {/* Header */}
                 <div className="mb-8 text-center">
-                    <Link href="/" className="inline-flex items-center gap-2">
+                    <Link
+                        href="/"
+                        className="inline-flex items-center gap-2"
+                    >
                         <Image
                             src="/images/school.jpg"
                             alt="School Logo"
@@ -136,10 +144,6 @@ export default function RegistrationForm() {
                     <h2 className="mt-8 text-2xl font-bold text-gray-800">
                         Create Your Account
                     </h2>
-
-                    {/*<p className="mt-2 text-sm text-gray-500">
-                        Register to join Garrison Grammar School
-                    </p> */}
                 </div>
 
                 {/* Progress */}
@@ -151,10 +155,11 @@ export default function RegistrationForm() {
                                 className="flex flex-1 items-center last:flex-none"
                             >
                                 <div
-                                    className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-sm font-semibold ${step >= item
-                                        ? "bg-[#01796F] text-white"
-                                        : "bg-gray-100 text-gray-400"
-                                        }`}
+                                    className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-sm font-semibold ${
+                                        step >= item
+                                            ? "bg-[#01796F] text-white"
+                                            : "bg-gray-100 text-gray-400"
+                                    }`}
                                 >
                                     {step > item ? (
                                         <Check size={17} />
@@ -165,10 +170,11 @@ export default function RegistrationForm() {
 
                                 {item < 4 && (
                                     <div
-                                        className={`mx-2 h-1 flex-1 rounded-full ${step > item
-                                            ? "bg-[#01796F]"
-                                            : "bg-gray-100"
-                                            }`}
+                                        className={`mx-2 h-1 flex-1 rounded-full ${
+                                            step > item
+                                                ? "bg-[#01796F]"
+                                                : "bg-gray-100"
+                                        }`}
                                     />
                                 )}
                             </div>
@@ -181,7 +187,9 @@ export default function RegistrationForm() {
                         <span>
                             {form.role === "Student"
                                 ? "Academic"
-                                : "Professional"}
+                                : form.role === "Teacher"
+                                ? "Professional"
+                                : "Parent"}
                         </span>
                         <span>Review</span>
                     </div>
@@ -199,15 +207,9 @@ export default function RegistrationForm() {
                                 <h3 className="text-lg font-semibold text-gray-800">
                                     Account Information
                                 </h3>
-
-                                {/* <p className="mt-1 text-sm text-gray-500">
-                                    Select your role and create your login credentials.
-                                </p> */}
                             </div>
 
-                            {/* Role Dropdown */}
                             <div className="grid gap-5 sm:grid-cols-2">
-
                                 <div>
                                     <label className="mb-2 block text-sm font-medium text-gray-700">
                                         I want to register as
@@ -228,37 +230,11 @@ export default function RegistrationForm() {
                                         <option value="Teacher">
                                             Teacher
                                         </option>
+                                        <option value="Parent">
+                                            Parent
+                                        </option>
                                     </select>
                                 </div>
-
-                                {/* Role Description */}
-                                {/* <div className="rounded-xl bg-[#e6f4f2] p-4">
-                                <div className="flex gap-3">
-                                    {form.role === "Student" ? (
-                                        <UserRound
-                                            size={22}
-                                            className="mt-0.5 shrink-0 text-[#01796F]"
-                                        />
-                                    ) : (
-                                        <BriefcaseBusiness
-                                            size={22}
-                                            className="mt-0.5 shrink-0 text-[#01796F]"
-                                        />
-                                    )}
-
-                                    <div>
-                                        <p className="font-medium text-[#01796F]">
-                                            Register as {form.role}
-                                        </p>
-
-                                        <p className="mt-1 text-sm text-gray-600">
-                                            {form.role === "Student"
-                                                ? "Create a student account to access your classes, attendance, assignments, results and timetable."
-                                                : "Create a teacher account to access your classes, attendance, assignments, exams and marks."}
-                                        </p>
-                                    </div>
-                                </div>
-                            </div> */}
 
                                 <Input
                                     label="Email Address"
@@ -307,7 +283,10 @@ export default function RegistrationForm() {
                                     type="password"
                                     value={form.confirmPassword}
                                     onChange={(value) =>
-                                        updateField("confirmPassword", value)
+                                        updateField(
+                                            "confirmPassword",
+                                            value
+                                        )
                                     }
                                     placeholder="Confirm your password"
                                     required
@@ -323,10 +302,6 @@ export default function RegistrationForm() {
                                 <h3 className="text-lg font-semibold text-gray-800">
                                     Personal Information
                                 </h3>
-
-                                {/* <p className="mt-1 text-sm text-gray-500">
-                                    Enter your basic personal information.
-                                </p> */}
                             </div>
 
                             <div className="grid gap-5 sm:grid-cols-2">
@@ -334,7 +309,10 @@ export default function RegistrationForm() {
                                     label="Full Name"
                                     value={form.fullName}
                                     onChange={(value) =>
-                                        updateField("fullName", value)
+                                        updateField(
+                                            "fullName",
+                                            value
+                                        )
                                     }
                                     placeholder="Enter your full name"
                                     required
@@ -345,7 +323,10 @@ export default function RegistrationForm() {
                                     type="date"
                                     value={form.dateOfBirth}
                                     onChange={(value) =>
-                                        updateField("dateOfBirth", value)
+                                        updateField(
+                                            "dateOfBirth",
+                                            value
+                                        )
                                     }
                                     required
                                 />
@@ -419,10 +400,6 @@ export default function RegistrationForm() {
                                     <h3 className="text-lg font-semibold text-gray-800">
                                         Student Information
                                     </h3>
-
-                                    {/* <p className="mt-1 text-sm text-gray-500">
-                                        Provide your academic and guardian information.
-                                    </p> */}
                                 </div>
 
                                 <div className="grid gap-5 sm:grid-cols-2">
@@ -470,7 +447,9 @@ export default function RegistrationForm() {
 
                                     <Input
                                         label="Previous Qualification / Grade"
-                                        value={form.previousQualification}
+                                        value={
+                                            form.previousQualification
+                                        }
                                         onChange={(value) =>
                                             updateField(
                                                 "previousQualification",
@@ -532,25 +511,6 @@ export default function RegistrationForm() {
                                         placeholder="Emergency contact number"
                                         required
                                     />
-
-                                    {/* <div className="sm:col-span-2">
-                                        <label className="mb-2 block text-sm font-medium text-gray-700">
-                                            Medical Information
-                                        </label>
-
-                                        <textarea
-                                            value={form.medicalInformation}
-                                            onChange={(e) =>
-                                                updateField(
-                                                    "medicalInformation",
-                                                    e.target.value
-                                                )
-                                            }
-                                            rows={3}
-                                            placeholder="Allergies, medical conditions, or write 'None'"
-                                            className="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm text-gray-700 outline-none transition focus:border-[#01796F] focus:ring-2 focus:ring-[#01796F]/10"
-                                        />
-                                    </div> */}
                                 </div>
                             </div>
                         )}
@@ -563,10 +523,6 @@ export default function RegistrationForm() {
                                     <h3 className="text-lg font-semibold text-gray-800">
                                         Professional Information
                                     </h3>
-
-                                    {/* <p className="mt-1 text-sm text-gray-500">
-                                        Provide your professional and qualification details.
-                                    </p> */}
                                 </div>
 
                                 <div className="grid gap-5 sm:grid-cols-2">
@@ -675,6 +631,77 @@ export default function RegistrationForm() {
                             </div>
                         )}
 
+                    {/* STEP 3 - PARENT */}
+                    {step === 3 &&
+                        form.role === "Parent" && (
+                            <div className="space-y-6">
+                                <div>
+                                    <h3 className="text-lg font-semibold text-gray-800">
+                                        Parent Information
+                                    </h3>
+                                </div>
+
+                                <div className="grid gap-5 sm:grid-cols-2">
+                                    <Input
+                                        label="Occupation"
+                                        value={form.occupation}
+                                        onChange={(value) =>
+                                            updateField(
+                                                "occupation",
+                                                value
+                                            )
+                                        }
+                                        placeholder="e.g. Businessman"
+                                        required
+                                    />
+
+                                    <Select
+                                        label="Relationship with Student"
+                                        value={form.relationship}
+                                        onChange={(value) =>
+                                            updateField(
+                                                "relationship",
+                                                value
+                                            )
+                                        }
+                                        options={[
+                                            "Father",
+                                            "Mother",
+                                            "Guardian",
+                                        ]}
+                                        placeholder="Select relationship"
+                                        required
+                                    />
+
+                                    <Input
+                                        label="Child Name"
+                                        value={form.childName}
+                                        onChange={(value) =>
+                                            updateField(
+                                                "childName",
+                                                value
+                                            )
+                                        }
+                                        placeholder="Enter child name"
+                                        required
+                                    />
+
+                                    <Input
+                                        label="Child Roll Number"
+                                        value={form.childRollNo}
+                                        onChange={(value) =>
+                                            updateField(
+                                                "childRollNo",
+                                                value
+                                            )
+                                        }
+                                        placeholder="e.g. 101"
+                                        required
+                                    />
+                                </div>
+                            </div>
+                        )}
+
                     {/* STEP 4 */}
                     {step === 4 && (
                         <div className="space-y-6">
@@ -682,10 +709,6 @@ export default function RegistrationForm() {
                                 <h3 className="text-lg font-semibold text-gray-800">
                                     Review & Create Account
                                 </h3>
-
-                                {/* <p className="mt-1 text-sm text-gray-500">
-                                    Review your information before creating your account.
-                                </p> */}
                             </div>
 
                             <div className="rounded-xl border border-gray-200 bg-gray-50 p-5">
@@ -734,14 +757,18 @@ export default function RegistrationForm() {
 
                                             <ReviewItem
                                                 label="Previous School"
-                                                value={form.previousSchool}
+                                                value={
+                                                    form.previousSchool
+                                                }
                                             />
                                         </>
-                                    ) : (
+                                    ) : form.role === "Teacher" ? (
                                         <>
                                             <ReviewItem
                                                 label="Qualification"
-                                                value={form.qualification}
+                                                value={
+                                                    form.qualification
+                                                }
                                             />
 
                                             <ReviewItem
@@ -751,7 +778,9 @@ export default function RegistrationForm() {
 
                                             <ReviewItem
                                                 label="Designation"
-                                                value={form.designation}
+                                                value={
+                                                    form.designation
+                                                }
                                             />
 
                                             <ReviewItem
@@ -759,18 +788,35 @@ export default function RegistrationForm() {
                                                 value={form.subjects}
                                             />
                                         </>
+                                    ) : (
+                                        <>
+                                            <ReviewItem
+                                                label="Occupation"
+                                                value={form.occupation}
+                                            />
+
+                                            <ReviewItem
+                                                label="Relationship"
+                                                value={
+                                                    form.relationship
+                                                }
+                                            />
+
+                                            <ReviewItem
+                                                label="Child Name"
+                                                value={form.childName}
+                                            />
+
+                                            <ReviewItem
+                                                label="Child Roll Number"
+                                                value={
+                                                    form.childRollNo
+                                                }
+                                            />
+                                        </>
                                     )}
                                 </div>
                             </div>
-
-                            {/* <div className="rounded-xl border border-[#01796F]/20 bg-[#e6f4f2] p-4">
-                                <p className="text-sm text-gray-700">
-                                    By creating your account, you confirm that the
-                                    information provided is accurate and belongs to you.
-                                    Your account will be activated immediately after
-                                    successful registration.
-                                </p>
-                            </div> */}
                         </div>
                     )}
 

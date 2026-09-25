@@ -6,7 +6,7 @@ export const studentAssignments: StudentAssignment[] = [
     title: "Algebra Practice",
     subject: "Mathematics",
     className: "Grade 5",
-    teacher: "Ayesha Khan",
+    teacher: "Anees Baloch",
     description:
       "Complete the algebra exercises and show all working steps.",
     dueDate: "2026-09-18",

@@ -62,7 +62,7 @@ export default function StudyMaterialPage() {
         </div>
 
         <Link
-          href="/dashboard/study-material/add"
+          href="/admin/study-material/add"
           className="inline-flex w-fit items-center gap-2 rounded-full bg-[#01796F] px-4 py-2.5 text-sm font-medium text-white transition hover:bg-[#015f58]"
         >
           <Plus size={17} />

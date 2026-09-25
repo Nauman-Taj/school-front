@@ -1,13 +1,13 @@
-export type FeeStatus = "Paid" | "Pending" | "Overdue";
-
 export type Fee = {
   id: string;
-  studentName: string;
-  rollNo: string;
+  studentId: number;
+  student: string;
   className: string;
-  feeType: string;
+  section: string;
+  feeType: "Tuition Fee" | "Admission Fee" | "Exam Fee";
   amount: number;
+  paidAmount: number;
+  remainingAmount: number;
   dueDate: string;
-  paidDate?: string;
-  status: FeeStatus;
+  status: "Paid" | "Partial" | "Pending" | "Overdue";
 };
