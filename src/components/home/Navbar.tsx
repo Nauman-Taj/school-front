@@ -45,10 +45,14 @@ const navLinks = [
                 name: "Subjects & Curriculum",
                 href: "/academics/subjects-curriculum",
             },
+            {
+                name: "Examination System",
+                href: "/academics/examination-system",
+            }
         ],
     },
     {
-                name: "Admissions",
+        name: "Admissions",
         href: "/admissions",
     },
     {
@@ -78,6 +82,10 @@ const navLinks = [
         name: "Contact",
         href: "/contact",
     },
+    {
+        name: "Resources",
+        href: "/resources",
+    }
 ];
 
 export default function Navbar() {

@@ -2,10 +2,10 @@
 
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
-import { Search, Menu, User, X } from "lucide-react";
+import { Search, Menu, User, X, LogOut } from "lucide-react";
 import { useRouter } from "next/navigation";
 
-import { getSession, AuthSession } from "@/lib/auth";
+import { getSession, logout, AuthSession } from "@/lib/auth";
 import { navigationByRole } from "@/data/navigation";
 
 type HeaderProps = {
@@ -207,6 +207,16 @@ export default function Header({ onMenuClick }: HeaderProps) {
               />
             </div>
           </div>
+
+          {/* Logout */}
+          <button
+            type="button"
+            onClick={logout}
+          className="ml-1 inline-flex w-fit items-center gap-2 rounded-xl p-2.5 text-sm font-semibold text-gray-600 transition hover:bg-red-50 hover:text-red-600"
+          >
+            <LogOut size={17} />
+            <span className="hidden sm:inline">Logout</span>
+          </button>
 
         </div>
       </div>

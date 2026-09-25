@@ -35,5 +35,5 @@ export const logout = () => {
 
   sessionStorage.removeItem("auth-session");
 
-  window.location.href = "/";
+  window.location.href = "/login";
 };

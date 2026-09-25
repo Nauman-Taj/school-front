@@ -8,9 +8,10 @@ import {
   Menu,
   User,
   X,
+  LogOut,
 } from "lucide-react";
 
-import { getSession, AuthSession } from "@/lib/auth";
+import { getSession, logout, AuthSession } from "@/lib/auth";
 import { navigationByRole } from "@/data/navigation";
 import { parentNavigation } from "@/data/parentNavigation";
 
@@ -225,6 +226,15 @@ export default function ParentHeader({
               />
             </div>
           </div>
+          {/* Logout */}
+          <button
+            type="button"
+            onClick={logout}
+            className="ml-1 inline-flex w-fit items-center gap-2 rounded-xl p-2.5 text-sm font-semibold text-gray-600 transition hover:bg-red-50 hover:text-red-600"
+          >
+            <LogOut size={18} />
+            <span className="hidden sm:inline">Logout</span>
+          </button>
         </div>
       </div>
     </header>
