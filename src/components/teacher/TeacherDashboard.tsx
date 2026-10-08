@@ -48,13 +48,16 @@ export default function TeacherDashboard() {
   const teacherClassKeys = Array.from(
     new Set(
       teacherSubjects.map(
-        (subject) => `${subject.className}-${subject.section}`
+        (subject) =>
+          `${subject.className}-${subject.section}`
       )
     )
   );
 
   const teacherStudents = students.filter((student) =>
-    teacherClassKeys.includes(`${student.className}-${student.section}`)
+    teacherClassKeys.includes(
+      `${student.className}-${student.section}`
+    )
   );
 
   const pendingAssignments = teacherAssignments.filter(
@@ -65,7 +68,13 @@ export default function TeacherDashboard() {
     (exam) => exam.status === "Upcoming"
   );
 
-  const todayClasses = teacherTimetable.slice(0, 4);
+  const today = new Intl.DateTimeFormat("en-US", {
+    weekday: "long",
+  }).format(new Date());
+
+  const todayClasses = teacherTimetable
+    .filter((item) => item.day === today)
+    .slice(0, 4);
 
   const stats = [
     {
@@ -141,7 +150,7 @@ export default function TeacherDashboard() {
           return (
             <div
               key={stat.title}
-              className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm"
+              className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm transition-shadow hover:shadow-md"
             >
               <div className="flex items-start justify-between">
                 <div>
@@ -155,7 +164,10 @@ export default function TeacherDashboard() {
                 </div>
 
                 <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#01796f]/10 text-[#01796f]">
-                  <Icon size={21} strokeWidth={1.8} />
+                  <Icon
+                    size={21}
+                    strokeWidth={2}
+                  />
                 </div>
               </div>
 
@@ -196,7 +208,10 @@ export default function TeacherDashboard() {
                 className="group flex items-center gap-4 rounded-xl border border-gray-200 p-4 text-left transition hover:border-[#01796f] hover:bg-[#e6f4f2]"
               >
                 <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[#01796f]/10 text-[#01796f]">
-                  <Icon size={20} />
+                  <Icon
+                    size={20}
+                    strokeWidth={2}
+                  />
                 </div>
 
                 <div className="min-w-0 flex-1">
@@ -211,6 +226,7 @@ export default function TeacherDashboard() {
 
                 <ArrowRight
                   size={17}
+                  strokeWidth={2}
                   className="text-gray-400 transition group-hover:translate-x-1 group-hover:text-[#01796f]"
                 />
               </Link>
@@ -250,7 +266,10 @@ export default function TeacherDashboard() {
                   className="flex items-center gap-4 rounded-xl bg-gray-50 p-4"
                 >
                   <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-[#01796f]/10 text-[#01796f]">
-                    <CalendarDays size={19} />
+                    <CalendarDays
+                      size={19}
+                      strokeWidth={2}
+                    />
                   </div>
 
                   <div className="min-w-0 flex-1">
@@ -270,7 +289,7 @@ export default function TeacherDashboard() {
               ))
             ) : (
               <p className="py-6 text-center text-sm text-gray-500">
-                No classes scheduled.
+                No classes scheduled for today.
               </p>
             )}
           </div>
@@ -305,7 +324,10 @@ export default function TeacherDashboard() {
                   className="flex items-center gap-4 rounded-xl bg-gray-50 p-4"
                 >
                   <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-[#01796f]/10 text-[#01796f]">
-                    <CalendarDays size={19} />
+                    <CalendarDays
+                      size={19}
+                      strokeWidth={2}
+                    />
                   </div>
 
                   <div className="min-w-0 flex-1">

@@ -49,7 +49,7 @@ export default function StudentFeeTable({
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search fees..."
+              placeholder="Search fees"
               className="w-full rounded-full border border-gray-200 py-2.5 pl-9 pr-4 text-sm outline-none transition focus:border-[#01796f] focus:ring-2 focus:ring-[#01796f]/10"
             />
           </div>
@@ -214,6 +214,10 @@ function StatusBadge({
       icon: <Clock3 size={14} />,
     },
     Pending: {
+      className: "bg-blue-50 text-blue-700",
+      icon: <Clock3 size={14} />,
+    },
+    Overdue: {
       className: "bg-red-50 text-red-700",
       icon: <Clock3 size={14} />,
     },

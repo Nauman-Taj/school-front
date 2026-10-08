@@ -9,14 +9,25 @@ import {
 } from "lucide-react";
 
 import { results as sharedResults } from "@/data/results";
+import { students } from "@/data/students";
 import { getCurrentParentChildren } from "@/lib/parent";
+
 import ParentResultsTable from "./ParentResultsTable";
 
 export default function ParentResultsPage() {
-    const children = getCurrentParentChildren();
+    const parentChildren = getCurrentParentChildren();
+
+    const children = parentChildren
+        .map((relation) =>
+            students.find((student) => student.id === relation.studentId)
+        )
+        .filter(
+            (student): student is (typeof students)[number] =>
+                Boolean(student)
+        );
 
     const [selectedChild, setSelectedChild] = useState(
-        children[0]?.studentId ?? 0
+        children[0]?.id ?? 0
     );
 
     const results = useMemo(
@@ -75,8 +86,22 @@ export default function ParentResultsPage() {
     ];
 
     const selectedStudent = children.find(
-        (child) => child.studentId === selectedChild
+        (child) => child.id === selectedChild
     );
+
+    if (!selectedStudent) {
+        return (
+            <div className="rounded-2xl border border-gray-200 bg-white p-8 text-center">
+                <h2 className="text-lg font-semibold text-gray-800">
+                    Child data not found
+                </h2>
+
+                <p className="mt-2 text-sm text-gray-500">
+                    No results information is available.
+                </p>
+            </div>
+        );
+    }
 
     return (
         <div className="space-y-5">
@@ -92,55 +117,47 @@ export default function ParentResultsPage() {
                 </p>
             </div>
 
-            {/* Child Selector */}
-            <div className="rounded-2xl border border-gray-200 bg-white p-5">
-                <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-                    <div>
-                        <p className="text-xs font-medium uppercase tracking-wide text-gray-400">
-                            Student
-                        </p>
+            {/* Child Information + Selector */}
+            <div className="grid gap-4 lg:grid-cols-[1fr_280px]">
+                <div className="rounded-2xl border border-gray-200 bg-white p-5">
+                    <p className="text-sm font-medium text-gray-500">
+                        Selected Child
+                    </p>
 
-                        <h2 className="mt-1 text-lg font-semibold text-gray-800">
-                            {selectedStudent?.name ?? "No student selected"}
-                        </h2>
+                    <h2 className="mt-2 text-xl font-bold text-gray-800">
+                        {selectedStudent.name}
+                    </h2>
 
-                        {selectedStudent && (
-                            <p className="mt-1 text-sm text-gray-500">
-                                {selectedStudent.className} - Section{" "}
-                                {selectedStudent.section}
-                                {" • "}
-                                Roll No: {selectedStudent.rollNo}
-                            </p>
-                        )}
-                    </div>
+                    <p className="mt-1 text-sm text-gray-500">
+                        {selectedStudent.className} - Section{" "}
+                        {selectedStudent.section}
+                        {" • "}
+                        Roll No: {selectedStudent.rollNo}
+                    </p>
+                </div>
 
-                    <div>
-                        <label
-                            htmlFor="child"
-                            className="mb-2 block text-sm font-medium text-gray-700"
-                        >
-                            Select Child
-                        </label>
+                <div className="rounded-2xl border border-gray-200 bg-white p-5">
+                    <label
+                        htmlFor="child"
+                        className="mb-2 block text-sm font-medium text-gray-700"
+                    >
+                        Select Child
+                    </label>
 
-                        <select
-                            id="child"
-                            value={selectedChild}
-                            onChange={(e) =>
-                                setSelectedChild(Number(e.target.value))
-                            }
-                            className="w-full rounded-lg border border-gray-200 bg-white px-4 py-2.5 text-sm text-gray-700 outline-none transition focus:border-[#01796f] focus:ring-2 focus:ring-[#01796f]/20 sm:w-80"
-                        >
-                            {children.map((child) => (
-                                <option
-                                    key={child.studentId}
-                                    value={child.studentId}
-                                >
-                                    {child.name} --- {child.className}-
-                                    {child.section}
-                                </option>
-                            ))}
-                        </select>
-                    </div>
+                    <select
+                        id="child"
+                        value={selectedChild}
+                        onChange={(e) =>
+                            setSelectedChild(Number(e.target.value))
+                        }
+                        className="w-full rounded-lg border border-gray-200 bg-white px-4 py-2.5 text-sm text-gray-700 outline-none transition focus:border-[#01796F] focus:ring-2 focus:ring-[#01796F]/20"
+                    >
+                        {children.map((child) => (
+                            <option key={child.id} value={child.id}>
+                                {child.name}
+                            </option>
+                        ))}
+                    </select>
                 </div>
             </div>
 
@@ -160,9 +177,9 @@ export default function ParentResultsPage() {
                                 </p>
 
                                 <div
-                                    className={`flex h-10 w-10 items-center justify-center rounded-xl ${stat.iconClass}`}
+                                    className={`flex h-11 w-11 items-center justify-center rounded-xl ${stat.iconClass}`}
                                 >
-                                    <Icon size={19} />
+                                    <Icon size={20} />
                                 </div>
                             </div>
 
@@ -174,8 +191,20 @@ export default function ParentResultsPage() {
                 })}
             </div>
 
-            {/* Results */}
-            <ParentResultsTable results={results} />
+            {/* Results Records */}
+            <div>
+                <div className="mb-4">
+                    <h2 className="text-lg font-semibold text-gray-800">
+                        Results Records
+                    </h2>
+
+                    <p className="mt-1 text-sm text-gray-500">
+                        Examination results for {selectedStudent.name}.
+                    </p>
+                </div>
+
+                <ParentResultsTable results={results} />
+            </div>
         </div>
     );
 }

@@ -1,17 +1,17 @@
 "use client";
 
 import Link from "next/link";
+import { navigationByRole } from "@/data/navigation";
 import { usePathname } from "next/navigation";
 import Image from "next/image";
-import { School } from "lucide-react";
-
-import { parentNavigation } from "@/data/parentNavigation";
 
 export default function ParentSidebar() {
-    const pathname = usePathname();
+  const pathname = usePathname();
+  const parentNavigation = navigationByRole.Parent;
 
-    return (
-        <aside className="fixed left-0 top-0 z-40 hidden h-screen w-64 border-r border-gray-200 bg-white lg:block">
+
+  return (
+    <aside className="fixed left-0 top-0 z-40 hidden h-screen w-64 border-r border-gray-200 bg-white lg:block">
 
       {/* Logo */}
       <div className="flex h-16 shrink-0 items-center border-b border-gray-200 px-6">
@@ -46,19 +46,28 @@ export default function ParentSidebar() {
 
           {parentNavigation.map((item) => {
             const Icon = item.icon;
+            const isActive =
+              item.href === "/parent"
+                ? pathname === "/parent"
+                : pathname.startsWith(item.href);
 
             return (
               <Link
-                key={item.title}
+                key={item.label}
                 href={item.href}
-                className="flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium text-gray-600 transition-colors hover:bg-[#01796f]/10 hover:text-[#01796f]"
+                className={`flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition-colors text-gray-600 hover:bg-[#01796f]/10 hover:text-[#01796f]`}
+              // ${
+              // isActive
+              //   ? "bg-[#01796f]/10 text-[#01796f]"
+              //   : "text-gray-600 hover:bg-[#01796f]/10 hover:text-[#01796f]"
+              // }`}
               >
                 <Icon
                   size={19}
                   strokeWidth={1.8}
                 />
 
-                <span>{item.title}</span>
+                <span>{item.label}</span>
               </Link>
             );
           })}
@@ -66,7 +75,7 @@ export default function ParentSidebar() {
         </div>
       </nav>
 
-    </aside>
-    );
+    </aside >
+  );
 }
 

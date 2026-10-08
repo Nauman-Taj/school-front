@@ -116,7 +116,7 @@ export default function StudentSubjectTable() {
               {/* Status */}
               <div className="flex items-center gap-2">
                 <GraduationCap
-                  size={18}
+                  size={17}
                   className="text-[#01796f]"
                   strokeWidth={1.8}
                 />

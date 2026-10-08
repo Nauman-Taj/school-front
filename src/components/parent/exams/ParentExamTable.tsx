@@ -3,15 +3,26 @@
 import { useState } from "react";
 import {
   Search,
-  Clock3,
   CalendarDays,
-  MapPin,
+  Check,
+  Clock3,
 } from "lucide-react";
 
-import { ParentExam } from "@/types/parentExam";
+import { Exam } from "@/types/exam";
 
 type ParentExamTableProps = {
-  exams: ParentExam[];
+  exams: Exam[];
+};
+
+const statusStyles = {
+  Upcoming: {
+    className: "bg-yellow-50 text-yellow-700",
+    icon: Clock3,
+  },
+  Completed: {
+    className: "bg-green-50 text-green-700",
+    icon: Check,
+  },
 };
 
 export default function ParentExamTable({
@@ -23,15 +34,16 @@ export default function ParentExamTable({
     const searchTerm = search.toLowerCase();
 
     return (
-      exam.examName.toLowerCase().includes(searchTerm) ||
+      exam.name.toLowerCase().includes(searchTerm) ||
       exam.subject.toLowerCase().includes(searchTerm) ||
-      exam.room.toLowerCase().includes(searchTerm) ||
+      exam.teacher.toLowerCase().includes(searchTerm) ||
+      exam.examDate.toLowerCase().includes(searchTerm) ||
       exam.status.toLowerCase().includes(searchTerm)
     );
   });
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-5">
       {/* Search */}
       <div className="relative">
         <Search
@@ -48,138 +60,167 @@ export default function ParentExamTable({
         />
       </div>
 
-      {/* Desktop Table */}
-      <div className="hidden overflow-hidden rounded-2xl border border-gray-200 bg-white md:block">
-        <div className="overflow-x-auto">
-          <table className="w-full text-left">
-            <thead className="border-b border-gray-200 bg-gray-50">
-              <tr>
-                <th className="px-5 py-4 text-sm font-semibold text-gray-700">
-                  Exam
-                </th>
-                <th className="px-5 py-4 text-sm font-semibold text-gray-700">
-                  Subject
-                </th>
-                <th className="px-5 py-4 text-sm font-semibold text-gray-700">
-                  Date
-                </th>
-                <th className="px-5 py-4 text-sm font-semibold text-gray-700">
-                  Time
-                </th>
-                <th className="px-5 py-4 text-sm font-semibold text-gray-700">
-                  Room
-                </th>
-                <th className="px-5 py-4 text-sm font-semibold text-gray-700">
-                  Status
-                </th>
-              </tr>
-            </thead>
+      {/* Desktop */}
+      <div className="hidden overflow-x-auto rounded-2xl border border-gray-200 bg-white md:block">
+        <table className="w-full text-sm">
+          <thead className="bg-gray-50">
+            <tr className="border-b border-gray-200 text-left">
+              <th className="px-6 py-4 font-semibold text-gray-600">
+                Exam
+              </th>
 
-            <tbody>
-              {filteredExams.map((exam) => (
+              <th className="px-6 py-4 font-semibold text-gray-600">
+                Subject
+              </th>
+
+              <th className="px-6 py-4 font-semibold text-gray-600">
+                Date
+              </th>
+
+              <th className="px-6 py-4 font-semibold text-gray-600">
+                Teacher
+              </th>
+
+              <th className="px-6 py-4 font-semibold text-gray-600">
+                Total Marks
+              </th>
+
+              <th className="px-6 py-4 font-semibold text-gray-600">
+                Status
+              </th>
+            </tr>
+          </thead>
+
+          <tbody>
+            {filteredExams.map((exam) => {
+              const status = statusStyles[exam.status];
+              const Icon = status.icon;
+
+              return (
                 <tr
                   key={exam.id}
                   className="border-b border-gray-100 last:border-0"
                 >
-                  <td className="px-5 py-4 text-sm font-medium text-gray-900">
-                    {exam.examName}
+                  <td className="px-6 py-4 font-medium text-gray-900">
+                    {exam.name}
                   </td>
 
-                  <td className="px-5 py-4 text-sm text-gray-600">
+                  <td className="px-6 py-4 text-gray-600">
                     {exam.subject}
                   </td>
 
-                  <td className="px-5 py-4 text-sm text-gray-600">
-                    {exam.date}
+                  <td className="px-6 py-4 text-gray-600">
+                    {new Date(
+                      exam.examDate
+                    ).toLocaleDateString("en-GB", {
+                      day: "2-digit",
+                      month: "short",
+                      year: "numeric",
+                    })}
                   </td>
 
-                  <td className="px-5 py-4 text-sm text-gray-600">
-                    {exam.time}
+                  <td className="px-6 py-4 text-gray-600">
+                    {exam.teacher}
                   </td>
 
-                  <td className="px-5 py-4 text-sm text-gray-600">
-                    {exam.room}
+                  <td className="px-6 py-4 text-gray-600">
+                    {exam.totalMarks}
                   </td>
 
-                  <td className="px-5 py-4">
+                  <td className="px-6 py-4">
                     <span
-                      className={`inline-flex rounded-full px-3 py-1 text-xs font-medium ${
-                        exam.status === "Upcoming"
-                          ? "bg-yellow-50 text-yellow-700"
-                          : "bg-green-50 text-green-700"
-                      }`}
+                      className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium ${status.className}`}
                     >
+                      <Icon size={14} />
                       {exam.status}
                     </span>
                   </td>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+              );
+            })}
+
+            {filteredExams.length === 0 && (
+              <tr>
+                <td
+                  colSpan={6}
+                  className="px-6 py-8 text-center text-sm text-gray-500"
+                >
+                  No exam records found.
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
       </div>
 
-      {/* Mobile Cards */}
-      <div className="space-y-4 md:hidden">
-        {filteredExams.map((exam) => (
-          <div
-            key={exam.id}
-            className="rounded-2xl border border-gray-200 bg-white p-5"
-          >
-            <div className="flex items-start justify-between gap-3">
-              <div>
-                <h3 className="font-semibold text-gray-900">
-                  {exam.examName}
-                </h3>
+      {/* Mobile */}
+      <div className="space-y-3 md:hidden">
+        {filteredExams.map((exam) => {
+          const status = statusStyles[exam.status];
+          const Icon = status.icon;
 
-                <p className="mt-1 text-sm text-gray-500">
-                  {exam.subject}
-                </p>
+          return (
+            <div
+              key={exam.id}
+              className="rounded-2xl border border-gray-200 bg-white p-4"
+            >
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <p className="font-semibold text-gray-900">
+                    {exam.name}
+                  </p>
+
+                  <p className="mt-1 text-sm text-gray-500">
+                    {exam.subject}
+                  </p>
+                </div>
+
+                <span
+                  className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium ${status.className}`}
+                >
+                  <Icon size={14} />
+                  {exam.status}
+                </span>
               </div>
 
-              <span
-                className={`shrink-0 rounded-full px-3 py-1 text-xs font-medium ${
-                  exam.status === "Upcoming"
-                    ? "bg-yellow-50 text-yellow-700"
-                    : "bg-green-50 text-green-700"
-                }`}
-              >
-                {exam.status}
-              </span>
+              <div className="mt-4 space-y-3 border-t border-gray-100 pt-4 text-sm">
+                <div className="flex items-center gap-3 text-gray-600">
+                  <CalendarDays
+                    size={16}
+                    className="text-gray-400"
+                  />
+
+                  {new Date(
+                    exam.examDate
+                  ).toLocaleDateString("en-GB", {
+                    day: "2-digit",
+                    month: "short",
+                    year: "numeric",
+                  })}
+                </div>
+
+                <div className="flex items-center justify-between text-gray-600">
+                  <span>Teacher</span>
+                  <span>{exam.teacher}</span>
+                </div>
+
+                <div className="flex items-center justify-between text-gray-600">
+                  <span>Total Marks</span>
+                  <span className="font-medium text-gray-900">
+                    {exam.totalMarks}
+                  </span>
+                </div>
+              </div>
             </div>
-
-            <div className="mt-4 space-y-3 text-sm text-gray-600">
-              <div className="flex items-center gap-2">
-                <CalendarDays size={16} className="text-[#01796F]" />
-                <span>{exam.date}</span>
-              </div>
-
-              <div className="flex items-center gap-2">
-                <Clock3 size={16} className="text-[#01796F]" />
-                <span>{exam.time}</span>
-              </div>
-
-              <div className="flex items-center gap-2">
-                <MapPin size={16} className="text-[#01796F]" />
-                <span>{exam.room}</span>
-              </div>
-            </div>
-          </div>
-        ))}
+          );
+        })}
 
         {filteredExams.length === 0 && (
-          <div className="rounded-2xl border border-gray-200 bg-white p-8 text-center text-sm text-gray-500">
-            No exams found.
+          <div className="rounded-2xl border border-gray-200 bg-white px-4 py-8 text-center text-sm text-gray-500">
+            No exam records found.
           </div>
         )}
       </div>
-
-      {/* Desktop Empty State */}
-      {filteredExams.length === 0 && (
-        <div className="hidden rounded-2xl border border-gray-200 bg-white p-8 text-center text-sm text-gray-500 md:block">
-          No exams found.
-        </div>
-      )}
     </div>
   );
 }

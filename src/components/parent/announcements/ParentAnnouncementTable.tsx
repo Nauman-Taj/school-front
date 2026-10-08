@@ -7,10 +7,10 @@ import {
   Bell,
 } from "lucide-react";
 
-import { ParentAnnouncement } from "@/types/parentAnnouncement";
+import { Announcement } from "@/types/announcement";
 
 type ParentAnnouncementTableProps = {
-  announcements: ParentAnnouncement[];
+  announcements: Announcement[];
 };
 
 export default function ParentAnnouncementTable({
@@ -26,10 +26,13 @@ export default function ParentAnnouncementTable({
         announcement.title
           .toLowerCase()
           .includes(searchTerm) ||
-        announcement.message
+        announcement.description
           .toLowerCase()
           .includes(searchTerm) ||
-        announcement.category
+        announcement.audience
+          .toLowerCase()
+          .includes(searchTerm) ||
+        announcement.date
           .toLowerCase()
           .includes(searchTerm)
       );
@@ -63,9 +66,11 @@ export default function ParentAnnouncementTable({
                 <th className="px-5 py-4 text-sm font-semibold text-gray-700">
                   Announcement
                 </th>
+
                 <th className="px-5 py-4 text-sm font-semibold text-gray-700">
-                  Category
+                  Audience
                 </th>
+
                 <th className="px-5 py-4 text-sm font-semibold text-gray-700">
                   Date
                 </th>
@@ -84,18 +89,24 @@ export default function ParentAnnouncementTable({
                     </p>
 
                     <p className="mt-1 max-w-xl text-sm text-gray-500">
-                      {announcement.message}
+                      {announcement.description}
                     </p>
                   </td>
 
                   <td className="px-5 py-4">
                     <span className="rounded-full bg-[#e6f4f2] px-3 py-1 text-xs font-medium text-[#01796F]">
-                      {announcement.category}
+                      {announcement.audience}
                     </span>
                   </td>
 
                   <td className="px-5 py-4 text-sm text-gray-600">
-                    {announcement.date}
+                    {new Date(
+                      announcement.date
+                    ).toLocaleDateString("en-GB", {
+                      day: "2-digit",
+                      month: "short",
+                      year: "numeric",
+                    })}
                   </td>
                 </tr>
               ))}
@@ -123,12 +134,12 @@ export default function ParentAnnouncementTable({
                   </h3>
 
                   <span className="shrink-0 rounded-full bg-[#e6f4f2] px-3 py-1 text-xs font-medium text-[#01796F]">
-                    {announcement.category}
+                    {announcement.audience}
                   </span>
                 </div>
 
                 <p className="mt-2 text-sm leading-6 text-gray-500">
-                  {announcement.message}
+                  {announcement.description}
                 </p>
 
                 <div className="mt-4 flex items-center gap-2 text-sm text-gray-500">
@@ -136,7 +147,16 @@ export default function ParentAnnouncementTable({
                     size={16}
                     className="text-[#01796F]"
                   />
-                  <span>{announcement.date}</span>
+
+                  <span>
+                    {new Date(
+                      announcement.date
+                    ).toLocaleDateString("en-GB", {
+                      day: "2-digit",
+                      month: "short",
+                      year: "numeric",
+                    })}
+                  </span>
                 </div>
               </div>
             </div>

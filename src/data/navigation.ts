@@ -12,7 +12,6 @@ import {
   Wallet,
   School,
   CalendarCheck,
-  Bell,
   Settings,
   Bus,
   ClipboardList,
@@ -191,7 +190,7 @@ export const navigationByRole: Record<UserRole, NavigationItem[]> = {
     },
     {
       label: "Assignments",
-      href: "/student/studentassignments",
+      href: "/student/assignments",
       icon: ClipboardList,
     },
     {
@@ -238,6 +237,11 @@ export const navigationByRole: Record<UserRole, NavigationItem[]> = {
       icon: LayoutDashboard,
     },
     {
+      label: "Child Profile",
+      href: "/parent/child-profile",
+      icon: UserRound,
+    },
+    {
       label: "Attendance",
       href: "/parent/attendance",
       icon: CalendarCheck,
@@ -271,11 +275,6 @@ export const navigationByRole: Record<UserRole, NavigationItem[]> = {
       label: "Announcements",
       href: "/parent/announcements",
       icon: Megaphone,
-    },
-    {
-      label: "Notifications",
-      href: "/parent/notifications",
-      icon: Bell,
     },
     {
       label: "Profile",

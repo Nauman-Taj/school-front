@@ -12,6 +12,7 @@ import {
 
 import { getSession } from "@/lib/auth";
 
+import { teachers } from "@/data/teachers";
 import { classes } from "@/data/classes";
 import { subjects } from "@/data/subjects";
 import { students } from "@/data/students";
@@ -23,14 +24,18 @@ export default function TeacherClassProfile() {
 
   const classId = Number(params.id);
 
+  const currentTeacher =
+    teachers.find(
+      (teacher) =>
+        teacher.email === session?.email ||
+        teacher.name === session?.name
+    ) ?? teachers[0];
+
+  const currentTeacherId = currentTeacher.id;
+
   const schoolClass = classes.find(
     (item) => item.id === classId
   );
-
-  const currentTeacherId =
-    subjects.find(
-      (subject) => subject.teacher === session?.name
-    )?.teacherId ?? "T001";
 
   const classSubjects = schoolClass
     ? subjects.filter(
@@ -64,7 +69,9 @@ export default function TeacherClassProfile() {
 
   const subjectsText =
     classSubjects.length > 0
-      ? classSubjects.map((subject) => subject.name).join(", ")
+      ? classSubjects
+          .map((subject) => subject.name)
+          .join(", ")
       : "No subjects";
 
   const scheduleText = classTimetable
@@ -73,16 +80,20 @@ export default function TeacherClassProfile() {
 
   if (!schoolClass || classSubjects.length === 0) {
     return (
-      <div className="space-y-5">
+      <main className="space-y-5">
         <Link
           href="/teacher/classes"
-          className="inline-flex items-center gap-2 text-sm font-medium text-gray-500 hover:text-[#01796f]"
+          className="inline-flex items-center gap-2 text-sm font-medium text-gray-500 transition hover:text-[#01796f]"
         >
-          <ArrowLeft size={17} />
+          <ArrowLeft
+            size={17}
+            strokeWidth={2}
+          />
+
           Back to My Classes
         </Link>
 
-        <div className="rounded-2xl border border-gray-200 bg-white p-8 text-center">
+        <div className="rounded-2xl border border-gray-200 bg-white p-8 text-center shadow-sm">
           <h1 className="text-lg font-semibold text-gray-900">
             Class not found
           </h1>
@@ -91,19 +102,23 @@ export default function TeacherClassProfile() {
             This class is not assigned to you.
           </p>
         </div>
-      </div>
+      </main>
     );
   }
 
   return (
-    <div className="space-y-5">
+    <main className="space-y-5">
       {/* Header */}
       <div>
         <Link
           href="/teacher/classes"
-          className="mb-4 inline-flex items-center gap-2 text-sm font-medium text-gray-500 hover:text-[#01796f]"
+          className="mb-4 inline-flex items-center gap-2 text-sm font-medium text-gray-500 transition hover:text-[#01796f]"
         >
-          <ArrowLeft size={17} />
+          <ArrowLeft
+            size={17}
+            strokeWidth={2}
+          />
+
           Back to My Classes
         </Link>
 
@@ -128,10 +143,13 @@ export default function TeacherClassProfile() {
 
       {/* Stats */}
       <div className="grid gap-4 sm:grid-cols-3">
-        <div className="rounded-2xl border border-gray-200 bg-white p-5">
+        <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
           <div className="flex items-center gap-3">
-            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#01796f]/10 text-[#01796f]">
-              <Users size={20} />
+            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#e6f4f2] text-[#01796f]">
+              <Users
+                size={20}
+                strokeWidth={2}
+              />
             </div>
 
             <div>
@@ -146,10 +164,13 @@ export default function TeacherClassProfile() {
           </div>
         </div>
 
-        <div className="rounded-2xl border border-gray-200 bg-white p-5">
+        <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
           <div className="flex items-center gap-3">
-            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#01796f]/10 text-[#01796f]">
-              <BookOpen size={20} />
+            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#e6f4f2] text-[#01796f]">
+              <BookOpen
+                size={20}
+                strokeWidth={2}
+              />
             </div>
 
             <div className="min-w-0">
@@ -164,13 +185,16 @@ export default function TeacherClassProfile() {
           </div>
         </div>
 
-        <div className="rounded-2xl border border-gray-200 bg-white p-5">
+        <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
           <div className="flex items-center gap-3">
-            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#01796f]/10 text-[#01796f]">
-              <CalendarDays size={20} />
+            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#e6f4f2] text-[#01796f]">
+              <CalendarDays
+                size={20}
+                strokeWidth={2}
+              />
             </div>
 
-            <div>
+            <div className="min-w-0">
               <p className="text-sm text-gray-500">
                 Schedule
               </p>
@@ -184,7 +208,7 @@ export default function TeacherClassProfile() {
       </div>
 
       {/* Students */}
-      <div className="rounded-2xl border border-gray-200 bg-white p-6">
+      <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm sm:p-6">
         <div className="flex items-center justify-between gap-4">
           <div>
             <h2 className="text-lg font-semibold text-gray-900">
@@ -196,7 +220,7 @@ export default function TeacherClassProfile() {
             </p>
           </div>
 
-          <span className="rounded-full bg-[#e6f4f2] px-3 py-1 text-sm font-medium text-[#01796f]">
+          <span className="shrink-0 rounded-full bg-[#e6f4f2] px-3 py-1 text-sm font-medium text-[#01796f]">
             {classStudents.length} Students
           </span>
         </div>
@@ -209,7 +233,10 @@ export default function TeacherClassProfile() {
                 className="flex items-center gap-3 rounded-xl bg-gray-50 p-4"
               >
                 <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#01796f]/10 text-[#01796f]">
-                  <UserRound size={18} />
+                  <UserRound
+                    size={18}
+                    strokeWidth={2}
+                  />
                 </div>
 
                 <div className="min-w-0 flex-1">
@@ -224,7 +251,7 @@ export default function TeacherClassProfile() {
 
                 <Link
                   href={`/teacher/students/${student.id}`}
-                  className="rounded-lg border border-gray-200 px-3 py-2 text-sm font-medium text-gray-600 transition hover:border-[#01796f] hover:bg-[#e6f4f2] hover:text-[#01796f]"
+                  className="rounded-full border border-gray-200 px-4 py-2 text-sm font-medium text-gray-600 transition hover:border-[#01796f] hover:bg-[#e6f4f2] hover:text-[#01796f]"
                 >
                   View
                 </Link>
@@ -239,7 +266,7 @@ export default function TeacherClassProfile() {
       </div>
 
       {/* Class Management */}
-      <div className="rounded-2xl border border-gray-200 bg-white p-6">
+      <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm sm:p-6">
         <h2 className="text-lg font-semibold text-gray-900">
           Class Management
         </h2>
@@ -292,6 +319,6 @@ export default function TeacherClassProfile() {
           </Link>
         </div>
       </div>
-    </div>
+    </main>
   );
 }

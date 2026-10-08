@@ -1,103 +1,75 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import {
   Bell,
   CalendarDays,
-  School,
-  GraduationCap,
-  Receipt,
+  Users,
+  UserRound,
 } from "lucide-react";
 
-import { parentAnnouncements } from "@/data/parentAnnouncements";
-import { getCurrentParentChildren } from "@/lib/parent";
+import { announcements } from "@/data/announcements";
 import ParentAnnouncementTable from "./ParentAnnouncementTable";
 
 export default function ParentAnnouncementsPage() {
-  const children = getCurrentParentChildren();
-
-  const [selectedChild, setSelectedChild] = useState(
-    children[0]?.id ?? 0
-  );
-
-  const announcements = useMemo(
+  const parentAnnouncements = useMemo(
     () =>
-      parentAnnouncements.filter(
+      announcements.filter(
         (announcement) =>
-          announcement.childId === selectedChild
+          announcement.status === "Published" &&
+          (announcement.audience === "All" ||
+            announcement.audience === "Parents")
       ),
-    [selectedChild]
+    []
   );
 
   const stats = [
     {
       title: "Total",
-      value: announcements.length,
+      value: parentAnnouncements.length,
       icon: Bell,
       iconClass: "bg-[#e6f4f2] text-[#01796F]",
     },
     {
-      title: "School",
-      value: announcements.filter(
-        (item) => item.category === "School"
+      title: "For Everyone",
+      value: parentAnnouncements.filter(
+        (announcement) => announcement.audience === "All"
       ).length,
-      icon: School,
+      icon: Users,
       iconClass: "bg-blue-50 text-blue-600",
     },
     {
-      title: "Academic",
-      value: announcements.filter(
-        (item) => item.category === "Academic"
+      title: "For Parents",
+      value: parentAnnouncements.filter(
+        (announcement) => announcement.audience === "Parents"
       ).length,
-      icon: GraduationCap,
+      icon: UserRound,
       iconClass: "bg-yellow-50 text-yellow-600",
     },
     {
-      title: "Fee",
-      value: announcements.filter(
-        (item) => item.category === "Fee"
+      title: "Published",
+      value: parentAnnouncements.filter(
+        (announcement) => announcement.status === "Published"
       ).length,
-      icon: Receipt,
-      iconClass: "bg-red-50 text-red-600",
+      icon: CalendarDays,
+      iconClass: "bg-green-50 text-green-600",
     },
   ];
 
   return (
     <div className="space-y-5">
+      {/* Heading */}
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">
+        <h1 className="text-2xl font-bold text-gray-900 sm:text-3xl">
           Announcements
         </h1>
 
-        <p className="mt-1 text-sm text-gray-500">
-          View school announcements and important updates for your child.
+        <p className="mt-1 text-sm text-gray-500 sm:text-base">
+          View school announcements and important updates for parents.
         </p>
       </div>
 
-      <div className="rounded-2xl border border-gray-200 bg-white p-5">
-        <label
-          htmlFor="child"
-          className="mb-2 block text-sm font-medium text-gray-700"
-        >
-          Select Child
-        </label>
-
-        <select
-          id="child"
-          value={selectedChild}
-          onChange={(e) =>
-            setSelectedChild(Number(e.target.value))
-          }
-          className="w-full rounded-lg border border-gray-200 bg-white px-4 py-2.5 text-sm text-gray-700 outline-none transition focus:border-[#01796F] sm:w-80"
-        >
-          {children.map((child) => (
-            <option key={child.id} value={child.id}>
-              {child.name} --- {child.className}
-            </option>
-          ))}
-        </select>
-      </div>
-
+      {/* Stats */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {stats.map((stat) => {
           const Icon = stat.icon;
@@ -127,19 +99,20 @@ export default function ParentAnnouncementsPage() {
         })}
       </div>
 
+      {/* Announcement Records */}
       <div>
-        {/* <div className="mb-4">
-          <h2 className="text-lg font-semibold text-gray-900">
-            Announcements
+        <div className="mb-4">
+          <h2 className="text-lg font-semibold text-gray-800">
+            School Announcements
           </h2>
 
           <p className="mt-1 text-sm text-gray-500">
-            Latest announcements for the selected child.
+            Latest published announcements available to parents.
           </p>
-        </div> */}
+        </div>
 
         <ParentAnnouncementTable
-          announcements={announcements}
+          announcements={parentAnnouncements}
         />
       </div>
     </div>

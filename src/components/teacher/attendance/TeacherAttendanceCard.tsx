@@ -1,9 +1,9 @@
 "use client";
 
-import { AttendanceRecord } from "@/types/attendance";
+import { StudentAttendanceRecord } from "@/types/attendance";
 
 type Props = {
-  attendance: AttendanceRecord[];
+  attendance: StudentAttendanceRecord[];
 };
 
 export default function TeacherAttendanceCard({
@@ -18,13 +18,13 @@ export default function TeacherAttendanceCard({
             className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm"
           >
             <div className="flex items-center justify-between gap-4">
-              <div>
+              <div className="min-w-0">
                 <h2 className="font-semibold text-gray-900">
                   {item.name}
                 </h2>
 
                 <p className="mt-1 text-sm text-gray-500">
-                  {item.class}
+                  {item.className}-{item.section}
                 </p>
               </div>
 
@@ -53,7 +53,7 @@ export default function TeacherAttendanceCard({
       {attendance.length > 0 && (
         <button
           type="button"
-          className="w-full rounded-xl bg-[#01796f] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#015f58]"
+          className="w-full rounded-full bg-[#01796f] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#015f58]"
         >
           Save Attendance
         </button>

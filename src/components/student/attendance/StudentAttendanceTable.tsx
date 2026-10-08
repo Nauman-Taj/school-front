@@ -10,7 +10,7 @@ import {
 
 import { attendance } from "@/data/attendance";
 import { students } from "@/data/students";
-import { AttendanceRecord } from "@/types/attendance";
+import { AttendanceRecord, StudentAttendanceRecord, } from "@/types/attendance";
 
 function StatusBadge({
   status,
@@ -46,12 +46,12 @@ export default function StudentAttendanceTable() {
     (student) => student.id === 1
   );
 
-  const studentAttendance = currentStudent
+  const studentAttendance: StudentAttendanceRecord[] = currentStudent
     ? attendance.filter(
-        (record) =>
-          record.role === "Student" &&
-          record.studentId === currentStudent.id
-      )
+      (record): record is StudentAttendanceRecord =>
+        record.role === "Student" &&
+        record.studentId === currentStudent.id
+    )
     : [];
 
   const presentCount = studentAttendance.filter(
@@ -160,7 +160,7 @@ export default function StudentAttendanceTable() {
                     </td>
 
                     <td className="px-6 py-4 text-sm text-gray-600">
-                      {record.class}
+                      {record.className}-{record.section}
                     </td>
 
                     <td className="px-6 py-4 text-center">

@@ -28,9 +28,8 @@ export default function MobileAdminSidebar({
       )}
 
       <aside
-        className={`fixed left-0 top-0 z-50 h-screen w-72 border-r border-gray-200 bg-white transition-transform duration-300 lg:hidden ${
-          open ? "translate-x-0" : "-translate-x-full"
-        }`}
+        className={`fixed left-0 top-0 z-50 h-screen w-72 border-r border-gray-200 bg-white transition-transform duration-300 lg:hidden ${open ? "translate-x-0" : "-translate-x-full"
+          }`}
       >
         {/* Header */}
         <div className="flex h-16 items-center justify-between border-b border-gray-200 ps-6">
@@ -77,10 +76,10 @@ export default function MobileAdminSidebar({
                   href={item.href}
                   onClick={onClose}
                   className={`flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition-colors text-gray-600 hover:bg-[#01796f]/10 hover:text-[#01796f]`}
-                  //    ${
+                  // ${
                   //   isActive
-                  //     ? "bg-[#01796f]/10 text-[#01796f]"
-                  //     : "text-gray-600 hover:bg-[#01796f]/10 hover:text-[#01796f]"
+                  //   ? "bg-[#01796f]/10 text-[#01796f]"
+                  //   : "text-gray-600 hover:bg-[#01796f]/10 hover:text-[#01796f]"
                   // }`}
                 >
                   <Icon size={19} strokeWidth={1.8} />

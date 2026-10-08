@@ -45,7 +45,8 @@ export default function ParentAttendanceTable({
 
             return (
                 record.name.toLowerCase().includes(searchTerm) ||
-                record.class.toLowerCase().includes(searchTerm) ||
+                record.className.toLowerCase().includes(searchTerm) ||
+                record.section.toLowerCase().includes(searchTerm) ||
                 record.date.toLowerCase().includes(searchTerm) ||
                 record.status.toLowerCase().includes(searchTerm)
             );
@@ -103,13 +104,14 @@ export default function ParentAttendanceTable({
                                     className="border-b border-gray-100 last:border-0"
                                 >
                                     <td className="px-6 py-4 text-gray-700">
-                                        {new Date(
-                                            record.date
-                                        ).toLocaleDateString("en-GB", {
-                                            day: "2-digit",
-                                            month: "short",
-                                            year: "numeric",
-                                        })}
+                                        {new Date(record.date).toLocaleDateString(
+                                            "en-GB",
+                                            {
+                                                day: "2-digit",
+                                                month: "short",
+                                                year: "numeric",
+                                            }
+                                        )}
                                     </td>
 
                                     <td className="px-6 py-4 font-medium text-gray-900">
@@ -117,7 +119,7 @@ export default function ParentAttendanceTable({
                                     </td>
 
                                     <td className="px-6 py-4 text-gray-600">
-                                        {record.class}
+                                        {record.className}-{record.section}
                                     </td>
 
                                     <td className="px-6 py-4">
@@ -164,7 +166,7 @@ export default function ParentAttendanceTable({
                                     </p>
 
                                     <p className="mt-1 text-sm text-gray-500">
-                                        {record.class}
+                                        {record.className}-{record.section}
                                     </p>
                                 </div>
 
@@ -177,13 +179,14 @@ export default function ParentAttendanceTable({
                             </div>
 
                             <p className="mt-4 text-sm text-gray-500">
-                                {new Date(
-                                    record.date
-                                ).toLocaleDateString("en-GB", {
-                                    day: "2-digit",
-                                    month: "short",
-                                    year: "numeric",
-                                })}
+                                {new Date(record.date).toLocaleDateString(
+                                    "en-GB",
+                                    {
+                                        day: "2-digit",
+                                        month: "short",
+                                        year: "numeric",
+                                    }
+                                )}
                             </p>
                         </div>
                     );

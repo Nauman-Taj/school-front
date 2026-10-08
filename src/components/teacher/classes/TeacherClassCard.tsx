@@ -22,7 +22,7 @@ export default function TeacherClassCard({
             className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm"
           >
             <div className="flex items-start justify-between gap-3">
-              <div>
+              <div className="min-w-0">
                 <h2 className="font-semibold text-gray-900">
                   {item.className} - {item.section}
                 </h2>
@@ -55,7 +55,11 @@ export default function TeacherClassCard({
               </p>
 
               <div className="flex items-center gap-2">
-                <Users size={16} />
+                <Users
+                  size={16}
+                  strokeWidth={2}
+                  className="text-[#01796f]"
+                />
 
                 <span>
                   {item.students} students
@@ -65,9 +69,13 @@ export default function TeacherClassCard({
 
             <Link
               href={`/teacher/classes/${item.id}`}
-              className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-lg border border-gray-200 px-4 py-2.5 text-sm font-medium text-gray-600 transition hover:border-[#01796f] hover:bg-[#e6f4f2] hover:text-[#01796f]"
+              className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-full border border-gray-200 px-4 py-2.5 text-sm font-medium text-gray-600 transition hover:border-[#01796f] hover:bg-[#e6f4f2] hover:text-[#01796f]"
             >
-              <Eye size={16} />
+              <Eye
+                size={16}
+                strokeWidth={2}
+              />
+
               View Class
             </Link>
           </div>

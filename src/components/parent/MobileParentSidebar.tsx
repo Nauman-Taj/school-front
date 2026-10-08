@@ -1,15 +1,13 @@
 "use client";
 
 import Link from "next/link";
+import { navigationByRole } from "@/data/navigation";
 import { usePathname } from "next/navigation";
 import {
-  School,
   X,
 } from "lucide-react";
 
 import Image from "next/image";
-import { parentNavigation } from "@/data/parentNavigation";
-import next from "next";
 
 type MobileParentSidebarProps = {
   open: boolean;
@@ -21,6 +19,7 @@ export default function MobileParentSidebar({
   onClose,
 }: MobileParentSidebarProps) {
   const pathname = usePathname();
+  const parentNavigation = navigationByRole.Parent;
 
   if (!open) return null;
 
@@ -75,6 +74,10 @@ export default function MobileParentSidebar({
           <div className="space-y-1">
             {parentNavigation.map((item) => {
               const Icon = item.icon;
+              const isActive =
+                item.href === "/parent"
+                  ? pathname === "/parent"
+                  : pathname.startsWith(item.href);
 
               return (
                 <Link
@@ -82,8 +85,8 @@ export default function MobileParentSidebar({
                   href={item.href}
                   onClick={onClose}
                   className={`flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition-colors text-gray-600 hover:bg-[#01796f]/10 hover:text-[#01796f]`}
-                //    ${
-                //   isActive
+                // ${
+                // isActive
                 //     ? "bg-[#01796f]/10 text-[#01796f]"
                 //     : "text-gray-600 hover:bg-[#01796f]/10 hover:text-[#01796f]"
                 // }`}                
@@ -93,13 +96,13 @@ export default function MobileParentSidebar({
                     strokeWidth={1.8}
                   />
 
-                  <span>{item.title}</span>
+                  <span>{item.label}</span>
                 </Link>
               );
             })}
           </div>
         </nav>
-      </aside>
+      </aside >
     </>
   );
 }

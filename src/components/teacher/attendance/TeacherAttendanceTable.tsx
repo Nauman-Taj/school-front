@@ -1,9 +1,9 @@
 "use client";
 
-import { AttendanceRecord } from "@/types/attendance";
+import { StudentAttendanceRecord } from "@/types/attendance";
 
 type Props = {
-  attendance: AttendanceRecord[];
+  attendance: StudentAttendanceRecord[];
 };
 
 export default function TeacherAttendanceTable({
@@ -41,20 +41,19 @@ export default function TeacherAttendanceTable({
                   </td>
 
                   <td className="px-5 py-4 text-sm text-gray-600">
-                    {item.class}
+                    {item.className}-{item.section}
                   </td>
 
                   <td className="px-5 py-4">
                     <span
-                      className={`rounded-full px-3 py-1 text-xs font-medium ${
-                        item.status === "Present"
-                          ? "bg-green-50 text-green-600"
-                          : item.status === "Absent"
-                            ? "bg-red-50 text-red-600"
-                            : item.status === "Late"
-                              ? "bg-yellow-50 text-yellow-600"
-                              : "bg-blue-50 text-blue-600"
-                      }`}
+                      className={`rounded-full px-3 py-1 text-xs font-medium ${item.status === "Present"
+                        ? "bg-green-50 text-green-600"
+                        : item.status === "Absent"
+                          ? "bg-red-50 text-red-600"
+                          : item.status === "Late"
+                            ? "bg-yellow-50 text-yellow-600"
+                            : "bg-blue-50 text-blue-600"
+                        }`}
                     >
                       {item.status}
                     </span>
@@ -78,7 +77,7 @@ export default function TeacherAttendanceTable({
       <div className="border-t border-gray-200 p-5">
         <button
           type="button"
-          className="rounded-xl bg-[#01796f] px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-[#015f58]"
+          className="rounded-full bg-[#01796f] px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-[#015f58]"
         >
           Save Attendance
         </button>

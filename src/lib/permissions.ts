@@ -62,15 +62,14 @@ export const rolePermissions: Record<string, UserRole[]> = {
   // =========================
 
   "/parent": ["Parent"],
-  "/parent/children": ["Parent"],
+  "/parent/child-profile": ["Parent"],
   "/parent/attendance": ["Parent"],
-  "/parent/assignments": ["Parent"],
   "/parent/results": ["Parent"],
+  "/parent/assignments": ["Parent"],
   "/parent/fees": ["Parent"],
   "/parent/timetable": ["Parent"],
   "/parent/exams": ["Parent"],
   "/parent/announcements": ["Parent"],
-  "/parent/notifications": ["Parent"],
   "/parent/profile": ["Parent"],
 };
 

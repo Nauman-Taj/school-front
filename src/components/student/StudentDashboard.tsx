@@ -1,9 +1,19 @@
+import {
+  BookOpen,
+  CalendarCheck,
+  ClipboardList,
+  GraduationCap,
+  Bell,
+  Trophy,
+} from "lucide-react";
+
 import { students } from "@/data/students";
 import { subjects } from "@/data/subjects";
 import { assignments } from "@/data/assignments";
 import { exams } from "@/data/exams";
 import { results } from "@/data/results";
 import { notifications } from "@/data/notifications";
+import { attendance } from "@/data/attendance";
 
 import StudentAttendanceCard from "./attendance/StudentAttendanceCard";
 
@@ -14,32 +24,40 @@ export default function StudentDashboard() {
 
   const studentSubjects = currentStudent
     ? subjects.filter(
-      (subject) =>
-        subject.className === currentStudent.className &&
-        subject.section === currentStudent.section
-    )
+        (subject) =>
+          subject.className === currentStudent.className &&
+          subject.section === currentStudent.section
+      )
     : [];
 
   const studentAssignments = currentStudent
     ? assignments.filter(
-      (assignment) =>
-        assignment.className === currentStudent.className &&
-        assignment.section === currentStudent.section
-    )
+        (assignment) =>
+          assignment.className === currentStudent.className &&
+          assignment.section === currentStudent.section
+      )
     : [];
 
   const studentExams = currentStudent
     ? exams.filter(
-      (exam) =>
-        exam.className === currentStudent.className &&
-        exam.section === currentStudent.section
-    )
+        (exam) =>
+          exam.className === currentStudent.className &&
+          exam.section === currentStudent.section
+      )
     : [];
 
   const studentResults = currentStudent
     ? results.filter(
-      (result) => result.studentId === currentStudent.id
-    )
+        (result) => result.studentId === currentStudent.id
+      )
+    : [];
+
+  const studentAttendance = currentStudent
+    ? attendance.filter(
+        (record) =>
+          record.role === "Student" &&
+          record.studentId === currentStudent.id
+      )
     : [];
 
   const totalMarks = studentResults.reduce(
@@ -52,19 +70,35 @@ export default function StudentDashboard() {
     0
   );
 
-  const currentGPA =
+  const currentPerformance =
     studentResults.length > 0
       ? (
-        studentResults.reduce(
-          (total, result) => total + result.percentage,
-          0
-        ) / studentResults.length
-      ).toFixed(2)
+          studentResults.reduce(
+            (total, result) => total + result.percentage,
+            0
+          ) / studentResults.length
+        ).toFixed(2)
       : "0.00";
 
   const overallPercentage =
     totalMarks > 0
       ? Math.round((obtainedMarks / totalMarks) * 100)
+      : 0;
+
+  const presentOrLate = studentAttendance.filter(
+    (record) =>
+      record.status === "Present" ||
+      record.status === "Late"
+  ).length;
+
+  const attendanceRate =
+    studentAttendance.length > 0
+      ? Number(
+          (
+            (presentOrLate / studentAttendance.length) *
+            100
+          ).toFixed(1)
+        )
       : 0;
 
   const pendingAssignments = studentAssignments.length;
@@ -75,15 +109,60 @@ export default function StudentDashboard() {
 
   const unreadNotifications = currentStudent
     ? notifications.filter(
-      (notification) =>
-        notification.role === "Student" &&
-        notification.userId === (currentStudent.id) &&
-        !notification.read
-    ).length
+        (notification) =>
+          notification.role === "Student" &&
+          notification.userId === currentStudent.id &&
+          !notification.read
+      ).length
     : 0;
 
+  const statsData = [
+    {
+      title: "Attendance",
+      value: `${attendanceRate}%`,
+      change: `${attendanceRate}%`,
+      description: "current attendance",
+      icon: CalendarCheck,
+    },
+    {
+      title: "Current Performance",
+      value: currentPerformance,
+      change: `${overallPercentage}%`,
+      description: "overall performance",
+      icon: Trophy,
+    },
+    {
+      title: "Pending Assignments",
+      value: pendingAssignments.toString(),
+      change: pendingAssignments.toString(),
+      description: "assignments to complete",
+      icon: ClipboardList,
+    },
+    {
+      title: "Upcoming Exams",
+      value: upcomingExams.toString(),
+      change: upcomingExams.toString(),
+      description: "exams scheduled",
+      icon: GraduationCap,
+    },
+    {
+      title: "Current Courses",
+      value: studentSubjects.length.toString(),
+      change: studentSubjects.length.toString(),
+      description: "enrolled subjects",
+      icon: BookOpen,
+    },
+    {
+      title: "Unread Notifications",
+      value: unreadNotifications.toString(),
+      change: unreadNotifications.toString(),
+      description: "notifications to review",
+      icon: Bell,
+    },
+  ];
+
   return (
-    <div className="space-y-5">
+    <main className="space-y-5">
       {/* Page Header */}
       <div>
         <h1 className="text-2xl font-bold text-gray-900 sm:text-3xl">
@@ -96,100 +175,50 @@ export default function StudentDashboard() {
       </div>
 
       {/* Student Stats */}
-      <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-4">
-        {/* Attendance */}
-        <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
-          <p className="text-sm font-medium text-gray-500">
-            Attendance
-          </p>
+      <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
+        {statsData.map((stat) => {
+          const Icon = stat.icon;
 
-          <h2 className="mt-2 text-2xl font-bold text-gray-900">
-            92%
-          </h2>
+          return (
+            <div
+              key={stat.title}
+              className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm transition-shadow hover:shadow-md"
+            >
+              <div className="flex items-start justify-between">
+                <div>
+                  <p className="text-sm font-medium text-gray-500">
+                    {stat.title}
+                  </p>
 
-          <p className="mt-4 text-sm text-[#01796f]">
-            Good attendance
-          </p>
-        </div>
+                  <h2 className="mt-2 text-2xl font-bold text-gray-900">
+                    {stat.value}
+                  </h2>
+                </div>
 
-        {/* Current GPA */}
-        <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
-          <p className="text-sm font-medium text-gray-500">
-            Current GPA
-          </p>
+                <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#01796f]/10 text-[#01796f]">
+                  <Icon
+                    size={21}
+                    strokeWidth={1.8}
+                  />
+                </div>
+              </div>
 
-          <h2 className="mt-2 text-2xl font-bold text-gray-900">
-            {currentGPA}
-          </h2>
+              <div className="mt-4 flex items-center gap-2 text-sm">
+                <span className="font-semibold text-[#01796f]">
+                  {stat.change}
+                </span>
 
-          <p className="mt-4 text-sm text-[#01796f]">
-            {overallPercentage}% overall performance
-          </p>
-        </div>
-
-        {/* Pending Assignments */}
-        <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
-          <p className="text-sm font-medium text-gray-500">
-            Pending Assignments
-          </p>
-
-          <h2 className="mt-2 text-2xl font-bold text-gray-900">
-            {pendingAssignments}
-          </h2>
-
-          <p className="mt-4 text-sm text-gray-500">
-            Assignments for your class
-          </p>
-        </div>
-
-        {/* Upcoming Exams */}
-        <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
-          <p className="text-sm font-medium text-gray-500">
-            Upcoming Exams
-          </p>
-
-          <h2 className="mt-2 text-2xl font-bold text-gray-900">
-            {upcomingExams}
-          </h2>
-
-          <p className="mt-4 text-sm text-gray-500">
-            Exams scheduled for your class
-          </p>
-        </div>
-
-        {/* Current Courses */}
-        <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
-          <p className="text-sm font-medium text-gray-500">
-            Current Courses
-          </p>
-
-          <h2 className="mt-2 text-2xl font-bold text-gray-900">
-            {studentSubjects.length}
-          </h2>
-
-          <p className="mt-4 text-sm text-gray-500">
-            Your enrolled subjects
-          </p>
-        </div>
-
-        {/* Unread Notifications */}
-        <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
-          <p className="text-sm font-medium text-gray-500">
-            Unread Notifications
-          </p>
-
-          <h2 className="mt-2 text-2xl font-bold text-gray-900">
-            {unreadNotifications}
-          </h2>
-
-          <p className="mt-4 text-sm text-gray-500">
-            Notifications to review
-          </p>
-        </div>
+                <span className="text-gray-500">
+                  {stat.description}
+                </span>
+              </div>
+            </div>
+          );
+        })}
       </div>
 
       {/* Attendance */}
       <StudentAttendanceCard />
-    </div>
+    </main>
   );
 }

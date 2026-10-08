@@ -5,7 +5,8 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 
-import { studentNavigation } from "@/data/student/studentNavigation";
+import { navigationByRole } from "@/data/navigation";
+
 
 type MobileStudentSidebarProps = {
   open: boolean;
@@ -16,6 +17,7 @@ export default function MobileStudentSidebar({
   open,
   onClose,
 }: MobileStudentSidebarProps) {
+  const studentNavigation = navigationByRole.Student;
   const pathname = usePathname();
 
   if (!open) return null;
@@ -77,10 +79,10 @@ export default function MobileStudentSidebar({
                   href={item.href}
                   onClick={onClose}
                   className={`flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition-colors text-gray-600 hover:bg-[#01796f]/10 hover:text-[#01796f]`}
-                  //    ${
+                  // ${
                   //   isActive
-                  //     ? "bg-[#01796f]/10 text-[#01796f]"
-                  //     : "text-gray-600 hover:bg-[#01796f]/10 hover:text-[#01796f]"
+                  //   ? "bg-[#01796f]/10 text-[#01796f]"
+                  //   : "text-gray-600 hover:bg-[#01796f]/10 hover:text-[#01796f]"
                   // }`}
                 >
                   <Icon size={19} strokeWidth={1.8} />
