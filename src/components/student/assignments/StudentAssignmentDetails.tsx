@@ -148,7 +148,7 @@ export default function StudentAssignmentDetails({
             Assignment Information
           </h2>
 
-          <div className="mt-4 space-y-4">
+          <div className="mt-4 space-y-5">
             <DetailRow
               label="Title"
               value={assignment.title}
@@ -187,7 +187,7 @@ export default function StudentAssignmentDetails({
           </h2>
 
           {submission ? (
-            <div className="mt-4 space-y-4">
+            <div className="mt-4 space-y-5">
               <DetailRow
                 label="Student"
                 value={submission.student}

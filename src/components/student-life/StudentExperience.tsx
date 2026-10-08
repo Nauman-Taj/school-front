@@ -37,7 +37,7 @@ export default function StudentExperience() {
             </p>
           </div>
 
-          <div className="space-y-4">
+          <div className="space-y-5">
             {experiences.map((experience) => (
               <div
                 key={experience.number}

@@ -22,7 +22,7 @@ export default function TeacherStudentTable({
   return (
     <div className="hidden overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm md:block">
       <div className="border-b border-gray-200 p-5">
-        <div className="relative max-w-md">
+        <div className="relative max-w-full">
           <Search
             size={18}
             className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
@@ -119,7 +119,7 @@ export default function TeacherStudentTable({
                   <td className="px-5 py-4 text-right">
                     <Link
                       href={`/teacher/students/${student.id}`}
-                      className="inline-flex items-center gap-2 rounded-lg border border-gray-200 px-3 py-2 text-sm font-medium text-gray-600 transition hover:border-[#01796f] hover:bg-[#e6f4f2] hover:text-[#01796f]"
+                      className="inline-flex items-center gap-2 rounded-full border border-gray-200 px-3 py-2 text-sm font-medium text-gray-600 transition hover:border-[#01796f] hover:bg-[#e6f4f2] hover:text-[#01796f]"
                     >
                       <UserRound size={16} />
                       View

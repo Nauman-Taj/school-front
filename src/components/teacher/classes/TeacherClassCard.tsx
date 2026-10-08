@@ -14,7 +14,7 @@ export default function TeacherClassCard({
   classes,
 }: TeacherClassCardProps) {
   return (
-    <div className="space-y-4 md:hidden">
+    <div className="space-y- md:hidden">
       {classes.length > 0 ? (
         classes.map((item) => (
           <div

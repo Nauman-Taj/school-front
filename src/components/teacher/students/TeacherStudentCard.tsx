@@ -11,7 +11,7 @@ export default function TeacherStudentCard({
   students,
 }: TeacherStudentCardProps) {
   return (
-    <div className="space-y-4 md:hidden">
+    <div className="space-y-5 md:hidden">
       {students.length > 0 ? (
         students.map((student) => (
           <div

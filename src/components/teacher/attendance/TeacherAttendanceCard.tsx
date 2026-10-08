@@ -10,7 +10,7 @@ export default function TeacherAttendanceCard({
   attendance,
 }: Props) {
   return (
-    <div className="space-y-4 md:hidden">
+    <div className="space-y-5 md:hidden">
       {attendance.length > 0 ? (
         attendance.map((item) => (
           <div

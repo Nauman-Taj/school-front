@@ -22,7 +22,7 @@ export default function TeacherAssignmentTable({
     <div className="rounded-2xl border border-gray-200 bg-white shadow-sm">
       {/* Search */}
       <div className="border-b border-gray-200 p-5">
-        <div className="relative max-w-md">
+        <div className="relative max-w-full">
           <Search
             size={18}
             className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
@@ -30,10 +30,10 @@ export default function TeacherAssignmentTable({
 
           <input
             type="text"
-            placeholder="Search assignments..."
+            placeholder="Search assignments"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full rounded-xl border border-gray-200 py-2.5 pl-10 pr-4 text-sm outline-none transition focus:border-[#01796f]"
+            className="w-full rounded-full border border-gray-200 py-2.5 pl-10 pr-4 text-sm outline-none transition focus:border-[#01796f]"
           />
         </div>
       </div>

@@ -106,7 +106,7 @@ export default function TeacherDetails({
             Contact Information
           </h2>
 
-          <div className="mt-5 space-y-4">
+          <div className="mt-5 space-y-5">
 
             <div className="flex items-start gap-3">
               <div className="rounded-full bg-gray-50 p-2 text-gray-500">

@@ -29,7 +29,7 @@ export default function ParentTimetableTable({
   );
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-5">
       {/* Desktop Table */}
       <div className="hidden overflow-hidden rounded-2xl border border-gray-200 bg-white md:block">
         <div className="overflow-x-auto">

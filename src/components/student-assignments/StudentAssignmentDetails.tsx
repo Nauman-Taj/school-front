@@ -186,7 +186,7 @@ export default function StudentAssignmentDetails({ id }: Props) {
               Assignment Details
             </h2>
 
-            <div className="mt-4 space-y-4">
+            <div className="mt-4 space-y-5">
               <div className="flex items-center gap-3">
                 <CalendarDays size={18} className="text-gray-400" />
                 <div>

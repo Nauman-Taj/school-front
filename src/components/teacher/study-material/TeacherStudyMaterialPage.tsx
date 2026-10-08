@@ -3,6 +3,8 @@
 import { useMemo, useState } from "react";
 
 import { getSession } from "@/lib/auth";
+import { Plus } from "lucide-react";
+
 
 import { teachers } from "@/data/teachers";
 import { studyMaterial } from "@/data/studyMaterial";
@@ -59,8 +61,9 @@ export default function TeacherStudyMaterialPage() {
         <button
           type="button"
           onClick={() => setShowForm(true)}
-          className="rounded-xl bg-[#01796f] px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-[#015f58]"
+          className="inline-flex items-center justify-center rounded-full gap-2 bg-[#01796f] px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-[#015f58]"
         >
+          <Plus size={17} />
           Add Material
         </button>
       </div>

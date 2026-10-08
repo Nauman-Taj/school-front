@@ -91,7 +91,7 @@ export default function AdmissionsInfo() {
               </div>
             </div>
 
-            <div className="mt-6 space-y-4">
+            <div className="mt-6 space-y-5">
               {eligibility.map((item) => (
                 <div key={item} className="flex items-start gap-3">
                   <CheckCircle2
@@ -122,7 +122,7 @@ export default function AdmissionsInfo() {
               </div>
             </div>
 
-            <div className="mt-6 space-y-4">
+            <div className="mt-6 space-y-5">
               {requirements.map((item) => (
                 <div key={item} className="flex items-start gap-3">
                   <CheckCircle2

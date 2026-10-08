@@ -88,7 +88,7 @@ export default function ProfilePage() {
             </span>
           </div>
 
-          <div className="mt-6 space-y-4 border-t border-gray-100 pt-5">
+          <div className="mt-6 space-y-5 border-t border-gray-100 pt-5">
             <div className="flex items-center gap-3">
               <Mail size={17} className="text-gray-400" />
               <div>

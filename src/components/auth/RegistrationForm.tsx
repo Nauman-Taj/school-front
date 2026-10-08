@@ -202,7 +202,7 @@ export default function RegistrationForm() {
                 >
                     {/* STEP 1 */}
                     {step === 1 && (
-                        <div className="space-y-6">
+                        <div className="space-y-5">
                             <div>
                                 <h3 className="text-lg font-semibold text-gray-800">
                                     Account Information
@@ -297,7 +297,7 @@ export default function RegistrationForm() {
 
                     {/* STEP 2 */}
                     {step === 2 && (
-                        <div className="space-y-6">
+                        <div className="space-y-5">
                             <div>
                                 <h3 className="text-lg font-semibold text-gray-800">
                                     Personal Information
@@ -395,7 +395,7 @@ export default function RegistrationForm() {
                     {/* STEP 3 - STUDENT */}
                     {step === 3 &&
                         form.role === "Student" && (
-                            <div className="space-y-6">
+                            <div className="space-y-5">
                                 <div>
                                     <h3 className="text-lg font-semibold text-gray-800">
                                         Student Information
@@ -518,7 +518,7 @@ export default function RegistrationForm() {
                     {/* STEP 3 - TEACHER */}
                     {step === 3 &&
                         form.role === "Teacher" && (
-                            <div className="space-y-6">
+                            <div className="space-y-5">
                                 <div>
                                     <h3 className="text-lg font-semibold text-gray-800">
                                         Professional Information
@@ -634,7 +634,7 @@ export default function RegistrationForm() {
                     {/* STEP 3 - PARENT */}
                     {step === 3 &&
                         form.role === "Parent" && (
-                            <div className="space-y-6">
+                            <div className="space-y-5">
                                 <div>
                                     <h3 className="text-lg font-semibold text-gray-800">
                                         Parent Information
@@ -704,7 +704,7 @@ export default function RegistrationForm() {
 
                     {/* STEP 4 */}
                     {step === 4 && (
-                        <div className="space-y-6">
+                        <div className="space-y-5">
                             <div>
                                 <h3 className="text-lg font-semibold text-gray-800">
                                     Review & Create Account

@@ -12,7 +12,7 @@ export default function TeacherTimetableTable({
   timetable,
 }: TeacherTimetableTableProps) {
   return (
-    <div className="space-y-4">
+    <div className="space-y-5">
       {/* Desktop */}
       <div className="hidden overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm md:block">
         <div className="overflow-x-auto">

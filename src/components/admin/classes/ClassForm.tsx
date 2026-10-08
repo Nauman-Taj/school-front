@@ -71,7 +71,7 @@ export default function ClassForm({ schoolClass }: ClassFormProps) {
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-5">
       {/* Back */}
       <Link
         href={
