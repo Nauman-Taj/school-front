@@ -1,326 +1,245 @@
 "use client";
 
-import { useState } from "react";
-import Link from "next/link";
-import {
-  CalendarDays,
-  ClipboardCheck,
-  Pencil,
-  Plus,
-  Search,
-  Trash2,
-  UserRound,
-} from "lucide-react";
+import { FormEvent, useState } from "react";
+import { useRouter } from "next/navigation";
+import { ArrowLeft, Save } from "lucide-react";
 
-import { exams } from "@/data/exams";
+import { Exam } from "@/types/exam";
 
-const statusStyles = {
-  Upcoming: "bg-blue-50 text-blue-700",
-  Completed: "bg-green-50 text-green-700",
+type ExamFormProps = {
+  exam?: Exam;
+  isEdit?: boolean;
 };
 
-export default function ExamTable() {
-  const [examList, setExamList] = useState(exams);
-  const [search, setSearch] = useState("");
+export default function ExamForm({
+  exam,
+  isEdit = false,
+}: ExamFormProps) {
+  const router = useRouter();
 
-  const filteredExams = examList.filter((exam) =>
-    [
-      exam.name,
-      exam.subject,
-      exam.className,
-      exam.teacher,
-      exam.status,
-    ]
-      .join(" ")
-      .toLowerCase()
-      .includes(search.toLowerCase())
+  const [name, setName] = useState(exam?.name ?? "");
+  const [subject, setSubject] = useState(exam?.subject ?? "");
+  const [subjectId, setSubjectId] = useState(exam?.subjectId ?? "");
+  const [className, setClassName] = useState(exam?.className ?? "");
+  const [section, setSection] = useState(exam?.section ?? "");
+  const [teacher, setTeacher] = useState(exam?.teacher ?? "");
+  const [teacherId, setTeacherId] = useState(exam?.teacherId ?? "");
+  const [examDate, setExamDate] = useState(exam?.examDate ?? "");
+  const [totalMarks, setTotalMarks] = useState(
+    exam?.totalMarks?.toString() ?? ""
+  );
+  const [status, setStatus] = useState<Exam["status"]>(
+    exam?.status ?? "Upcoming"
   );
 
-  const handleDelete = (id: string) => {
-    const exam = examList.find((exam) => exam.id === id);
+  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
 
-    if (!exam) return;
-
-    const confirmed = window.confirm(
-      `Are you sure you want to delete ${exam.name}?`
-    );
-
-    if (!confirmed) return;
-
-    setExamList((currentExams) =>
-      currentExams.filter((exam) => exam.id !== id)
-    );
+    // Frontend-only for now.
+    // Backend integration will be added later.
+    router.push("/admin/exams");
   };
 
   return (
     <div className="space-y-5">
-      {/* Header */}
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+      <div className="flex items-center gap-3">
+        <button
+          type="button"
+          onClick={() => router.back()}
+          className="flex h-10 w-10 items-center justify-center rounded-full border border-gray-200 bg-white text-gray-600 transition hover:border-[#01796f] hover:bg-[#e6f4f2] hover:text-[#01796f]"
+        >
+          <ArrowLeft size={18} />
+        </button>
+
         <div>
           <h1 className="text-2xl font-bold text-gray-900 sm:text-3xl">
-            Exams
+            {isEdit ? "Edit Exam" : "Add Exam"}
           </h1>
+
           <p className="mt-1 text-sm text-gray-500 sm:text-base">
-            Manage examinations and assessment schedules.
+            {isEdit
+              ? "Update the exam information below."
+              : "Create a new exam by entering the details below."}
           </p>
         </div>
-
-        <Link
-          href="/admin/exams/add"
-          className="inline-flex w-fit items-center justify-center gap-2 rounded-full bg-[#01796F] px-4 py-2.5 text-sm font-medium text-white transition hover:bg-[#015f58]"
-        >
-          <Plus size={17} />
-          Add Exam
-        </Link>
       </div>
 
-      {/* Search */}
-      <div className="relative">
-        <Search
-          size={17}
-          className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
-        />
+      <form
+        onSubmit={handleSubmit}
+        className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm sm:p-6"
+      >
+        <div className="grid gap-5 md:grid-cols-2">
+          <div>
+            <label className="mb-2 block text-sm font-medium text-gray-700">
+              Exam Name
+            </label>
 
-        <input
-          type="text"
-          placeholder="Search exams"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="w-full rounded-full border border-gray-200 bg-white py-3 pl-11 pr-4 text-sm text-gray-900 outline-none transition placeholder:text-gray-400 focus:border-[#01796f] focus:ring-2 focus:ring-[#01796f]/10"
-        />
-      </div>
+            <input
+              type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="e.g. Mid Term Examination"
+              required
+              className="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm outline-none transition focus:border-[#01796f] focus:ring-2 focus:ring-[#01796f]/10"
+            />
+          </div>
 
-      {/* Desktop Table */}
-      <div className="hidden overflow-hidden rounded-2xl border border-gray-200 bg-white md:block">
-        <div className="overflow-x-auto">
-          <table className="w-full min-w-[950px]">
-            <thead>
-              <tr className="border-b border-gray-200 bg-gray-50">
-                <th className="px-6 py-4 text-left text-sm font-semibold text-gray-600">
-                  Exam
-                </th>
+          <div>
+            <label className="mb-2 block text-sm font-medium text-gray-700">
+              Subject
+            </label>
 
-                <th className="px-6 py-4 text-left text-sm font-semibold text-gray-600">
-                  Subject
-                </th>
+            <input
+              type="text"
+              value={subject}
+              onChange={(e) => setSubject(e.target.value)}
+              placeholder="e.g. Mathematics"
+              required
+              className="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm outline-none transition focus:border-[#01796f] focus:ring-2 focus:ring-[#01796f]/10"
+            />
+          </div>
 
-                <th className="px-6 py-4 text-left text-sm font-semibold text-gray-600">
-                  Class
-                </th>
+          <div>
+            <label className="mb-2 block text-sm font-medium text-gray-700">
+              Subject ID
+            </label>
 
-                <th className="px-6 py-4 text-left text-sm font-semibold text-gray-600">
-                  Teacher
-                </th>
+            <input
+              type="text"
+              value={subjectId}
+              onChange={(e) => setSubjectId(e.target.value)}
+              placeholder="e.g. SUB001"
+              required
+              className="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm outline-none transition focus:border-[#01796f] focus:ring-2 focus:ring-[#01796f]/10"
+            />
+          </div>
 
-                <th className="px-6 py-4 text-left text-sm font-semibold text-gray-600">
-                  Exam Date
-                </th>
+          <div>
+            <label className="mb-2 block text-sm font-medium text-gray-700">
+              Class
+            </label>
 
-                <th className="px-6 py-4 text-left text-sm font-semibold text-gray-600">
-                  Marks
-                </th>
+            <input
+              type="text"
+              value={className}
+              onChange={(e) => setClassName(e.target.value)}
+              placeholder="e.g. Grade 10"
+              required
+              className="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm outline-none transition focus:border-[#01796f] focus:ring-2 focus:ring-[#01796f]/10"
+            />
+          </div>
 
-                <th className="px-6 py-4 text-left text-sm font-semibold text-gray-600">
-                  Status
-                </th>
+          <div>
+            <label className="mb-2 block text-sm font-medium text-gray-700">
+              Section
+            </label>
 
-                <th className="px-6 py-4 text-center text-sm font-semibold text-gray-600">
-                  Actions
-                </th>
-              </tr>
-            </thead>
+            <input
+              type="text"
+              value={section}
+              onChange={(e) => setSection(e.target.value)}
+              placeholder="e.g. A"
+              required
+              className="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm outline-none transition focus:border-[#01796f] focus:ring-2 focus:ring-[#01796f]/10"
+            />
+          </div>
 
-            <tbody>
-              {filteredExams.map((exam) => (
-                <tr
-                  key={exam.id}
-                  className="border-b border-gray-100 last:border-0"
-                >
-                  <td className="px-6 py-4">
-                    <div className="flex items-center gap-3">
-                      {/* <div className="flex h-10 w-13 items-center justify-center rounded-xl bg-[#e6f4f2] text-[#01796F]">
-                        <ClipboardCheck size={18} />
-                      </div> */}
+          <div>
+            <label className="mb-2 block text-sm font-medium text-gray-700">
+              Teacher
+            </label>
 
-                      <div>
-                        <p className="font-medium text-sm text-gray-900">
-                          {exam.name}
-                        </p>
-                        <p className="text-xs text-gray-500">
-                          {exam.id}
-                        </p>
-                      </div>
-                    </div>
-                  </td>
+            <input
+              type="text"
+              value={teacher}
+              onChange={(e) => setTeacher(e.target.value)}
+              placeholder="e.g. Ayesha Khan"
+              required
+              className="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm outline-none transition focus:border-[#01796f] focus:ring-2 focus:ring-[#01796f]/10"
+            />
+          </div>
 
-                  <td className="px-6 py-4 text-sm text-gray-600">
-                    {exam.subject}
-                  </td>
+          <div>
+            <label className="mb-2 block text-sm font-medium text-gray-700">
+              Teacher ID
+            </label>
 
-                  <td className="px-6 py-4 text-sm text-gray-600">
-                    {exam.className}
-                  </td>
+            <input
+              type="text"
+              value={teacherId}
+              onChange={(e) => setTeacherId(e.target.value)}
+              placeholder="e.g. T001"
+              required
+              className="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm outline-none transition focus:border-[#01796f] focus:ring-2 focus:ring-[#01796f]/10"
+            />
+          </div>
 
-                  <td className="px-6 py-4 text-sm text-gray-600">
-                    {exam.teacher}
-                  </td>
+          <div>
+            <label className="mb-2 block text-sm font-medium text-gray-700">
+              Exam Date
+            </label>
 
-                  <td className="px-6 py-4">
-                    <div className="flex items-center gap-2 text-sm text-gray-600">
-                      <CalendarDays size={15} className="text-[#01796F]" />
-                      {exam.examDate}
-                    </div>
-                  </td>
+            <input
+              type="date"
+              value={examDate}
+              onChange={(e) => setExamDate(e.target.value)}
+              required
+              className="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm outline-none transition focus:border-[#01796f] focus:ring-2 focus:ring-[#01796f]/10"
+            />
+          </div>
 
-                  <td className="px-6 py-4 text-sm font-medium text-gray-700">
-                    {exam.totalMarks}
-                  </td>
+          <div>
+            <label className="mb-2 block text-sm font-medium text-gray-700">
+              Total Marks
+            </label>
 
-                  <td className="px-6 py-4">
-                    <span
-                      className={`inline-flex rounded-full px-3 py-1 text-xs font-medium ${statusStyles[exam.status]}`}
-                    >
-                      {exam.status}
-                    </span>
-                  </td>
+            <input
+              type="number"
+              min="1"
+              value={totalMarks}
+              onChange={(e) => setTotalMarks(e.target.value)}
+              placeholder="e.g. 100"
+              required
+              className="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm outline-none transition focus:border-[#01796f] focus:ring-2 focus:ring-[#01796f]/10"
+            />
+          </div>
 
-                  {/* Actions */}
-                  <td className="px-6 py-4">
-                    <div className="flex items-center justify-center gap-2">
-                      <Link
-                        href={`/admin/exams/${exam.id}`}
-                        title="View"
-                        className="rounded-lg p-2 text-gray-500 transition hover:bg-[#01796F]/10 hover:text-[#01796F]"
-                      >
-                        <UserRound size={17} />
-                      </Link>
+          <div>
+            <label className="mb-2 block text-sm font-medium text-gray-700">
+              Status
+            </label>
 
-                      <Link
-                        href={`/admin/exams/${exam.id}/edit`}
-                        title="Edit"
-                        className="rounded-lg p-2 text-gray-500 transition hover:bg-[#01796F]/10 hover:text-[#01796F]"
-                      >
-                        <Pencil size={17} />
-                      </Link>
-
-                      <button
-                        type="button"
-                        title="Delete"
-                        onClick={() => handleDelete(exam.id)}
-                        className="rounded-lg p-2 text-gray-500 transition hover:bg-red-50 hover:text-red-600"
-                      >
-                        <Trash2 size={17} />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+            <select
+              value={status}
+              onChange={(e) =>
+                setStatus(e.target.value as Exam["status"])
+              }
+              className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm outline-none transition focus:border-[#01796f] focus:ring-2 focus:ring-[#01796f]/10"
+            >
+              <option value="Upcoming">Upcoming</option>
+              <option value="Completed">Completed</option>
+            </select>
+          </div>
         </div>
-      </div>
 
-      {/* Mobile Cards */}
-      <div className="space-y-4 md:hidden">
-        {filteredExams.map((exam) => (
-          <div
-            key={exam.id}
-            className="rounded-2xl border border-gray-200 bg-white p-5"
+        <div className="mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+          <button
+            type="button"
+            onClick={() => router.back()}
+            className="rounded-full border border-gray-200 px-5 py-2.5 text-sm font-semibold text-gray-600 transition hover:border-gray-300 hover:bg-gray-50"
           >
-            <div className="flex items-start justify-between gap-3">
-              <div className="flex items-center gap-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#e6f4f2] text-[#01796F]">
-                  <ClipboardCheck size={18} />
-                </div>
+            Cancel
+          </button>
 
-                <div>
-                  <h3 className="font-semibold text-gray-900">
-                    {exam.name}
-                  </h3>
-                  <p className="text-xs text-gray-500">{exam.id}</p>
-                </div>
-              </div>
-
-              <span
-                className={`rounded-full px-3 py-1 text-xs font-medium ${statusStyles[exam.status]}`}
-              >
-                {exam.status}
-              </span>
-            </div>
-
-            <div className="mt-4 grid grid-cols-2 gap-3 text-sm">
-              <div>
-                <p className="text-xs text-gray-400">Subject</p>
-                <p className="mt-1 font-medium text-gray-700">
-                  {exam.subject}
-                </p>
-              </div>
-
-              <div>
-                <p className="text-xs text-gray-400">Class</p>
-                <p className="mt-1 font-medium text-gray-700">
-                  {exam.className}
-                </p>
-              </div>
-
-              <div>
-                <p className="text-xs text-gray-400">Teacher</p>
-                <p className="mt-1 font-medium text-gray-700">
-                  {exam.teacher}
-                </p>
-              </div>
-
-              <div>
-                <p className="text-xs text-gray-400">Exam Date</p>
-                <p className="mt-1 font-medium text-gray-700">
-                  {exam.examDate}
-                </p>
-              </div>
-
-              <div>
-                <p className="text-xs text-gray-400">Total Marks</p>
-                <p className="mt-1 font-medium text-gray-700">
-                  {exam.totalMarks}
-                </p>
-              </div>
-            </div>
-
-            {/* Mobile Actions */}
-            <div className="mt-5 flex items-center justify-center gap-2 border-t border-gray-100 pt-4">
-              <Link
-                href={`/admin/exams/${exam.id}`}
-                title="View"
-                className="rounded-lg p-2 text-gray-500 transition hover:bg-[#01796F]/10 hover:text-[#01796F]"
-              >
-                <UserRound size={17} />
-              </Link>
-
-              <Link
-                href={`/admin/exams/${exam.id}/edit`}
-                title="Edit"
-                className="rounded-lg p-2 text-gray-500 transition hover:bg-[#01796F]/10 hover:text-[#01796F]"
-              >
-                <Pencil size={17} />
-              </Link>
-
-              <button
-                type="button"
-                title="Delete"
-                onClick={() => handleDelete(exam.id)}
-                className="rounded-lg p-2 text-gray-500 transition hover:bg-red-50 hover:text-red-600"
-              >
-                <Trash2 size={17} />
-              </button>
-            </div>
-          </div>
-        ))}
-
-        {filteredExams.length === 0 && (
-          <div className="rounded-2xl border border-gray-200 bg-white p-8 text-center text-sm text-gray-500">
-            No exams found.
-          </div>
-        )}
-      </div>
+          <button
+            type="submit"
+            className="inline-flex items-center justify-center gap-2 rounded-full bg-[#01796f] px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-[#015f58]"
+          >
+            <Save size={17} />
+            {isEdit ? "Update Exam" : "Save Exam"}
+          </button>
+        </div>
+      </form>
     </div>
   );
 }
