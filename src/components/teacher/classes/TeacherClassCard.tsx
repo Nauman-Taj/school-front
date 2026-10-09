@@ -4,10 +4,10 @@ import {
   Users,
 } from "lucide-react";
 
-import { TeacherClass } from "@/types/teacher/teacherClass";
+import { TeacherClassView } from "@/types/class";
 
 type TeacherClassCardProps = {
-  classes: TeacherClass[];
+  classes: TeacherClassView[];
 };
 
 export default function TeacherClassCard({

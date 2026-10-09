@@ -7,10 +7,10 @@ import {
   Users,
 } from "lucide-react";
 
-import { TeacherClass } from "@/types/teacher/teacherClass";
+import { TeacherClassView } from "@/types/class";
 
 type TeacherClassTableProps = {
-  classes: TeacherClass[];
+  classes: TeacherClassView[];
   search: string;
   setSearch: (value: string) => void;
 };
