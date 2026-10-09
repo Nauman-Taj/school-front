@@ -14,7 +14,7 @@ import {
 import { useRouter } from "next/navigation";
 
 import { getSession, logout, AuthSession } from "@/lib/auth";
-import { studentNavigation } from "@/data/student/studentNavigation";
+import { navigationByRole } from "@/data/navigation";
 import { notifications as initialNotifications } from "@/data/notifications";
 
 type StudentHeaderProps = {
@@ -36,6 +36,8 @@ export default function StudentHeader({
 
   const [studentNotifications, setStudentNotifications] =
     useState(initialNotifications);
+
+  const studentNavigation = navigationByRole.Student;
 
   useEffect(() => {
     setSession(getSession());

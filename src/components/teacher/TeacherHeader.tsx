@@ -14,7 +14,7 @@ import {
 import { useRouter } from "next/navigation";
 
 import { getSession, logout, AuthSession } from "@/lib/auth";
-import { teacherNavigation } from "@/data/teacher/teacherNavigation";
+import { navigationByRole} from "@/data/navigation";
 import { notifications as initialNotifications } from "@/data/notifications";
 
 type TeacherHeaderProps = {
@@ -42,6 +42,9 @@ export default function TeacherHeader({
 
   const [teacherNotifications, setTeacherNotifications] =
     useState(initialNotifications);
+
+  const teacherNavigation = navigationByRole.Teacher;
+  
 
   useEffect(() => {
     setSession(getSession());
@@ -110,9 +113,9 @@ export default function TeacherHeader({
       current.map((notification) =>
         notification.id === id
           ? {
-              ...notification,
-              read: true,
-            }
+            ...notification,
+            read: true,
+          }
           : notification
       )
     );
@@ -122,11 +125,11 @@ export default function TeacherHeader({
     setTeacherNotifications((current) =>
       current.map((notification) =>
         notification.role === "Teacher" &&
-        notification.userId === session?.id
+          notification.userId === session?.id
           ? {
-              ...notification,
-              read: true,
-            }
+            ...notification,
+            read: true,
+          }
           : notification
       )
     );
@@ -323,30 +326,27 @@ export default function TeacherHeader({
                           onClick={() =>
                             markAsRead(notification.id)
                           }
-                          className={`w-full border-b border-gray-100 px-4 py-3 text-left transition hover:bg-gray-50 ${
-                            !notification.read
+                          className={`w-full border-b border-gray-100 px-4 py-3 text-left transition hover:bg-gray-50 ${!notification.read
                               ? "bg-[#e6f4f2]/40"
                               : "bg-white"
-                          }`}
+                            }`}
                         >
                           <div className="flex gap-3">
                             {/* Read indicator */}
                             <div
-                              className={`mt-1 h-2 w-2 shrink-0 rounded-full ${
-                                notification.read
+                              className={`mt-1 h-2 w-2 shrink-0 rounded-full ${notification.read
                                   ? "bg-gray-300"
                                   : "bg-[#01796f]"
-                              }`}
+                                }`}
                             />
 
                             <div className="min-w-0 flex-1">
                               <div className="flex items-start justify-between gap-2">
                                 <p
-                                  className={`text-sm ${
-                                    notification.read
+                                  className={`text-sm ${notification.read
                                       ? "font-medium text-gray-700"
                                       : "font-semibold text-gray-900"
-                                  }`}
+                                    }`}
                                 >
                                   {notification.title}
                                 </p>

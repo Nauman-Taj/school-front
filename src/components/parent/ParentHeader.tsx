@@ -15,7 +15,6 @@ import {
 
 import { getSession, logout, AuthSession } from "@/lib/auth";
 import { navigationByRole } from "@/data/navigation";
-import { parentNavigation } from "@/data/parentNavigation";
 import { notifications as initialNotifications } from "@/data/notifications";
 
 
@@ -40,6 +39,9 @@ export default function ParentHeader({
 
   const [parentNotifications, setparentNotifications] =
     useState(initialNotifications);
+
+  const parentNavigation = navigationByRole.Parent;
+
 
   useEffect(() => {
     setSession(getSession());
@@ -92,7 +94,7 @@ export default function ParentHeader({
   const navigation =
     session?.role === "Parent"
       ? parentNavigation.map((item) => ({
-        label: item.title,
+        label: item.label,
         href: item.href,
         icon: item.icon,
       }))
