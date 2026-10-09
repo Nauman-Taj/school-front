@@ -107,20 +107,23 @@ export default function Navbar() {
 
             <div className="mx-auto flex h-[82px] max-w-[1400px] items-center justify-between px-6">
 
-                <Link
-                    href="/"
-                    className="flex items-center gap-3"
-                >
-                    <Image
-                        src="/images/school.jpg"
-                        alt="School Logo"
-                        width={70}
-                        height={70}
-                        className="object-contain"
-                    />
-                </Link>
+                <div className="flex items-center gap-6">
+                    <Link
+                        href="/"
+                        className="flex items-center gap-3"
+                    >
+                        <Image
+                            src="/images/school.jpg"
+                            alt="School Logo"
+                            width={70}
+                            height={70}
+                            className="object-contain"
+                        />
+                    </Link>
 
-                <nav className="hidden items-center gap-7 lg:flex">
+                </div>
+
+                <nav className="hidden whitespace-nowrap items-center gap-7 lg:flex">
 
                     {navLinks.map((link) => {
 
@@ -195,9 +198,16 @@ export default function Navbar() {
 
                     <Link
                         href="/login"
-                        className="rounded-3xl bg-[#01796f] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#015f58]"
+                        className="rounded-3xl bg-[#01796f] px-5 py-3 whitespace-nowrap text-sm font-semibold text-white transition hover:bg-[#015f58]"
                     >
-                        Sign in
+                        Sign In
+                    </Link>
+
+                    <Link
+                        href="/register"
+                        className="rounded-3xl bg-[#01796f] px-5 py-3 whitespace-nowrap text-sm font-semibold text-white transition hover:bg-[#015f58]"
+                    >
+                        Join Now
                     </Link>
 
                 </div>
@@ -305,6 +315,14 @@ export default function Navbar() {
                             className="mt-3 rounded-xl bg-[#01796f] px-4 py-3 text-center text-sm font-semibold text-white transition hover:bg-[#015f58]"
                         >
                             Sign in
+                        </Link>
+
+                        <Link
+                            href="/register"
+                            onClick={() => setMenuOpen(false)}
+                            className="mt-3 rounded-xl bg-[#01796f] px-4 py-3 text-center text-sm font-semibold text-white transition hover:bg-[#015f58]"
+                        >
+                            Join Now
                         </Link>
 
                     </nav>
