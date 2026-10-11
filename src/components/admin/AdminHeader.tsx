@@ -181,7 +181,7 @@ export default function AdminHeader({
               <div
                 className="
                   absolute
-                  right-[-140px]
+                  right-[-130px]
                   top-[-10px]
                   z-50
                   w-[calc(100vw-2rem)]

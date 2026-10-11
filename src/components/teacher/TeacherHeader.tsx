@@ -184,7 +184,7 @@ export default function TeacherHeader({
               <div
                 className="
                   absolute
-                  right-[-50px]
+                  right-[-130px]
                   top-[-10px]
                   z-50
                   w-[calc(100vw-2rem)]
@@ -289,7 +289,7 @@ export default function TeacherHeader({
 
             {/* Notification Dropdown */}
             {notificationOpen && (
-              <div className="absolute right-[-55px] top-12 z-50 w-[calc(100vw-2rem)] max-w-sm overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-lg sm:right-0">
+              <div className="absolute right-[-120px] top-12 z-50 w-[calc(100vw-2rem)] max-w-sm overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-lg sm:right-0">
 
                 {/* Header */}
                 <div className="flex items-center justify-between border-b border-gray-200 px-4 py-3">
