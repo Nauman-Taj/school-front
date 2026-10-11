@@ -1,4 +1,5 @@
 import { StudyMaterial } from "@/types/studyMaterial";
+import { teachers } from "@/data/teachers";
 
 export const studyMaterial: StudyMaterial[] = [
   {
@@ -114,3 +115,31 @@ export const studyMaterial: StudyMaterial[] = [
       "Educational material covering basic physics concepts, motion, and energy.",
   },
 ];
+
+const STUDY_MATERIALS_KEY = "school-study-materials";
+
+export const getStudyMaterials = (): StudyMaterial[] => {
+  return [...studyMaterial];
+};
+
+export const saveStudyMaterials = (_materials: StudyMaterial[]): boolean => {
+  return true;
+};
+
+export const getTeacherByEmail = (email: string) => {
+  const normalizedEmail = email.trim().toLowerCase();
+
+  return teachers.find(
+    (teacher) => teacher.email.trim().toLowerCase() === normalizedEmail
+  );
+};
+
+export const getTeacherStudyMaterials = (email: string): StudyMaterial[] => {
+  const teacher = getTeacherByEmail(email);
+
+  if (!teacher) return [];
+
+  return getStudyMaterials().filter(
+    (material) => material.teacherId === teacher.id
+  );
+};

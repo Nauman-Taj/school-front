@@ -121,7 +121,7 @@ export default function TeacherMarksTable({
       </div>
 
       {students.length > 0 && (
-        <div className="border-t border-gray-200 p-5">
+        <div className="flex border-t justify-end border-gray-200 p-5">
           <button
             type="button"
             onClick={handleSave}

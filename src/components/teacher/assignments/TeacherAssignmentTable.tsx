@@ -1,7 +1,9 @@
 "use client";
 
+import Link from "next/link";
 import {
   ClipboardList,
+  Eye,
   Search,
 } from "lucide-react";
 
@@ -20,7 +22,6 @@ export default function TeacherAssignmentTable({
 }: Props) {
   return (
     <div className="rounded-2xl border border-gray-200 bg-white shadow-sm">
-      {/* Search */}
       <div className="border-b border-gray-200 p-5">
         <div className="relative max-w-full">
           <Search
@@ -46,21 +47,17 @@ export default function TeacherAssignmentTable({
               <th className="px-5 py-4 text-xs font-semibold uppercase text-gray-500">
                 Assignment
               </th>
-
               <th className="px-5 py-4 text-xs font-semibold uppercase text-gray-500">
                 Subject
               </th>
-
               <th className="px-5 py-4 text-xs font-semibold uppercase text-gray-500">
                 Class
               </th>
-
               <th className="px-5 py-4 text-xs font-semibold uppercase text-gray-500">
                 Due Date
               </th>
-
-              <th className="px-5 py-4 text-xs font-semibold uppercase text-gray-500">
-                Status
+              <th className="px-5 py-4 text-right text-xs font-semibold uppercase text-gray-500">
+                Action
               </th>
             </tr>
           </thead>
@@ -82,7 +79,6 @@ export default function TeacherAssignmentTable({
                         <p className="font-medium text-gray-900">
                           {assignment.title}
                         </p>
-
                         <p className="mt-1 text-xs text-gray-500">
                           {assignment.id}
                         </p>
@@ -103,7 +99,15 @@ export default function TeacherAssignmentTable({
                   </td>
 
                   <td className="px-5 py-4">
-                    <StatusBadge status={assignment.status} />
+                    <div className="flex justify-end">
+                      <Link
+                        href={`/teacher/assignments/${encodeURIComponent(String(assignment.id))}`}
+                      className="inline-flex items-center gap-2 rounded-full border border-gray-200 px-4 py-2 text-sm font-medium text-gray-600 transition hover:border-[#01796f] hover:bg-[#e6f4f2] hover:text-[#01796f]"
+                      >
+                        <Eye size={16} />
+                        Edit
+                      </Link>
+                    </div>
                   </td>
                 </tr>
               ))
@@ -135,44 +139,41 @@ export default function TeacherAssignmentTable({
                 </div>
 
                 <div className="min-w-0 flex-1">
-                  <div className="flex items-start justify-between gap-3">
-                    <div>
-                      <h3 className="font-medium text-gray-900">
-                        {assignment.title}
-                      </h3>
-
-                      <p className="mt-1 text-sm text-gray-500">
-                        {assignment.subject}
-                      </p>
-                    </div>
-
-                    <StatusBadge status={assignment.status} />
-                  </div>
-
-                  <div className="mt-4 grid grid-cols-2 gap-3 text-sm">
-                    <div>
-                      <p className="text-xs text-gray-400">
-                        Class
-                      </p>
-
-                      <p className="mt-1 text-gray-700">
-                        {assignment.className} -{" "}
-                        {assignment.section}
-                      </p>
-                    </div>
-
-                    <div>
-                      <p className="text-xs text-gray-400">
-                        Due Date
-                      </p>
-
-                      <p className="mt-1 text-gray-700">
-                        {assignment.dueDate}
-                      </p>
-                    </div>
-                  </div>
+                  <h3 className="font-medium text-gray-900">
+                    {assignment.title}
+                  </h3>
+                  <p className="mt-1 text-sm text-gray-500">
+                    {assignment.subject}
+                  </p>
+                  <p className="mt-1 text-xs text-gray-400">
+                    ID: {assignment.id}
+                  </p>
                 </div>
               </div>
+
+              <div className="mt-4 grid grid-cols-2 gap-3 text-sm">
+                <div>
+                  <p className="text-xs text-gray-400">Class</p>
+                  <p className="mt-1 text-gray-700">
+                    {assignment.className} - {assignment.section}
+                  </p>
+                </div>
+
+                <div>
+                  <p className="text-xs text-gray-400">Due Date</p>
+                  <p className="mt-1 text-gray-700">
+                    {assignment.dueDate}
+                  </p>
+                </div>
+              </div>
+
+              <Link
+                href={`/teacher/assignments/${encodeURIComponent(String(assignment.id))}`}
+                className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-full border border-[#01796f] px-4 py-2.5 text-sm font-semibold text-[#01796f] transition hover:bg-[#e6f4f2]"
+              >
+                <Eye size={16} />
+                Edit Assignment
+              </Link>
             </div>
           ))
         ) : (
@@ -182,25 +183,5 @@ export default function TeacherAssignmentTable({
         )}
       </div>
     </div>
-  );
-}
-
-function StatusBadge({
-  status,
-}: {
-  status: Assignment["status"];
-}) {
-  const styles = {
-    Pending: "bg-yellow-50 text-yellow-600",
-    Submitted: "bg-green-50 text-green-600",
-    Overdue: "bg-red-50 text-red-600",
-  };
-
-  return (
-    <span
-      className={`inline-flex rounded-full px-3 py-1 text-xs font-medium ${styles[status]}`}
-    >
-      {status}
-    </span>
   );
 }

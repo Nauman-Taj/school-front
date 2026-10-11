@@ -3,7 +3,6 @@
 import { useMemo, useState } from "react";
 
 import { getSession } from "@/lib/auth";
-
 import { exams } from "@/data/exams";
 import { teachers } from "@/data/teachers";
 
@@ -14,21 +13,24 @@ export default function TeacherExamsPage() {
 
   const session = getSession();
 
-  const currentTeacher =
-    teachers.find(
-      (teacher) =>
-        teacher.email === session?.email ||
-        teacher.name === session?.name
-    ) ?? teachers[0];
+  const currentTeacher = teachers.find(
+    (teacher) =>
+      teacher.email === session?.email ||
+      teacher.name === session?.name
+  );
 
   const teacherExams = useMemo(() => {
+    if (!currentTeacher) {
+      return [];
+    }
+
     return exams.filter(
       (exam) => exam.teacherId === currentTeacher.id
     );
-  }, [currentTeacher.id]);
+  }, [currentTeacher]);
 
   const filteredExams = teacherExams.filter((exam) => {
-    const value = search.toLowerCase();
+    const value = search.toLowerCase().trim();
 
     return (
       exam.name.toLowerCase().includes(value) ||
@@ -48,7 +50,7 @@ export default function TeacherExamsPage() {
         </h1>
 
         <p className="mt-1 text-sm text-gray-500 sm:text-base">
-          View exams assigned to your classes and subjects.
+          View and manage exams assigned to your classes and subjects.
         </p>
       </div>
 

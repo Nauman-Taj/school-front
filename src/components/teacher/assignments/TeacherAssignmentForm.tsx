@@ -22,35 +22,26 @@ export default function TeacherAssignmentForm({
         className: "Grade 10",
         section: "A",
         dueDate: "2026-09-20",
-        status: "Pending",
       }
     : null;
 
   const [title, setTitle] = useState(
     existingAssignment?.title ?? ""
   );
-
   const [subject, setSubject] = useState(
     existingAssignment?.subject ?? ""
   );
-
   const [className, setClassName] = useState(
     existingAssignment?.className ?? ""
   );
-
   const [section, setSection] = useState(
     existingAssignment?.section ?? ""
   );
-
   const [dueDate, setDueDate] = useState(
     existingAssignment?.dueDate ?? ""
   );
 
-  const [status, setStatus] = useState(
-    existingAssignment?.status ?? "Pending"
-  );
-
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     const assignmentData = {
@@ -60,7 +51,6 @@ export default function TeacherAssignmentForm({
       className,
       section,
       dueDate,
-      status,
     };
 
     console.log(
@@ -71,7 +61,6 @@ export default function TeacherAssignmentForm({
 
   return (
     <div className="space-y-5">
-      {/* Header */}
       <div>
         <Link
           href="/teacher/assignments"
@@ -92,13 +81,11 @@ export default function TeacherAssignmentForm({
         </p>
       </div>
 
-      {/* Form */}
       <form
         onSubmit={handleSubmit}
         className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm"
       >
         <div className="grid gap-5 sm:grid-cols-2">
-          {/* Title */}
           <div className="sm:col-span-2">
             <label className="mb-2 block text-sm font-medium text-gray-700">
               Assignment Title
@@ -114,7 +101,6 @@ export default function TeacherAssignmentForm({
             />
           </div>
 
-          {/* Subject */}
           <div>
             <label className="mb-2 block text-sm font-medium text-gray-700">
               Subject
@@ -136,7 +122,6 @@ export default function TeacherAssignmentForm({
             </select>
           </div>
 
-          {/* Class */}
           <div>
             <label className="mb-2 block text-sm font-medium text-gray-700">
               Class
@@ -156,7 +141,6 @@ export default function TeacherAssignmentForm({
             </select>
           </div>
 
-          {/* Section */}
           <div>
             <label className="mb-2 block text-sm font-medium text-gray-700">
               Section
@@ -174,7 +158,6 @@ export default function TeacherAssignmentForm({
             </select>
           </div>
 
-          {/* Due Date */}
           <div>
             <label className="mb-2 block text-sm font-medium text-gray-700">
               Due Date
@@ -188,37 +171,19 @@ export default function TeacherAssignmentForm({
               className="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm outline-none transition focus:border-[#01796f]"
             />
           </div>
-
-          {/* Status */}
-          <div>
-            <label className="mb-2 block text-sm font-medium text-gray-700">
-              Status
-            </label>
-
-            <select
-              value={status}
-              onChange={(e) => setStatus(e.target.value)}
-              className="w-full rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm outline-none transition focus:border-[#01796f]"
-            >
-              <option value="Pending">Pending</option>
-              <option value="Submitted">Submitted</option>
-              <option value="Overdue">Overdue</option>
-            </select>
-          </div>
         </div>
 
-        {/* Actions */}
         <div className="mt-6 flex flex-col-reverse gap-3 border-t border-gray-200 pt-5 sm:flex-row sm:justify-end">
           <Link
             href="/teacher/assignments"
-            className="rounded-xl border border-gray-200 px-5 py-2.5 text-center text-sm font-semibold text-gray-700 transition hover:bg-gray-50"
+            className="rounded-full border border-gray-200 px-5 py-2.5 text-center text-sm font-semibold text-gray-700 transition hover:bg-gray-50"
           >
             Cancel
           </Link>
 
           <button
             type="submit"
-            className="rounded-xl bg-[#01796f] px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-[#015f58]"
+            className="rounded-full bg-[#01796f] px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-[#015f58]"
           >
             {isEdit ? "Update Assignment" : "Add Assignment"}
           </button>

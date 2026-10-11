@@ -1,5 +1,5 @@
-import TeacherStudyMaterialPage from "@/components/teacher/study-material/TeacherStudyMaterialPage";
+import StudyMaterialPage from "@/components/teacher/study-material/StudyMaterialPage";
 
-export default function TeacherStudyMaterialRoute() {
-  return <TeacherStudyMaterialPage />;
+export default function StudyMaterial() {
+  return <StudyMaterialPage />;
 }

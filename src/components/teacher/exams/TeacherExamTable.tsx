@@ -1,6 +1,11 @@
 "use client";
 
-import { Search, FileText } from "lucide-react";
+import Link from "next/link";
+import {
+  Search,
+  FileText,
+  Eye,
+} from "lucide-react";
 
 import { Exam } from "@/types/exam";
 
@@ -44,25 +49,23 @@ export default function TeacherExamTable({
                 <th className="px-5 py-4 text-sm font-semibold text-gray-600">
                   Exam
                 </th>
-
                 <th className="px-5 py-4 text-sm font-semibold text-gray-600">
                   Subject
                 </th>
-
                 <th className="px-5 py-4 text-sm font-semibold text-gray-600">
                   Class
                 </th>
-
                 <th className="px-5 py-4 text-sm font-semibold text-gray-600">
                   Exam Date
                 </th>
-
                 <th className="px-5 py-4 text-sm font-semibold text-gray-600">
                   Total Marks
                 </th>
-
                 <th className="px-5 py-4 text-sm font-semibold text-gray-600">
                   Status
+                </th>
+                <th className="px-5 py-4 text-right text-sm font-semibold text-gray-600">
+                  Action
                 </th>
               </tr>
             </thead>
@@ -76,7 +79,7 @@ export default function TeacherExamTable({
                   >
                     <td className="px-5 py-4">
                       <div className="flex items-center gap-3">
-                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-[#01796f]/10 text-[#01796f]">
+                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-[#e6f4f2] text-[#01796f]">
                           <FileText size={18} />
                         </div>
 
@@ -104,7 +107,7 @@ export default function TeacherExamTable({
 
                     <td className="px-5 py-4">
                       <span
-                        className={`rounded-full px-3 py-1 text-xs font-medium ${
+                        className={`inline-flex rounded-full px-3 py-1 text-xs font-medium ${
                           exam.status === "Upcoming"
                             ? "bg-blue-50 text-blue-600"
                             : "bg-green-50 text-green-600"
@@ -113,12 +116,24 @@ export default function TeacherExamTable({
                         {exam.status}
                       </span>
                     </td>
+
+                    <td className="px-5 py-4">
+                      <div className="flex justify-end">
+                        <Link
+                          href={`/teacher/exams/${encodeURIComponent(String(exam.id))}`}
+                      className="inline-flex items-center gap-2 rounded-full border border-gray-200 px-4 py-2 text-sm font-medium text-gray-600 transition hover:border-[#01796f] hover:bg-[#e6f4f2] hover:text-[#01796f]"
+                        >
+                          <Eye size={16} />
+                          Manage
+                        </Link>
+                      </div>
+                    </td>
                   </tr>
                 ))
               ) : (
                 <tr>
                   <td
-                    colSpan={6}
+                    colSpan={7}
                     className="px-5 py-8 text-center text-sm text-gray-500"
                   >
                     No exams found.
@@ -139,7 +154,7 @@ export default function TeacherExamTable({
               className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm"
             >
               <div className="flex items-start gap-3">
-                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[#01796f]/10 text-[#01796f]">
+                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[#e6f4f2] text-[#01796f]">
                   <FileText size={19} />
                 </div>
 
@@ -147,7 +162,6 @@ export default function TeacherExamTable({
                   <h2 className="font-semibold text-gray-900">
                     {exam.name}
                   </h2>
-
                   <p className="mt-1 text-sm text-gray-500">
                     {exam.subject}
                   </p>
@@ -186,6 +200,14 @@ export default function TeacherExamTable({
                   {exam.totalMarks}
                 </p>
               </div>
+
+              <Link
+                href={`/teacher/exams/${encodeURIComponent(String(exam.id))}`}
+                className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-full border border-[#01796f] px-4 py-2.5 text-sm font-semibold text-[#01796f] transition hover:bg-[#e6f4f2]"
+              >
+                <Eye size={16} />
+                Manage Exam
+              </Link>
             </div>
           ))
         ) : (

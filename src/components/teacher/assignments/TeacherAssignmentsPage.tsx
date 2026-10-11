@@ -48,7 +48,7 @@ export default function TeacherAssignmentsPage() {
   return (
     <div className="space-y-5">
       {/* Header */}
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-900 sm:text-3xl">
             Assignments
@@ -61,7 +61,7 @@ export default function TeacherAssignmentsPage() {
 
         <Link
           href="/teacher/assignments/add"
-          className="inline-flex items-center justify-center gap-2 rounded-full bg-[#01796f] px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-[#015f58]"
+          className="inline-flex w-fit items-center  gap-2 rounded-full bg-[#01796f] px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-[#015f58]"
         >
           <Plus size={17} />
           Add Assignment
