@@ -18,66 +18,59 @@ export default function LoginForm() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const handleLogin = (e: React.FormEvent) => {
-    e.preventDefault();
+  
+const handleLogin = (e: React.FormEvent<HTMLFormElement>) => {
+  e.preventDefault();
+  setError("");
 
-    const normalizedIdentifier = identifier.trim().toLowerCase();
+  const normalizedIdentifier = identifier.trim().toLowerCase();
 
-    const user = getUsers().find(
-      (item) =>
-        (item.email.toLowerCase() === normalizedIdentifier ||
-          item.username.toLowerCase() === normalizedIdentifier) &&
-        item.password === password
+  const user = getUsers().find(
+    (item) =>
+      (item.email.trim().toLowerCase() === normalizedIdentifier ||
+        item.username.trim().toLowerCase() === normalizedIdentifier) &&
+      item.password === password
+  );
+
+  if (!user) {
+    setError("Invalid email/username or password.");
+    return;
+  }
+
+  if (user.status !== "Active") {
+    setError(
+      "Your account is inactive. Please contact the school administration."
     );
+    return;
+  }
 
-    if (!user) {
-      window.alert("Invalid email/username or password.");
-      return;
-    }
-
-    if (user.status !== "Active") {
-      window.alert(
-        "Your account is inactive. Please contact the school administration."
-      );
-      return;
-    }
-
-    const session = {
-      id: user.id,
-      name: user.name,
-      email: user.email,
-      username: user.username,
-      role: user.role,
-      loginTime: new Date().toISOString(),
-    };
-
-    localStorage.removeItem("auth-session");
-    sessionStorage.removeItem("auth-session");
-
-    if (rememberMe) {
-      localStorage.setItem(
-        "auth-session",
-        JSON.stringify(session)
-      );
-    } else {
-      sessionStorage.setItem(
-        "auth-session",
-        JSON.stringify(session)
-      );
-    }
-
-    localStorage.setItem("isLoggedIn", "true");
-
-    if (user.role === "Admin") {
-      router.replace("/admin");
-    } else if (user.role === "Teacher") {
-      router.replace("/teacher");
-    } else if (user.role === "Student") {
-      router.replace("/student");
-    } else if (user.role === "Parent") {
-      router.replace("/parent");
-    }
+  const session = {
+    id: user.id,
+    name: user.name,
+    email: user.email,
+    username: user.username,
+    role: user.role,
+    loginTime: new Date().toISOString(),
   };
+
+  localStorage.removeItem("auth-session");
+  sessionStorage.removeItem("auth-session");
+
+  const storage = rememberMe ? localStorage : sessionStorage;
+  storage.setItem("auth-session", JSON.stringify(session));
+
+  localStorage.setItem("isLoggedIn", "true");
+
+  const routes = {
+    Admin: "/admin",
+    Teacher: "/teacher",
+    Student: "/student",
+    Parent: "/parent",
+  } as const;
+
+  router.replace(routes[user.role]);
+};
+
 
 
   return (

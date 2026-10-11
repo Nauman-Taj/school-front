@@ -1,6 +1,7 @@
+
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   User,
   Mail,
@@ -12,66 +13,271 @@ import {
   Check,
   Eye,
   EyeOff,
+  AlertCircle,
 } from "lucide-react";
 
+import { getSession } from "@/lib/auth";
+import { getUsers, saveUsers } from "@/lib/users";
+import {
+  getRegisteredParent,
+  saveRegisteredParent,
+  type RegisteredParent,
+} from "@/lib/registeredProfiles";
 import { parents } from "@/data/parents";
-import { getCurrentParent } from "@/lib/parent";
+
+type ParentProfile = {
+  id: number;
+  name: string;
+  email: string;
+  phone: string;
+  occupation: string;
+  address: string;
+  status: "Active" | "Inactive";
+};
+
+type ProfileForm = {
+  name: string;
+  email: string;
+  phone: string;
+  occupation: string;
+  address: string;
+};
+
+type PasswordForm = {
+  currentPassword: string;
+  newPassword: string;
+  confirmPassword: string;
+};
+
+const emptyForm: ProfileForm = {
+  name: "",
+  email: "",
+  phone: "",
+  occupation: "",
+  address: "",
+};
+
+const emptyPasswordForm: PasswordForm = {
+  currentPassword: "",
+  newPassword: "",
+  confirmPassword: "",
+};
 
 export default function ParentProfilePage() {
-  const currentParent = getCurrentParent();
-
-  const parent =
-    parents.find((item) => item.id === currentParent?.id) ??
-    parents[0];
-
-  const [profile, setProfile] = useState(parent);
-
+  const [profile, setProfile] = useState<ParentProfile | null>(null);
+  const [form, setForm] = useState<ProfileForm>(emptyForm);
   const [isEditing, setIsEditing] = useState(false);
+  const [loading, setLoading] = useState(true);
 
-  const [form, setForm] = useState({
-    name: profile.name,
-    email: profile.email,
-    phone: profile.phone,
-    occupation: profile.occupation,
-    address: profile.address,
+  const [passwordVisibility, setPasswordVisibility] = useState({
+    currentPassword: false,
+    newPassword: false,
+    confirmPassword: false,
   });
 
-  const [passwordVisibility, setPasswordVisibility] =
-    useState({
-      currentPassword: false,
-      newPassword: false,
-      confirmPassword: false,
+  const [passwordForm, setPasswordForm] =
+    useState<PasswordForm>(emptyPasswordForm);
+
+  const [feedback, setFeedback] = useState<{
+    type: "success" | "error";
+    message: string;
+  } | null>(null);
+
+  useEffect(() => {
+    const session = getSession();
+
+    if (!session || session.role !== "Parent") {
+      setLoading(false);
+      return;
+    }
+
+    const registeredParent = getRegisteredParent(session);
+
+    // Match the signed-in parent, never use parents[0] as a fallback.
+    const sharedParent =
+      parents.find(
+        (item) =>
+          item.email.trim().toLowerCase() ===
+          session.email.trim().toLowerCase()
+      ) ??
+      parents.find(
+        (item) =>
+          item.name.trim().toLowerCase() ===
+          session.name.trim().toLowerCase()
+      ) ??
+      null;
+
+    const matchedParent = registeredParent ?? sharedParent;
+
+    if (!matchedParent) {
+      setLoading(false);
+      return;
+    }
+
+    const nextProfile: ParentProfile = {
+      id: matchedParent.id,
+      name: matchedParent.name,
+      email: matchedParent.email,
+      phone: matchedParent.phone ?? "",
+      occupation: matchedParent.occupation ?? "",
+      address: matchedParent.address ?? "",
+      status:
+        matchedParent.status === "Inactive" ? "Inactive" : "Active",
+    };
+
+    setProfile(nextProfile);
+    setForm({
+      name: nextProfile.name,
+      email: nextProfile.email,
+      phone: nextProfile.phone,
+      occupation: nextProfile.occupation,
+      address: nextProfile.address,
     });
 
-  const [passwordForm, setPasswordForm] = useState({
-    currentPassword: "",
-    newPassword: "",
-    confirmPassword: "",
-  });
+    setLoading(false);
+  }, []);
 
-  const [saved, setSaved] = useState(false);
-  const [passwordUpdated, setPasswordUpdated] =
-    useState(false);
+  const showFeedback = (
+    type: "success" | "error",
+    message: string
+  ) => {
+    setFeedback({ type, message });
+  };
 
-  const handleSave = () => {
-    setProfile((current) => ({
-      ...current,
-      ...form,
-    }));
+  const handleCancelEdit = () => {
+    if (!profile) return;
+
+    setForm({
+      name: profile.name,
+      email: profile.email,
+      phone: profile.phone,
+      occupation: profile.occupation,
+      address: profile.address,
+    });
 
     setIsEditing(false);
-    setSaved(true);
+    setFeedback(null);
+  };
 
-    setTimeout(() => {
-      setSaved(false);
-    }, 2500);
+  const handleSave = () => {
+    if (!profile) return;
+
+    const session = getSession();
+
+    if (!session || session.role !== "Parent") {
+      showFeedback("error", "Your session has expired. Please sign in again.");
+      return;
+    }
+
+    const name = form.name.trim();
+    const email = form.email.trim().toLowerCase();
+
+    if (!name || !email) {
+      showFeedback("error", "Name and email are required.");
+      return;
+    }
+
+    const users = getUsers();
+
+    const duplicateEmail = users.some(
+      (user) =>
+        user.id !== session.id &&
+        user.email.trim().toLowerCase() === email
+    );
+
+    if (duplicateEmail) {
+      showFeedback("error", "That email address is already in use.");
+      return;
+    }
+
+    const updatedProfile: ParentProfile = {
+      ...profile,
+      name,
+      email,
+      phone: form.phone.trim(),
+      occupation: form.occupation.trim(),
+      address: form.address.trim(),
+    };
+
+    try {
+      const registeredParent = getRegisteredParent(session);
+
+      if (registeredParent) {
+        const updatedRegisteredParent: RegisteredParent = {
+          ...registeredParent,
+          name: updatedProfile.name,
+          email: updatedProfile.email,
+          phone: updatedProfile.phone,
+          occupation: updatedProfile.occupation,
+          address: updatedProfile.address,
+          status: updatedProfile.status,
+        };
+
+        saveRegisteredParent(updatedRegisteredParent);
+      } else {
+        // Shared seed records are not modified. Store an editable
+        // profile for this account in the registered-profile collection.
+        saveRegisteredParent({
+          id: session.id,
+          name: updatedProfile.name,
+          email: updatedProfile.email,
+          phone: updatedProfile.phone,
+          occupation: updatedProfile.occupation,
+          address: updatedProfile.address,
+          status: updatedProfile.status,
+        });
+      }
+
+      // Keep the login account consistent with the edited profile.
+      const account = users.find((user) => user.id === session.id);
+
+      if (account) {
+        saveUsers(
+          users.map((user) =>
+            user.id === session.id
+              ? { ...user, name, email }
+              : user
+          )
+        );
+      }
+
+      // Keep whichever storage currently holds the session.
+      const updatedSession = { ...session, name, email };
+      const localSession = localStorage.getItem("auth-session");
+      const sessionStoredLocally = localSession !== null;
+
+      if (sessionStoredLocally) {
+        localStorage.setItem(
+          "auth-session",
+          JSON.stringify(updatedSession)
+        );
+      } else {
+        sessionStorage.setItem(
+          "auth-session",
+          JSON.stringify(updatedSession)
+        );
+      }
+
+      setProfile(updatedProfile);
+      setForm({
+        name: updatedProfile.name,
+        email: updatedProfile.email,
+        phone: updatedProfile.phone,
+        occupation: updatedProfile.occupation,
+        address: updatedProfile.address,
+      });
+      setIsEditing(false);
+      showFeedback("success", "Profile updated successfully.");
+    } catch {
+      showFeedback(
+        "error",
+        "Could not save your profile. Please try again."
+      );
+    }
   };
 
   const togglePassword = (
-    field:
-      | "currentPassword"
-      | "newPassword"
-      | "confirmPassword"
+    field: keyof typeof passwordVisibility
   ) => {
     setPasswordVisibility((current) => ({
       ...current,
@@ -80,39 +286,99 @@ export default function ParentProfilePage() {
   };
 
   const handlePasswordUpdate = () => {
-    if (
-      !passwordForm.currentPassword ||
-      !passwordForm.newPassword ||
-      !passwordForm.confirmPassword
-    ) {
+    const { currentPassword, newPassword, confirmPassword } =
+      passwordForm;
+
+    if (!currentPassword || !newPassword || !confirmPassword) {
+      showFeedback("error", "Please complete all password fields.");
       return;
     }
 
-    if (
-      passwordForm.newPassword !==
-      passwordForm.confirmPassword
-    ) {
+    if (newPassword.length < 8) {
+      showFeedback(
+        "error",
+        "Your new password must contain at least 8 characters."
+      );
       return;
     }
 
-    setPasswordUpdated(true);
+    if (newPassword !== confirmPassword) {
+      showFeedback("error", "The new passwords do not match.");
+      return;
+    }
 
-    setPasswordForm({
-      currentPassword: "",
-      newPassword: "",
-      confirmPassword: "",
-    });
+    if (currentPassword === newPassword) {
+      showFeedback(
+        "error",
+        "Your new password must be different from your current password."
+      );
+      return;
+    }
 
-    setPasswordVisibility({
-      currentPassword: false,
-      newPassword: false,
-      confirmPassword: false,
-    });
+    const session = getSession();
 
-    setTimeout(() => {
-      setPasswordUpdated(false);
-    }, 2500);
+    if (!session || session.role !== "Parent") {
+      showFeedback("error", "Please sign in again.");
+      return;
+    }
+
+    const users = getUsers();
+    const account = users.find((user) => user.id === session.id);
+
+    if (!account || account.password !== currentPassword) {
+      showFeedback("error", "Your current password is incorrect.");
+      return;
+    }
+
+    try {
+      saveUsers(
+        users.map((user) =>
+          user.id === session.id
+            ? { ...user, password: newPassword }
+            : user
+        )
+      );
+
+      setPasswordForm(emptyPasswordForm);
+      setPasswordVisibility({
+        currentPassword: false,
+        newPassword: false,
+        confirmPassword: false,
+      });
+
+      showFeedback("success", "Password updated successfully.");
+    } catch {
+      showFeedback(
+        "error",
+        "Could not update your password. Please try again."
+      );
+    }
   };
+
+  if (loading) {
+    return (
+      <div className="rounded-2xl border border-gray-200 bg-white p-8 text-center">
+        <p className="text-sm text-gray-500">Loading your profile...</p>
+      </div>
+    );
+  }
+
+  if (!profile) {
+    return (
+      <div className="rounded-2xl border border-gray-200 bg-white p-8 text-center">
+        <User className="mx-auto mb-3 h-10 w-10 text-gray-400" />
+
+        <h2 className="text-lg font-semibold text-gray-900">
+          Parent profile not found
+        </h2>
+
+        <p className="mt-2 text-sm text-gray-500">
+          We couldn't find a parent profile matching your account. Please
+          contact the school administration.
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-5">
@@ -127,6 +393,26 @@ export default function ParentProfilePage() {
         </p>
       </div>
 
+      {/* Feedback */}
+      {feedback && (
+        <div
+          role="status"
+          className={`flex items-start gap-2 rounded-xl border p-4 text-sm ${
+            feedback.type === "success"
+              ? "border-[#b8e4dd] bg-[#e6f4f2] text-[#015f58]"
+              : "border-red-200 bg-red-50 text-red-700"
+          }`}
+        >
+          {feedback.type === "success" ? (
+            <Check size={18} className="mt-0.5 shrink-0" />
+          ) : (
+            <AlertCircle size={18} className="mt-0.5 shrink-0" />
+          )}
+
+          {feedback.message}
+        </div>
+      )}
+
       {/* Profile Header */}
       <div className="rounded-2xl border border-gray-200 bg-white p-5 sm:p-6">
         <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
@@ -135,30 +421,34 @@ export default function ParentProfilePage() {
               <User size={30} />
             </div>
 
-            <div>
-              <h2 className="text-lg font-semibold text-gray-900">
+            <div className="min-w-0">
+              <h2 className="break-words text-lg font-semibold text-gray-900">
                 {profile.name}
               </h2>
 
-              <p className="mt-1 text-sm text-gray-500">
-                Parent
-              </p>
+              <p className="mt-1 text-sm text-gray-500">Parent</p>
             </div>
           </div>
 
           <button
             type="button"
-            onClick={() => setIsEditing(!isEditing)}
-            className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-[#01796F] px-5 py-3 text-sm font-medium text-white transition hover:bg-[#015f58] sm:w-auto"
+            onClick={() => {
+              if (isEditing) {
+                handleCancelEdit();
+              } else {
+                setFeedback(null);
+                setIsEditing(true);
+              }
+            }}
+            className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-[#01796F] px-5 py-2.5 text-sm font-medium text-white transition hover:bg-[#015f58] sm:w-auto"
           >
-            <Pencil size={16} />
-
+            {isEditing ? <User size={16} /> : <Pencil size={16} />}
             {isEditing ? "Cancel" : "Edit Profile"}
           </button>
         </div>
       </div>
 
-      {/* Profile Information */}
+      {/* Personal Information */}
       <div className="rounded-2xl border border-gray-200 bg-white p-5 sm:p-6">
         <div className="mb-5">
           <h2 className="text-lg font-semibold text-gray-900">
@@ -168,102 +458,49 @@ export default function ParentProfilePage() {
 
         {isEditing ? (
           <div className="grid gap-5 sm:grid-cols-2">
-            {/* Full Name */}
-            <div>
-              <label className="mb-2 block text-sm font-medium text-gray-700">
-                Full Name
-              </label>
+            <FormInput
+              label="Full Name"
+              value={form.name}
+              onChange={(value) =>
+                setForm((current) => ({ ...current, name: value }))
+              }
+            />
 
-              <input
-                type="text"
-                value={form.name}
-                onChange={(e) =>
-                  setForm({
-                    ...form,
-                    name: e.target.value,
-                  })
-                }
-                className="w-full rounded-lg border border-gray-200 px-4 py-2.5 text-sm outline-none transition focus:border-[#01796F] focus:ring-2 focus:ring-[#01796F]/10"
-              />
-            </div>
+            <FormInput
+              label="Email"
+              type="email"
+              value={form.email}
+              onChange={(value) =>
+                setForm((current) => ({ ...current, email: value }))
+              }
+            />
 
-            {/* Email */}
-            <div>
-              <label className="mb-2 block text-sm font-medium text-gray-700">
-                Email
-              </label>
+            <FormInput
+              label="Phone"
+              value={form.phone}
+              onChange={(value) =>
+                setForm((current) => ({ ...current, phone: value }))
+              }
+            />
 
-              <input
-                type="email"
-                value={form.email}
-                onChange={(e) =>
-                  setForm({
-                    ...form,
-                    email: e.target.value,
-                  })
-                }
-                className="w-full rounded-lg border border-gray-200 px-4 py-2.5 text-sm outline-none transition focus:border-[#01796F] focus:ring-2 focus:ring-[#01796F]/10"
-              />
-            </div>
+            <FormInput
+              label="Occupation"
+              value={form.occupation}
+              onChange={(value) =>
+                setForm((current) => ({ ...current, occupation: value }))
+              }
+            />
 
-            {/* Phone */}
-            <div>
-              <label className="mb-2 block text-sm font-medium text-gray-700">
-                Phone
-              </label>
-
-              <input
-                type="text"
-                value={form.phone}
-                onChange={(e) =>
-                  setForm({
-                    ...form,
-                    phone: e.target.value,
-                  })
-                }
-                className="w-full rounded-lg border border-gray-200 px-4 py-2.5 text-sm outline-none transition focus:border-[#01796F] focus:ring-2 focus:ring-[#01796F]/10"
-              />
-            </div>
-
-            {/* Occupation */}
-            <div>
-              <label className="mb-2 block text-sm font-medium text-gray-700">
-                Occupation
-              </label>
-
-              <input
-                type="text"
-                value={form.occupation}
-                onChange={(e) =>
-                  setForm({
-                    ...form,
-                    occupation: e.target.value,
-                  })
-                }
-                className="w-full rounded-lg border border-gray-200 px-4 py-2.5 text-sm outline-none transition focus:border-[#01796F] focus:ring-2 focus:ring-[#01796F]/10"
-              />
-            </div>
-
-            {/* Address */}
             <div className="sm:col-span-2">
-              <label className="mb-2 block text-sm font-medium text-gray-700">
-                Address
-              </label>
-
-              <input
-                type="text"
+              <FormInput
+                label="Address"
                 value={form.address}
-                onChange={(e) =>
-                  setForm({
-                    ...form,
-                    address: e.target.value,
-                  })
+                onChange={(value) =>
+                  setForm((current) => ({ ...current, address: value }))
                 }
-                className="w-full rounded-lg border border-gray-200 px-4 py-2.5 text-sm outline-none transition focus:border-[#01796F] focus:ring-2 focus:ring-[#01796F]/10"
               />
             </div>
 
-            {/* Save */}
             <div className="flex justify-end sm:col-span-2">
               <button
                 type="button"
@@ -322,61 +559,50 @@ export default function ParentProfilePage() {
           <h2 className="text-lg font-semibold text-gray-900">
             Change Password
           </h2>
+
+          <p className="mt-1 text-sm text-gray-500">
+            Enter your current password before choosing a new one.
+          </p>
         </div>
 
         <div className="grid gap-5 sm:grid-cols-2">
-          {/* Current Password */}
           <PasswordInput
             label="Current Password"
             value={passwordForm.currentPassword}
             onChange={(value) =>
-              setPasswordForm({
-                ...passwordForm,
+              setPasswordForm((current) => ({
+                ...current,
                 currentPassword: value,
-              })
+              }))
             }
-            showPassword={
-              passwordVisibility.currentPassword
-            }
-            onToggle={() =>
-              togglePassword("currentPassword")
-            }
+            showPassword={passwordVisibility.currentPassword}
+            onToggle={() => togglePassword("currentPassword")}
           />
 
-          {/* New Password */}
           <PasswordInput
             label="New Password"
             value={passwordForm.newPassword}
             onChange={(value) =>
-              setPasswordForm({
-                ...passwordForm,
+              setPasswordForm((current) => ({
+                ...current,
                 newPassword: value,
-              })
+              }))
             }
-            showPassword={
-              passwordVisibility.newPassword
-            }
-            onToggle={() =>
-              togglePassword("newPassword")
-            }
+            showPassword={passwordVisibility.newPassword}
+            onToggle={() => togglePassword("newPassword")}
           />
 
-          {/* Confirm Password */}
           <PasswordInput
             label="Confirm New Password"
             value={passwordForm.confirmPassword}
             onChange={(value) =>
-              setPasswordForm({
-                ...passwordForm,
+              setPasswordForm((current) => ({
+                ...current,
                 confirmPassword: value,
-              })
+              }))
             }
-            showPassword={
-              passwordVisibility.confirmPassword
-            }
-            onToggle={() =>
-              togglePassword("confirmPassword")
-            }
+            showPassword={passwordVisibility.confirmPassword}
+            onToggle={() => togglePassword("confirmPassword")}
           />
         </div>
 
@@ -391,28 +617,41 @@ export default function ParentProfilePage() {
           </button>
         </div>
       </div>
+    </div>
+  );
+}
 
-      {/* Profile Feedback */}
-      {saved && (
-        <div className="fixed left-1/2 top-5 z-50 flex -translate-x-1/2 items-center gap-2 rounded-xl bg-gray-900 px-5 py-3 text-sm font-medium text-white shadow-lg">
-          <Check size={17} />
-          Profile updated successfully.
-        </div>
-      )}
+type FormInputProps = {
+  label: string;
+  value: string;
+  type?: string;
+  onChange: (value: string) => void;
+};
 
-      {/* Password Feedback */}
-      {passwordUpdated && (
-        <div className="fixed left-1/2 top-5 z-50 flex -translate-x-1/2 items-center gap-2 rounded-xl bg-gray-900 px-5 py-3 text-sm font-medium text-white shadow-lg">
-          <Check size={17} />
-          Password updated successfully.
-        </div>
-      )}
+function FormInput({
+  label,
+  value,
+  type = "text",
+  onChange,
+}: FormInputProps) {
+  return (
+    <div>
+      <label className="mb-2 block text-sm font-medium text-gray-700">
+        {label}
+      </label>
+
+      <input
+        type={type}
+        value={value}
+        onChange={(event) => onChange(event.target.value)}
+        className="w-full rounded-full border border-gray-200 px-4 py-3 text-sm text-gray-900 outline-none transition focus:border-[#01796F] focus:ring-2 focus:ring-[#01796F]/10"
+      />
     </div>
   );
 }
 
 type ProfileItemProps = {
-  icon: React.ElementType;
+  icon: typeof User;
   label: string;
   value: string;
 };
@@ -423,18 +662,16 @@ function ProfileItem({
   value,
 }: ProfileItemProps) {
   return (
-    <div className="flex items-start gap-3">
-      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-[#e6f4f2] text-[#01796F]">
+    <div className="flex min-w-0 items-start gap-3">
+      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#e6f4f2] text-[#01796F]">
         <Icon size={18} />
       </div>
 
       <div className="min-w-0">
-        <p className="text-xs font-medium text-gray-500">
-          {label}
-        </p>
+        <p className="text-xs font-medium text-gray-500">{label}</p>
 
         <p className="mt-1 break-words text-sm font-medium text-gray-900">
-          {value}
+          {value || "Not provided"}
         </p>
       </div>
     </div>
@@ -466,25 +703,18 @@ function PasswordInput({
         <input
           type={showPassword ? "text" : "password"}
           value={value}
-          onChange={(e) => onChange(e.target.value)}
-          className="w-full rounded-lg border border-gray-200 px-4 py-2.5 pr-11 text-sm outline-none transition focus:border-[#01796F] focus:ring-2 focus:ring-[#01796F]/10"
+          onChange={(event) => onChange(event.target.value)}
+          autoComplete="current-password"
+          className="w-full rounded-full border border-gray-200 px-4 py-3 pr-12 text-sm text-gray-900 outline-none transition focus:border-[#01796F] focus:ring-2 focus:ring-[#01796F]/10"
         />
 
         <button
           type="button"
           onClick={onToggle}
-          className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 transition hover:text-[#01796F]"
-          aria-label={
-            showPassword
-              ? "Hide password"
-              : "Show password"
-          }
+          className="absolute right-3 top-1/2 -translate-y-1/2 rounded-full p-1 text-gray-400 transition hover:text-[#01796F]"
+          aria-label={showPassword ? "Hide password" : "Show password"}
         >
-          {showPassword ? (
-            <EyeOff size={18} />
-          ) : (
-            <Eye size={18} />
-          )}
+          {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
         </button>
       </div>
     </div>
