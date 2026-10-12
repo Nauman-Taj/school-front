@@ -7,145 +7,92 @@ type RegisteredParent = {
   id: number;
   name: string;
   email: string;
-  phone?: string;
-  childName?: string;
   childRollNo?: string;
+  phone?: string;
   status?: string;
+};
+
+const getRegisteredParents = (): RegisteredParent[] => {
+  if (typeof window === "undefined") return [];
+
+  try {
+    return JSON.parse(
+      localStorage.getItem("registered-parents") || "[]"
+    ) as RegisteredParent[];
+  } catch {
+    return [];
+  }
 };
 
 export const getCurrentParent = () => {
   const session = getSession();
 
-  if (!session || session.role !== "Parent") {
-    return null;
-  }
+  if (!session || session.role !== "Parent") return null;
 
-  // First, find an existing shared parent by account ID.
-  const sharedParent = parents.find(
-    (parent) => Number(parent.id) === Number(session.id)
-  );
+  const email = session.email.trim().toLowerCase();
 
-  if (sharedParent) {
-    return sharedParent;
-  }
-
-  // Then, check newly registered parents.
-  let registeredParents: RegisteredParent[] = [];
-
-  try {
-    registeredParents = JSON.parse(
-      localStorage.getItem("registered-parents") || "[]"
-    );
-  } catch {
-    registeredParents = [];
-  }
-
-  const registeredParent = registeredParents.find(
-    (parent) =>
-      parent.id === session.id ||
-      parent.email?.toLowerCase() === session.email.toLowerCase()
-  );
-
-  if (registeredParent) {
-    return {
-      ...registeredParent,
-      id: registeredParent.id,
-    };
-  }
-
-  // Backward-compatible lookup for existing shared data.
   return (
-    parents.find(
-      (parent) =>
-        parent.email?.toLowerCase() === session.email.toLowerCase()
+    getRegisteredParents().find(
+      (parent) => parent.email?.trim().toLowerCase() === email
     ) ??
-    parents.find((parent) => parent.name === session.name) ??
+    parents.find(
+      (parent) => parent.email?.trim().toLowerCase() === email
+    ) ??
     null
   );
 };
 
 export const getCurrentParentChildren = () => {
-  const parent = getCurrentParent();
+  const session = getSession();
 
-  if (!parent) {
-    return [];
+  if (!session || session.role !== "Parent") return [];
+
+  const email = session.email.trim().toLowerCase();
+
+  const sharedParent = parents.find(
+    (parent) => parent.email?.trim().toLowerCase() === email
+  );
+
+  if (sharedParent) {
+    return parentChildren
+      .filter(
+        (relationship) =>
+          Number(relationship.parentId) === Number(sharedParent.id)
+      )
+      .flatMap((relationship) => {
+        const student = students.find(
+          (item) => Number(item.id) === Number(relationship.studentId)
+        );
+
+        return student
+          ? [{
+              studentId: student.id,
+              name: student.name,
+              className: student.className,
+              section: student.section,
+              rollNo: student.rollNo,
+            }]
+          : [];
+      });
   }
 
-  // Existing relationships to official student records.
-  const linkedChildren = parentChildren
-    .filter((child) => child.parentId === parent.id)
-    .map((child) => {
-      const student = students.find(
-        (student) => student.id === child.studentId
-      );
+  const registeredParent = getRegisteredParents().find(
+    (parent) => parent.email?.trim().toLowerCase() === email
+  );
 
-      if (!student) {
-        return null;
-      }
+  const student = students.find(
+    (item) =>
+      registeredParent?.childRollNo?.trim() &&
+      String(item.rollNo).trim() === registeredParent.childRollNo.trim()
+  );
 
-      return {
+  return student
+    ? [{
         studentId: student.id,
         name: student.name,
         className: student.className,
         section: student.section,
         rollNo: student.rollNo,
-      };
-    })
-    .filter((child): child is NonNullable<typeof child> => child !== null);
-
-  if (linkedChildren.length > 0) {
-    return linkedChildren;
-  }
-
-  // A newly registered parent may identify a child by roll number.
-  const session = getSession();
-
-  if (!session) {
-    return [];
-  }
-
-  let registeredParents: RegisteredParent[] = [];
-
-  try {
-    registeredParents = JSON.parse(
-      localStorage.getItem("registered-parents") || "[]"
-    );
-  } catch {
-    registeredParents = [];
-  }
-
-  const registeredParent = registeredParents.find(
-    (item) =>
-      item.id === session.id ||
-      item.email?.toLowerCase() === session.email.toLowerCase()
-  );
-
-  if (!registeredParent) {
-    return [];
-  }
-
-  const childRollNo = registeredParent.childRollNo?.trim();
-
-  if (childRollNo) {
-    const student = students.find(
-      (item) => String(item.rollNo) === childRollNo
-    );
-
-    if (student) {
-      return [
-        {
-          studentId: student.id,
-          name: student.name,
-          className: student.className,
-          section: student.section,
-          rollNo: student.rollNo,
-        },
-      ];
-    }
-  }
-
-  // Show the entered child details only as registration information.
-  // This does not create an official student record or grant access
-  // to attendance, results, fees, or other school records.
-  return [];
+      }]
+    : [];
 };

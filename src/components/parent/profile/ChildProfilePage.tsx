@@ -63,65 +63,23 @@ export default function ChildProfilePage() {
                 </p>
             </div>
 
-            {/* Child Selector */}
-            <div className="grid grid-cols-1 gap-5 lg:grid-cols-[1fr_280px]">
-                <div className="rounded-2xl border border-gray-200 bg-white p-5">
-                    <div className="flex items-center gap-4">
-                        <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-[#e6f4f2] text-[#01796F]">
-                            <UserRound className="h-7 w-7" />
-                        </div>
-
-                        <div>
-                            <h2 className="text-lg font-semibold text-gray-900">
-                                {selectedChild.name}
-                            </h2>
-                            <p className="mt-1 text-sm text-gray-500">
-                                {className} • Roll No. {selectedChild.rollNo}
-                            </p>
-                        </div>
-                    </div>
-                </div>
-
-                <div className="rounded-2xl border border-gray-200 bg-white p-5">
-                    <label
-                        htmlFor="child"
-                        className="mb-2 block text-sm font-medium text-gray-700"
-                    >
-                        Select Child
-                    </label>
-
-                    <select
-                        id="child"
-                        value={selectedChildId}
-                        onChange={(e) => setSelectedChildId(Number(e.target.value))}
-                        className="w-full rounded-xl border border-gray-300 bg-white px-3 py-2.5 text-sm text-gray-700 outline-none transition focus:border-[#01796F] focus:ring-2 focus:ring-[#01796F]/10"
-                    >
-                        {children.map((child) => (
-                            <option key={child!.id} value={child!.id}>
-                                {child!.name}
-                            </option>
-                        ))}
-                    </select>
-                </div>
-            </div>
-
             {/* Profile Header */}
-            <div className="rounded-2xl border border-gray-200 bg-white p-6">
-                <div className="flex flex-col gap-5 sm:flex-row sm:items-center">
-                    <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-full bg-[#e6f4f2] text-[#01796F]">
-                        <UserRound className="h-10 w-10" />
+            <div className="rounded-2xl border border-gray-200 bg-white p-5 sm:p-6">
+                <div className="flex flex-row items-center gap-3 sm:gap-5">
+                    <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-[#e6f4f2] text-[#01796F] sm:h-20 sm:w-20">
+                        <UserRound className="h-8 w-8 sm:h-10 sm:w-10" />
                     </div>
 
-                    <div className="flex-1">
-                        <div className="flex flex-wrap items-center gap-3">
-                            <h2 className="text-xl font-bold text-gray-900">
+                    <div className="min-w-0 flex-1">
+                        <div className="flex flex-wrap items-center gap-2">
+                            <h2 className="text-base font-bold text-gray-900 sm:text-xl">
                                 {selectedChild.name}
                             </h2>
 
                             <span
-                                className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium ${selectedChild.status === "Active"
-                                    ? "bg-green-50 text-green-700"
-                                    : "bg-gray-100 text-gray-600"
+                                className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-medium ${selectedChild.status === "Active"
+                                        ? "bg-green-50 text-green-700"
+                                        : "bg-gray-100 text-gray-600"
                                     }`}
                             >
                                 <CheckCircle2 className="h-3.5 w-3.5" />
@@ -129,11 +87,35 @@ export default function ChildProfilePage() {
                             </span>
                         </div>
 
-                        <p className="mt-2 text-sm text-gray-500">
+                        <p className="mt-2 text-xs text-gray-500 sm:text-sm">
                             Student ID: {selectedChild.id} • {className} • Roll No.{" "}
                             {selectedChild.rollNo}
                         </p>
                     </div>
+
+                    {children.length > 1 && (
+                        <div className="w-28 shrink-0 sm:w-48">
+                            <label
+                                htmlFor="child"
+                                className="mb-1.5 block text-xs font-medium text-gray-700 sm:text-sm"
+                            >
+                                Select Child
+                            </label>
+
+                            <select
+                                id="child"
+                                value={selectedChildId}
+                                onChange={(e) => setSelectedChildId(Number(e.target.value))}
+                                className="w-full rounded-lg border border-gray-200 bg-white px-2 py-2 text-xs text-gray-700 outline-none transition focus:border-[#01796F] focus:ring-2 focus:ring-[#01796F]/10 sm:px-4 sm:py-2.5 sm:text-sm"
+                            >
+                                {children.map((child) => (
+                                    <option key={child!.id} value={child!.id}>
+                                        {child!.name}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+                    )}
                 </div>
             </div>
 
