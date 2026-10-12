@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState } from "react";
@@ -6,7 +7,34 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 
-import { getUsers } from "@/lib/users";
+import { apiRequest } from "@/lib/api";
+import { saveAuthSession, type AuthSession } from "@/lib/auth";
+import type { UserRole } from "@/types/user";
+
+type LoginResponse = {
+  accessToken: string;
+  user: {
+    id: number;
+    name: string;
+    email: string;
+    username: string;
+    role: string;
+  };
+};
+
+const roleMap: Record<string, UserRole> = {
+  ADMIN: "Admin",
+  TEACHER: "Teacher",
+  STUDENT: "Student",
+  PARENT: "Parent",
+};
+
+const routes: Record<UserRole, string> = {
+  Admin: "/admin",
+  Teacher: "/teacher",
+  Student: "/student",
+  Parent: "/parent",
+};
 
 export default function LoginForm() {
   const router = useRouter();
@@ -18,65 +46,55 @@ export default function LoginForm() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  
-const handleLogin = (e: React.FormEvent<HTMLFormElement>) => {
-  e.preventDefault();
-  setError("");
+  const handleLogin = async (
+    e: React.FormEvent<HTMLFormElement>
+  ) => {
+    e.preventDefault();
+    setError("");
+    setLoading(true);
 
-  const normalizedIdentifier = identifier.trim().toLowerCase();
+    try {
+      const result = await apiRequest<LoginResponse>("/auth/login", {
+        method: "POST",
+        body: JSON.stringify({
+          // The backend accepts either username or email in this field.
+          username: identifier.trim(),
+          password,
+        }),
+      });
 
-  const user = getUsers().find(
-    (item) =>
-      (item.email.trim().toLowerCase() === normalizedIdentifier ||
-        item.username.trim().toLowerCase() === normalizedIdentifier) &&
-      item.password === password
-  );
+      const role = roleMap[result.user.role.toUpperCase()];
 
-  if (!user) {
-    setError("Invalid email/username or password.");
-    return;
-  }
+      if (!role) {
+        throw new Error("Your account has an unsupported role.");
+      }
 
-  if (user.status !== "Active") {
-    setError(
-      "Your account is inactive. Please contact the school administration."
-    );
-    return;
-  }
+      const session: AuthSession = {
+        id: result.user.id,
+        name: result.user.name,
+        email: result.user.email,
+        username: result.user.username,
+        role,
+        loginTime: new Date().toISOString(),
+      };
 
-  const session = {
-    id: user.id,
-    name: user.name,
-    email: user.email,
-    username: user.username,
-    role: user.role,
-    loginTime: new Date().toISOString(),
+      saveAuthSession(session, result.accessToken, rememberMe);
+
+      router.replace(routes[role]);
+    } catch (err) {
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Unable to sign in. Please try again."
+      );
+    } finally {
+      setLoading(false);
+    }
   };
-
-  localStorage.removeItem("auth-session");
-  sessionStorage.removeItem("auth-session");
-
-  const storage = rememberMe ? localStorage : sessionStorage;
-  storage.setItem("auth-session", JSON.stringify(session));
-
-  localStorage.setItem("isLoggedIn", "true");
-
-  const routes = {
-    Admin: "/admin",
-    Teacher: "/teacher",
-    Student: "/student",
-    Parent: "/parent",
-  } as const;
-
-  router.replace(routes[user.role]);
-};
-
-
 
   return (
     <main className="flex min-h-screen items-center justify-center bg-[#f6f8f8] px-4 py-8">
       <div className="grid w-full max-w-md justify-center">
-        {/* Logo */}
         <div className="mb-8 text-center">
           <Image
             src="/images/school.jpg"
@@ -91,20 +109,14 @@ const handleLogin = (e: React.FormEvent<HTMLFormElement>) => {
           </h1>
         </div>
 
-        {/* Login Card */}
         <div className="w-full rounded-2xl border border-gray-100 bg-white p-6 shadow-sm sm:p-8">
           <div className="mb-6">
             <h2 className="text-xl font-semibold text-gray-900">
               Welcome
             </h2>
-
-            {/* <p className="mt-1 text-sm text-gray-500">
-              Sign in to your account
-            </p> */}
           </div>
 
           <form onSubmit={handleLogin} className="space-y-5">
-            {/* Email / Username */}
             <div>
               <label
                 htmlFor="identifier"
@@ -116,6 +128,7 @@ const handleLogin = (e: React.FormEvent<HTMLFormElement>) => {
               <input
                 id="identifier"
                 type="text"
+                autoComplete="username"
                 value={identifier}
                 onChange={(e) => setIdentifier(e.target.value)}
                 placeholder="Enter your email or username"
@@ -124,7 +137,6 @@ const handleLogin = (e: React.FormEvent<HTMLFormElement>) => {
               />
             </div>
 
-            {/* Password */}
             <div>
               <label
                 htmlFor="password"
@@ -137,6 +149,7 @@ const handleLogin = (e: React.FormEvent<HTMLFormElement>) => {
                 <input
                   id="password"
                   type={showPassword ? "text" : "password"}
+                  autoComplete="current-password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="Enter your password"
@@ -146,34 +159,23 @@ const handleLogin = (e: React.FormEvent<HTMLFormElement>) => {
 
                 <button
                   type="button"
-                  onClick={() =>
-                    setShowPassword(!showPassword)
-                  }
+                  onClick={() => setShowPassword((value) => !value)}
                   className="absolute right-3 top-1/2 -translate-y-1/2 rounded-lg p-1.5 text-gray-400 hover:text-[#01796f]"
                   aria-label={
-                    showPassword
-                      ? "Hide password"
-                      : "Show password"
+                    showPassword ? "Hide password" : "Show password"
                   }
                 >
-                  {showPassword ? (
-                    <EyeOff size={19} />
-                  ) : (
-                    <Eye size={19} />
-                  )}
+                  {showPassword ? <EyeOff size={19} /> : <Eye size={19} />}
                 </button>
               </div>
             </div>
 
-            {/* Remember Me / Forgot Password */}
             <div className="flex items-center justify-between gap-3">
               <label className="flex cursor-pointer items-center gap-2">
                 <input
                   type="checkbox"
                   checked={rememberMe}
-                  onChange={(e) =>
-                    setRememberMe(e.target.checked)
-                  }
+                  onChange={(e) => setRememberMe(e.target.checked)}
                   className="h-4 w-4 rounded border-gray-300 accent-[#01796f]"
                 />
 
@@ -184,20 +186,21 @@ const handleLogin = (e: React.FormEvent<HTMLFormElement>) => {
 
               <button
                 type="button"
+                onClick={() =>
+                  setError("Password recovery has not been connected yet.")
+                }
                 className="text-sm font-medium text-[#01796f] hover:text-[#015f58]"
               >
                 Forgot password?
               </button>
             </div>
 
-            {/* Error */}
             {error && (
-              <p className="text-sm text-red-500">
+              <p role="alert" className="text-sm text-red-500">
                 {error}
               </p>
             )}
 
-            {/* Login Button */}
             <button
               type="submit"
               disabled={loading}
@@ -206,22 +209,20 @@ const handleLogin = (e: React.FormEvent<HTMLFormElement>) => {
               {loading ? "Signing in..." : "Sign in"}
             </button>
           </form>
+
           <div className="mt-6 border-t border-gray-100 pt-5 text-center">
             <p className="text-sm text-gray-500">
-              Dont't have an account?{" "}
+              Don't have an account?{" "}
               <Link
                 href="/register"
-                className="mt-2 inline-flex text-sm items-center font-medium text-[#01796F] transition hover:text-[#015f58] hover:underline"
+                className="inline-flex items-center text-sm font-medium text-[#01796F] transition hover:text-[#015f58] hover:underline"
               >
                 Register
               </Link>
             </p>
-
           </div>
-
         </div>
       </div>
     </main>
   );
 }
-
