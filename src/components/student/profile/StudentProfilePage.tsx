@@ -258,14 +258,14 @@ export default function StudentProfilePage() {
       )}
 
       {/* Profile Card */}
-      <section className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm sm:p-5">
+      <section className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm sm:p-6">
         <div className="flex flex-row items-center gap-3 sm:gap-5">
           <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-[#01796f]/10 text-[#01796f] sm:h-20 sm:w-20">
             <UserRound size={28} className="sm:hidden" />
             <UserRound size={36} className="hidden sm:block" />
           </div>
 
-          <div className="min-w-0 flex-1">
+          <div className="min-w-0 ">
             <h2 className="truncate text-base font-bold text-gray-900 sm:text-xl">
               {currentStudent.name}
             </h2>
