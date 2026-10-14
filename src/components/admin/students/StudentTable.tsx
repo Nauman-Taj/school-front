@@ -143,8 +143,8 @@ export default function StudentTable() {
       {/* Page heading */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-800">Students</h1>
-          <p className="mt-1 text-sm text-gray-500">
+          <h1 className="text-2xl font-bold text-gray-900 sm:text-3xl">Students</h1>
+          <p className="mt-1 text-sm text-gray-500 sm:text-base">
             Manage student records and their information.
           </p>
         </div>
@@ -241,7 +241,7 @@ export default function StudentTable() {
         <div className="hidden overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm lg:block">
           <div className="overflow-x-auto">
             <table className="w-full min-w-[1050px] text-left text-sm">
-              <thead className="bg-[#e6f4f2] text-gray-700">
+              <thead className="bg-gray-50 text-gray-700">
                 <tr>
                   <th className="px-5 py-4 font-semibold">Student</th>
                   <th className="px-5 py-4 font-semibold">Roll No.</th>
