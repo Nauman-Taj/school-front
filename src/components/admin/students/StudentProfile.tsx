@@ -7,7 +7,7 @@ import {
   Pencil,
 } from "lucide-react";
 
-import { Student } from "@/types/student";
+import type { Student } from "@/types/student";
 
 type StudentProfileProps = {
   student: Student;
@@ -77,6 +77,10 @@ export default function StudentProfile({
               label="Class"
               value={student.className}
             />
+
+            <InfoRow
+              label="Section"
+              value={student.section} />
 
             <InfoRow
               label="Status"
@@ -166,11 +170,10 @@ function InfoRow({
 
       {status ? (
         <span
-          className={`rounded-full px-2.5 py-1 text-xs font-medium ${
-            value === "Active"
+          className={`rounded-full px-2.5 py-1 text-xs font-medium ${value === "Active"
               ? "bg-green-50 text-green-700"
               : "bg-gray-100 text-gray-600"
-          }`}
+            }`}
         >
           {value}
         </span>

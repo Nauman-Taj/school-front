@@ -7,7 +7,7 @@ import {
   Trash2,
 } from "lucide-react";
 
-import { Student } from "@/types/student";
+import type { Student } from "@/types/student";
 
 type StudentCardProps = {
   student: Student;
@@ -101,8 +101,9 @@ export default function StudentCard({
         <button
           type="button"
           onClick={() => onDelete(student.id, student.name)}
-          className="flex items-center justify-center rounded-lg  border-gray-200 px-3 py-2.5 text-gray-500 transition hover:border-red-200 hover:bg-red-50 hover:text-red-600"
-          aria-label={`Delete ${student.name}`}
+          disabled={student.status === "Inactive"}
+          className="flex items-center justify-center rounded-full border border-gray-200 px-3 py-2.5 text-gray-500 transition hover:border-red-200 hover:bg-red-50 hover:text-red-600 disabled:cursor-not-allowed disabled:opacity-40"
+          aria-label={`Mark ${student.name} inactive`}
         >
           <Trash2 size={17} strokeWidth={1.8} />
         </button>

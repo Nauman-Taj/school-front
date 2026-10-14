@@ -3,23 +3,34 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 
-import { Student } from "@/types/student";
+import type { Student } from "@/types/student";
 import { parents } from "@/data/parents";
 import { parentChildren } from "@/data/parentChildren";
+import { apiRequest } from "@/lib/api";
+import { getAuthToken } from "@/lib/auth";
 
 type StudentFormProps = {
   student?: Student;
 };
 
-export default function StudentForm({
-  student,
-}: StudentFormProps) {
+type ApiStudent = {
+  id: number;
+  name: string;
+  email: string | null;
+  className: string;
+  section: string;
+  rollNo: string;
+  parentName: string | null;
+  phone: string | null;
+  status: "ACTIVE" | "INACTIVE";
+};
+
+export default function StudentForm({ student }: StudentFormProps) {
   const router = useRouter();
 
-  // Find the student's parent through the parentChildren relationship
   const existingParentId = student
     ? parentChildren.find(
-        (relation) => relation.studentId === student.id
+        (relation) => relation.studentId === student.id,
       )?.parentId
     : undefined;
 
@@ -34,64 +45,85 @@ export default function StudentForm({
     status: student?.status ?? "Active",
   });
 
-  const isEditMode = Boolean(student);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  const isEditMode = Boolean(student);
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+    event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
   ) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
+    const { name, value } = event.target;
+
+    setFormData((current) => ({
+      ...current,
+      [name]: value,
+    }));
   };
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  const handleSubmit = async (
+    event: React.FormEvent<HTMLFormElement>,
+  ) => {
+    event.preventDefault();
+    setError("");
 
-    setLoading(true);
+    const token = getAuthToken();
 
-    const selectedParent = parents.find(
-      (parent) => parent.id === Number(formData.parentId)
-    );
-
-    if (!selectedParent) {
-      setLoading(false);
+    if (!token) {
+      setError("Your session has expired. Please log in again.");
       return;
     }
 
-    const studentData = {
-      id: student?.id,
-      name: formData.name,
-      email: formData.email,
-      className: formData.className,
-      section: formData.section,
-      rollNo: formData.rollNo,
-      parentName: selectedParent.name,
-      phone: formData.phone,
-      status: formData.status as "Active" | "Inactive",
-    };
+    const selectedParent = parents.find(
+      (parent) => parent.id === Number(formData.parentId),
+    );
 
-    console.log("Student Data:", studentData);
+    if (!selectedParent) {
+      setError("Please select a parent or guardian.");
+      return;
+    }
 
-    // Parent-child relationship ready for backend
-    const parentChildData = {
-      id: isEditMode
-        ? parentChildren.find(
-            (relation) => relation.studentId === student?.id
-          )?.id
-        : undefined,
-      parentId: Number(formData.parentId),
-      studentId: student?.id,
-    };
+    setLoading(true);
 
-    console.log("Parent-Child Relationship:", parentChildData);
+    try {
+      const payload = {
+        name: formData.name.trim(),
+        // The DTO permits null, but an empty string fails IsEmail().
+        email: formData.email.trim() || null,
+        className: formData.className,
+        section: formData.section,
+        rollNo: formData.rollNo.trim(),
+        parentName: selectedParent.name,
+        phone: formData.phone.trim() || null,
+        status:
+          formData.status === "Active" ? "ACTIVE" : "INACTIVE",
+      };
 
-    // Fake submit for frontend demonstration
-    setTimeout(() => {
-      setLoading(false);
+      if (isEditMode && student) {
+        await apiRequest<ApiStudent>(`/students/${student.id}`, {
+          method: "PATCH",
+          token,
+          body: JSON.stringify(payload),
+        });
+      } else {
+        await apiRequest<ApiStudent>("/students", {
+          method: "POST",
+          token,
+          body: JSON.stringify(payload),
+        });
+      }
+
       router.push("/admin/students");
-    }, 700);
+      router.refresh();
+    } catch (err) {
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Unable to save the student. Please try again.",
+      );
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -99,8 +131,16 @@ export default function StudentForm({
       onSubmit={handleSubmit}
       className="max-w-5xl rounded-2xl border border-gray-100 bg-white p-6 shadow-sm sm:p-8"
     >
+      {error && (
+        <div
+          role="alert"
+          className="mb-5 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700"
+        >
+          {error}
+        </div>
+      )}
+
       <div className="grid gap-5 sm:grid-cols-2">
-        {/* Student Name */}
         <div>
           <label
             htmlFor="name"
@@ -108,7 +148,6 @@ export default function StudentForm({
           >
             Student Name
           </label>
-
           <input
             id="name"
             name="name"
@@ -116,12 +155,13 @@ export default function StudentForm({
             value={formData.name}
             onChange={handleChange}
             placeholder="Enter student name"
+            minLength={2}
+            maxLength={100}
             required
             className="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm text-gray-900 outline-none transition placeholder:text-gray-400 focus:border-[#01796f] focus:ring-2 focus:ring-[#01796f]/10"
           />
         </div>
 
-        {/* Email */}
         <div>
           <label
             htmlFor="email"
@@ -129,20 +169,18 @@ export default function StudentForm({
           >
             Email
           </label>
-
           <input
             id="email"
             name="email"
             type="email"
             value={formData.email}
             onChange={handleChange}
-            placeholder="Enter email address"
-            required
+            placeholder="Enter email address (optional)"
+            maxLength={255}
             className="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm text-gray-900 outline-none transition placeholder:text-gray-400 focus:border-[#01796f] focus:ring-2 focus:ring-[#01796f]/10"
           />
         </div>
 
-        {/* Class */}
         <div>
           <label
             htmlFor="className"
@@ -150,7 +188,6 @@ export default function StudentForm({
           >
             Class
           </label>
-
           <select
             id="className"
             name="className"
@@ -169,7 +206,6 @@ export default function StudentForm({
           </select>
         </div>
 
-        {/* Section */}
         <div>
           <label
             htmlFor="section"
@@ -177,7 +213,6 @@ export default function StudentForm({
           >
             Section
           </label>
-
           <select
             id="section"
             name="section"
@@ -192,7 +227,6 @@ export default function StudentForm({
           </select>
         </div>
 
-        {/* Roll Number */}
         <div>
           <label
             htmlFor="rollNo"
@@ -200,7 +234,6 @@ export default function StudentForm({
           >
             Roll Number
           </label>
-
           <input
             id="rollNo"
             name="rollNo"
@@ -208,12 +241,12 @@ export default function StudentForm({
             value={formData.rollNo}
             onChange={handleChange}
             placeholder="Enter roll number"
+            maxLength={30}
             required
             className="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm text-gray-900 outline-none transition placeholder:text-gray-400 focus:border-[#01796f] focus:ring-2 focus:ring-[#01796f]/10"
           />
         </div>
 
-        {/* Parent */}
         <div>
           <label
             htmlFor="parentId"
@@ -221,7 +254,6 @@ export default function StudentForm({
           >
             Parent
           </label>
-
           <select
             id="parentId"
             name="parentId"
@@ -231,7 +263,6 @@ export default function StudentForm({
             className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-900 outline-none transition focus:border-[#01796f] focus:ring-2 focus:ring-[#01796f]/10"
           >
             <option value="">Select parent</option>
-
             {parents.map((parent) => (
               <option key={parent.id} value={parent.id}>
                 {parent.name}
@@ -240,7 +271,6 @@ export default function StudentForm({
           </select>
         </div>
 
-        {/* Phone */}
         <div>
           <label
             htmlFor="phone"
@@ -248,20 +278,18 @@ export default function StudentForm({
           >
             Phone
           </label>
-
           <input
             id="phone"
             name="phone"
             type="tel"
             value={formData.phone}
             onChange={handleChange}
-            placeholder="Enter phone number"
-            required
+            placeholder="Enter phone number (optional)"
+            maxLength={30}
             className="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm text-gray-900 outline-none transition placeholder:text-gray-400 focus:border-[#01796f] focus:ring-2 focus:ring-[#01796f]/10"
           />
         </div>
 
-        {/* Status */}
         <div>
           <label
             htmlFor="status"
@@ -269,7 +297,6 @@ export default function StudentForm({
           >
             Status
           </label>
-
           <select
             id="status"
             name="status"
@@ -284,12 +311,12 @@ export default function StudentForm({
         </div>
       </div>
 
-      {/* Actions */}
       <div className="mt-8 flex flex-col-reverse gap-3 border-t border-gray-100 pt-6 sm:flex-row sm:justify-end">
         <button
           type="button"
           onClick={() => router.push("/admin/students")}
-          className="rounded-full border border-gray-200 px-5 py-2.5 text-sm font-medium text-gray-700 transition hover:bg-gray-50"
+          disabled={loading}
+          className="rounded-full border border-gray-200 px-5 py-2.5 text-sm font-medium text-gray-700 transition hover:bg-gray-50 disabled:opacity-60"
         >
           Cancel
         </button>
@@ -297,7 +324,7 @@ export default function StudentForm({
         <button
           type="submit"
           disabled={loading}
-          className="rounded-full bg-[#01796f] px-5 py-2.5 text-sm font-medium text-white transition hover:bg-[#01665d] disabled:cursor-not-allowed disabled:opacity-70"
+          className="rounded-full bg-[#01796f] px-5 py-2.5 text-sm font-medium text-white transition hover:bg-[#015f58] disabled:cursor-not-allowed disabled:opacity-70"
         >
           {loading
             ? "Saving..."
