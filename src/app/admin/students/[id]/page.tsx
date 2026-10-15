@@ -1,7 +1,4 @@
-import { notFound } from "next/navigation";
-
-import StudentProfile from "@/components/admin/students/StudentProfile";
-import { students } from "@/data/students";
+import StudentRecordLoader from "@/components/admin/students/StudentRecordLoader";
 
 type StudentPageProps = {
   params: Promise<{
@@ -14,13 +11,5 @@ export default async function StudentPage({
 }: StudentPageProps) {
   const { id } = await params;
 
-  const student = students.find(
-    (student) => student.id === Number(id)
-  );
-
-  if (!student) {
-    notFound();
-  }
-
-  return <StudentProfile student={student} />;
+  return <StudentRecordLoader id={id} mode="view" />;
 }

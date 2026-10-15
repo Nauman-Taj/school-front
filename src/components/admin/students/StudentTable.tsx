@@ -5,6 +5,7 @@ import Link from "next/link";
 import {
   Pencil,
   Search,
+  Eye,
   UserPlus,
   Trash2,
   RefreshCw,
@@ -309,7 +310,7 @@ export default function StudentTable() {
                           aria-label={`View ${student.name}`}
                           className="rounded-full p-2 text-gray-500 transition hover:bg-[#e6f4f2] hover:text-[#01796F]"
                         >
-                          <Search size={17} />
+                          <Eye size={17} />
                         </Link>
 
                         <Link
