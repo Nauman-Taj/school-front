@@ -29,9 +29,14 @@ export default function StudentForm({ student }: StudentFormProps) {
   const router = useRouter();
 
   const existingParentId = student
-    ? parentChildren.find(
+    ? (
+      parentChildren.find(
         (relation) => relation.studentId === student.id,
-      )?.parentId
+      )?.parentId ??
+      parents.find(
+        (parent) => parent.name === student.parentName,
+      )?.id
+    )
     : undefined;
 
   const [formData, setFormData] = useState({
