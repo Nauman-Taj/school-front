@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState } from "react";
@@ -7,11 +8,43 @@ import {
   ChevronRight,
 } from "lucide-react";
 
-import { attendance } from "@/data/attendance";
+import type { AttendanceRecord } from "@/types/attendance";
 
-export default function AttendanceCalendar() {
-  const [date, setDate] = useState(new Date(2026, 8, 1));
-  const [selectedDate, setSelectedDate] = useState("08 Sep 2026");
+type AttendanceCalendarProps = {
+  records: AttendanceRecord[];
+};
+
+const monthNames = [
+  "Jan",
+  "Feb",
+  "Mar",
+  "Apr",
+  "May",
+  "Jun",
+  "Jul",
+  "Aug",
+  "Sep",
+  "Oct",
+  "Nov",
+  "Dec",
+];
+
+function formatDate(day: number, month: number, year: number) {
+  return `${String(day).padStart(2, "0")} ${monthNames[month]} ${year}`;
+}
+
+export default function AttendanceCalendar({
+  records,
+}: AttendanceCalendarProps) {
+  const [date, setDate] = useState(() => new Date());
+  const [selectedDate, setSelectedDate] = useState(() => {
+    const today = new Date();
+    return formatDate(
+      today.getDate(),
+      today.getMonth(),
+      today.getFullYear(),
+    );
+  });
 
   const year = date.getFullYear();
   const month = date.getMonth();
@@ -23,37 +56,34 @@ export default function AttendanceCalendar() {
     month: "long",
   });
 
-  const formatDate = (day: number) => {
-    const months = [
-      "Jan",
-      "Feb",
-      "Mar",
-      "Apr",
-      "May",
-      "Jun",
-      "Jul",
-      "Aug",
-      "Sep",
-      "Oct",
-      "Nov",
-      "Dec",
-    ];
-
-    return `${String(day).padStart(2, "0")} ${months[month]} ${year}`;
-  };
-
   const getRecords = (day: number) =>
-    attendance.filter(
-      (record) => record.date === formatDate(day)
+    records.filter(
+      (record) => record.date === formatDate(day, month, year),
     );
 
-  const selectedRecords = attendance.filter(
-    (record) => record.date === selectedDate
+  const selectedRecords = records.filter(
+    (record) => record.date === selectedDate,
   );
 
   const changeMonth = (amount: number) => {
-    setDate(new Date(year, month + amount, 1));
-    setSelectedDate("");
+    const nextDate = new Date(year, month + amount, 1);
+    setDate(nextDate);
+
+    // Preserve the selected day when possible; otherwise select day 1.
+    const selectedParts = selectedDate.match(
+      /^(\d{2}) ([A-Za-z]{3}) (\d{4})$/,
+    );
+
+    if (selectedParts) {
+      const selectedMonth = monthNames.indexOf(selectedParts[2]);
+      const selectedYear = Number(selectedParts[3]);
+
+      if (selectedMonth === month && selectedYear === year) {
+        setSelectedDate(
+          formatDate(1, nextDate.getMonth(), nextDate.getFullYear()),
+        );
+      }
+    }
   };
 
   return (
@@ -76,18 +106,20 @@ export default function AttendanceCalendar() {
           <button
             type="button"
             onClick={() => changeMonth(-1)}
+            aria-label="Previous month"
             className="rounded-lg border border-gray-200 p-2 hover:bg-gray-50"
           >
             <ChevronLeft size={18} />
           </button>
 
-          <span className="min-w-[130px] text-center text-sm font-semibold">
+          <span className="min-w-[150px] text-center text-sm font-semibold">
             {monthName} {year}
           </span>
 
           <button
             type="button"
             onClick={() => changeMonth(1)}
+            aria-label="Next month"
             className="rounded-lg border border-gray-200 p-2 hover:bg-gray-50"
           >
             <ChevronRight size={18} />
@@ -97,7 +129,6 @@ export default function AttendanceCalendar() {
 
       {/* Calendar */}
       <div className="mt-6 overflow-hidden rounded-xl border border-gray-100">
-        {/* Weekdays */}
         <div className="grid grid-cols-7 bg-gray-50">
           {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map(
             (day) => (
@@ -107,39 +138,38 @@ export default function AttendanceCalendar() {
               >
                 {day}
               </div>
-            )
+            ),
           )}
         </div>
 
-        {/* Days */}
         <div className="grid grid-cols-7">
-          {Array.from({ length: firstDay }).map((_, i) => (
+          {Array.from({ length: firstDay }).map((_, index) => (
             <div
-              key={`empty-${i}`}
-              className="min-h-[85px] border-t border-r border-gray-100 bg-gray-50/30"
+              key={`empty-${index}`}
+              className="min-h-[85px] border-r border-t border-gray-100 bg-gray-50/30"
             />
           ))}
 
-          {Array.from({ length: daysInMonth }, (_, i) => {
-            const day = i + 1;
-            const records = getRecords(day);
-            const dateString = formatDate(day);
+          {Array.from({ length: daysInMonth }, (_, index) => {
+            const day = index + 1;
+            const dayRecords = getRecords(day);
+            const dateString = formatDate(day, month, year);
             const selected = dateString === selectedDate;
 
-            const present = records.filter(
-              (record) => record.status === "Present"
+            const present = dayRecords.filter(
+              (record) => record.status === "Present",
             ).length;
 
-            const late = records.filter(
-              (record) => record.status === "Late"
+            const late = dayRecords.filter(
+              (record) => record.status === "Late",
             ).length;
 
-            const absent = records.filter(
-              (record) => record.status === "Absent"
+            const absent = dayRecords.filter(
+              (record) => record.status === "Absent",
             ).length;
 
-            const leave = records.filter(
-              (record) => record.status === "Leave"
+            const leave = dayRecords.filter(
+              (record) => record.status === "Leave",
             ).length;
 
             return (
@@ -147,13 +177,11 @@ export default function AttendanceCalendar() {
                 type="button"
                 key={day}
                 onClick={() => setSelectedDate(dateString)}
-                className={`relative min-h-[85px] border-t border-r border-gray-100 p-2 text-left transition ${
-                  selected
-                    ? "bg-[#e6f4f2]"
-                    : "hover:bg-gray-50"
+                aria-pressed={selected}
+                className={`relative min-h-[85px] border-r border-t border-gray-100 p-2 text-left transition ${
+                  selected ? "bg-[#e6f4f2]" : "hover:bg-gray-50"
                 }`}
               >
-                {/* Date */}
                 <span
                   className={`flex h-7 w-7 items-center justify-center rounded-full text-sm ${
                     selected
@@ -164,31 +192,30 @@ export default function AttendanceCalendar() {
                   {day}
                 </span>
 
-                {/* Attendance Indicators */}
-                {records.length > 0 && (
+                {dayRecords.length > 0 && (
                   <div className="absolute bottom-2 left-2 flex flex-wrap items-center gap-x-2 gap-y-1 text-[10px]">
                     {present > 0 && (
-                      <p className="text-green-600">
+                      <span className="text-green-600">
                         ● {present}
-                      </p>
+                      </span>
                     )}
 
                     {late > 0 && (
-                      <p className="text-yellow-600">
+                      <span className="text-yellow-600">
                         ● {late}
-                      </p>
+                      </span>
                     )}
 
                     {absent > 0 && (
-                      <p className="text-red-600">
+                      <span className="text-red-600">
                         ● {absent}
-                      </p>
+                      </span>
                     )}
 
                     {leave > 0 && (
-                      <p className="text-blue-600">
+                      <span className="text-blue-600">
                         ● {leave}
-                      </p>
+                      </span>
                     )}
                   </div>
                 )}
@@ -200,7 +227,7 @@ export default function AttendanceCalendar() {
 
       {/* Selected Date */}
       <div className="mt-5">
-        <div className="mb-3 flex items-center justify-between">
+        <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
           <h3 className="font-semibold text-gray-900">
             {selectedDate || "Select a date"}
           </h3>
@@ -216,23 +243,23 @@ export default function AttendanceCalendar() {
           <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
             {selectedRecords.map((record) => (
               <div
-                key={record.id}
-                className="flex items-center justify-between rounded-xl border border-gray-100 p-3"
+                key={`${record.role}-${record.id}`}
+                className="flex items-center justify-between gap-3 rounded-xl border border-gray-100 p-3"
               >
-                <div>
-                  <p className="text-sm font-medium text-gray-900">
+                <div className="min-w-0">
+                  <p className="truncate text-sm font-medium text-gray-900">
                     {record.name}
                   </p>
 
                   <p className="text-xs text-gray-500">
                     {record.role === "Student"
-                      ? record.className + "-" + record.section
+                      ? `${record.className}-${record.section}`
                       : record.department}
                   </p>
                 </div>
 
                 <span
-                  className={`rounded-full px-2.5 py-1 text-xs font-medium ${
+                  className={`shrink-0 rounded-full px-2.5 py-1 text-xs font-medium ${
                     record.status === "Present"
                       ? "bg-green-50 text-green-700"
                       : record.status === "Late"

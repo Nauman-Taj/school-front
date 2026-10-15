@@ -1,7 +1,4 @@
-import { notFound } from "next/navigation";
-
-import { fees } from "@/data/fees";
-import FeeProfile from "@/components/admin/fees/FeeProfile";
+import FeeDetailsLoader from "@/components/admin/fees/FeeDetailsLoader";
 
 type FeeDetailsPageProps = {
   params: Promise<{
@@ -14,11 +11,5 @@ export default async function FeeDetailsPage({
 }: FeeDetailsPageProps) {
   const { id } = await params;
 
-  const fee = fees.find((item) => item.id === id);
-
-  if (!fee) {
-    notFound();
-  }
-
-  return <FeeProfile fee={fee} />;
+  return <FeeDetailsLoader id={id} />;
 }

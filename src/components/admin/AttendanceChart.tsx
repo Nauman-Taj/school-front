@@ -1,6 +1,6 @@
+
 "use client";
 
-import { attendance } from "@/data/attendance";
 import {
   Line,
   LineChart,
@@ -11,41 +11,67 @@ import {
   YAxis,
 } from "recharts";
 
-const attendanceChartData = [
-  ...new Set(
-    attendance
-      .filter((record) => record.role === "Student")
-      .map((record) => record.date)
-  ),
-]
-  .sort()
-  .map((date) => {
-    const records = attendance.filter(
-      (record) =>
-        record.role === "Student" &&
-        record.date === date
-    );
+import type { AttendanceRecord } from "@/types/attendance";
 
-    const presentOrLate = records.filter(
-      (record) =>
-        record.status === "Present" ||
-        record.status === "Late"
-    ).length;
+type AttendanceChartProps = {
+  records: AttendanceRecord[];
+};
 
-    const percentage =
-      records.length > 0
-        ? Number(
-            ((presentOrLate / records.length) * 100).toFixed(1)
-          )
-        : 0;
+export default function AttendanceChart({
+  records,
+}: AttendanceChartProps) {
+  const studentRecords = records.filter(
+    (record) => record.role === "Student"
+  );
 
-    return {
-      date,
-      attendance: percentage,
-    };
+  const groupedRecords = new Map<
+    string,
+    AttendanceRecord[]
+  >();
+
+  studentRecords.forEach((record) => {
+    const date = record.date;
+
+    const existing = groupedRecords.get(date) ?? [];
+    existing.push(record);
+    groupedRecords.set(date, existing);
   });
 
-export default function AttendanceChart() {
+  const attendanceChartData = Array.from(groupedRecords.entries())
+    .sort(([dateA], [dateB]) => {
+      const parseDate = (value: string) => {
+        const [day, month, year] = value.split(" ");
+        const monthIndex = [
+          "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+          "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
+        ].indexOf(month);
+
+        return new Date(
+          Number(year),
+          monthIndex,
+          Number(day)
+        ).getTime();
+      };
+
+      return parseDate(dateA) - parseDate(dateB);
+    })
+    .map(([date, dayRecords]) => {
+      const presentOrLate = dayRecords.filter(
+        (record) =>
+          record.status === "Present" || record.status === "Late"
+      ).length;
+
+      return {
+        date,
+        attendance:
+          dayRecords.length > 0
+            ? Number(
+                ((presentOrLate / dayRecords.length) * 100).toFixed(1)
+              )
+            : 0,
+      };
+    });
+
   return (
     <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
       <div className="mb-6">
@@ -73,14 +99,14 @@ export default function AttendanceChart() {
             />
 
             <YAxis
-              domain={[60, 100]}
+              domain={[0, 100]}
               tickFormatter={(value) => `${value}%`}
               axisLine={false}
               tickLine={false}
             />
 
             <Tooltip
-              formatter={(value) => `${value}%`}
+              formatter={(value) => [`${value}%`, "Attendance"]}
             />
 
             <Line

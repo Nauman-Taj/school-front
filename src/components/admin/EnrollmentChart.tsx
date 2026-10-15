@@ -1,6 +1,6 @@
+
 "use client";
 
-import { students } from "@/data/students";
 import {
   Bar,
   BarChart,
@@ -11,14 +11,22 @@ import {
   YAxis,
 } from "recharts";
 
-const enrollmentData = [
-  {
-    month: "Students",
-    students: students.length,
-  },
-];
+import type { ApiStudent } from "@/lib/attendance-api";
 
-export default function EnrollmentChart() {
+type EnrollmentChartProps = {
+  students: ApiStudent[];
+};
+
+export default function EnrollmentChart({
+  students,
+}: EnrollmentChartProps) {
+  const enrollmentData = [
+    {
+      month: "Students",
+      students: students.length,
+    },
+  ];
+
   return (
     <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
       <div className="mb-6">
@@ -35,20 +43,9 @@ export default function EnrollmentChart() {
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={enrollmentData}>
             <CartesianGrid strokeDasharray="3 3" vertical={false} />
-
-            <XAxis
-              dataKey="month"
-              axisLine={false}
-              tickLine={false}
-            />
-
-            <YAxis
-              axisLine={false}
-              tickLine={false}
-            />
-
+            <XAxis dataKey="month" axisLine={false} tickLine={false} />
+            <YAxis axisLine={false} tickLine={false} />
             <Tooltip />
-
             <Bar
               dataKey="students"
               fill="#01796f"
