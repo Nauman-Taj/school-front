@@ -9,6 +9,9 @@ import {
   Wallet,
 } from "lucide-react";
 
+import { apiRequest } from "@/lib/api";
+import { getAuthToken } from "@/lib/auth";
+
 import StatCard from "@/components/admin/StatCard";
 import EnrollmentChart from "@/components/admin/EnrollmentChart";
 import AttendanceChart from "@/components/admin/AttendanceChart";
@@ -22,6 +25,7 @@ import {
   type ApiStudent,
   type ApiTeacher,
 } from "@/lib/attendance-api";
+
 import type { AttendanceRecord } from "@/types/attendance";
 
 type DashboardData = {
@@ -30,36 +34,77 @@ type DashboardData = {
   attendance: AttendanceRecord[];
 };
 
+type FeeSummary = {
+  totalFees: number;
+  collected: number;
+  pending: number;
+  overdue: number;
+  collectionRate: number;
+  invoiceCount: number;
+};
+
 export default function AdminDashboard() {
   const [data, setData] = useState<DashboardData>({
     students: [],
     teachers: [],
     attendance: [],
   });
+
+  const [feeSummary, setFeeSummary] = useState<FeeSummary | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [feeError, setFeeError] = useState("");
 
   const loadDashboard = useCallback(async () => {
     setLoading(true);
     setError("");
+    setFeeError("");
 
-    try {
-      const [students, teachers, attendance] = await Promise.all([
-        fetchStudents(),
-        fetchTeachers(),
-        fetchAttendance(),
-      ]);
+    const coreRequest = Promise.all([
+      fetchStudents(),
+      fetchTeachers(),
+      fetchAttendance(),
+    ]);
+
+    const feeRequest = (async () => {
+      const token = getAuthToken();
+
+      if (!token) {
+        throw new Error("Authentication required to load fee summary.");
+      }
+
+      return apiRequest<FeeSummary>("/fees/summary", { token });
+    })();
+
+    const [coreResult, feeResult] = await Promise.allSettled([
+      coreRequest,
+      feeRequest,
+    ]);
+
+    if (coreResult.status === "fulfilled") {
+      const [students, teachers, attendance] = coreResult.value;
 
       setData({ students, teachers, attendance });
-    } catch (err) {
+    } else {
       setError(
-        err instanceof Error
-          ? err.message
-          : "Unable to load dashboard data."
+        coreResult.reason instanceof Error
+          ? coreResult.reason.message
+          : "Unable to load students, teachers, and attendance."
       );
-    } finally {
-      setLoading(false);
     }
+
+    if (feeResult.status === "fulfilled") {
+      setFeeSummary(feeResult.value);
+    } else {
+      setFeeSummary(null);
+      setFeeError(
+        feeResult.reason instanceof Error
+          ? feeResult.reason.message
+          : "Unable to load fee summary."
+      );
+    }
+
+    setLoading(false);
   }, []);
 
   useEffect(() => {
@@ -68,6 +113,10 @@ export default function AdminDashboard() {
 
   const activeStudents = data.students.filter(
     (student) => student.status.toUpperCase() === "ACTIVE"
+  ).length;
+
+  const activeTeachers = data.teachers.filter(
+    (teacher) => teacher.status.toUpperCase() === "ACTIVE"
   ).length;
 
   const studentAttendance = data.attendance.filter(
@@ -97,9 +146,7 @@ export default function AdminDashboard() {
     {
       title: "Total Teachers",
       value: data.teachers.length.toLocaleString(),
-      change: data.teachers.filter(
-        (teacher) => teacher.status.toUpperCase() === "ACTIVE"
-      ).length.toLocaleString(),
+      change: activeTeachers.toLocaleString(),
       description: "active teachers",
       icon: GraduationCap,
     },
@@ -112,9 +159,15 @@ export default function AdminDashboard() {
     },
     {
       title: "Fee Collection",
-      value: "—",
-      change: "—",
-      description: "Fees API not connected",
+      value: feeSummary ? `${feeSummary.collectionRate}%` : "—",
+      change: feeSummary
+        ? `Rs. ${feeSummary.collected.toLocaleString()}`
+        : "—",
+      description: feeSummary
+        ? `collected of Rs. ${feeSummary.totalFees.toLocaleString()}`
+        : feeError
+          ? "Unable to load fee summary"
+          : "Loading fee summary",
       icon: Wallet,
     },
   ];
@@ -148,6 +201,7 @@ export default function AdminDashboard() {
           className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700"
         >
           <p>{error}</p>
+
           <button
             type="button"
             onClick={() => void loadDashboard()}
@@ -158,8 +212,25 @@ export default function AdminDashboard() {
         </div>
       )}
 
+      {feeError && (
+        <div
+          role="alert"
+          className="rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800"
+        >
+          <p>Fee summary: {feeError}</p>
+
+          <button
+            type="button"
+            onClick={() => void loadDashboard()}
+            className="mt-2 font-semibold underline"
+          >
+            Retry dashboard requests
+          </button>
+        </div>
+      )}
+
       {loading && (
-        <p className="text-sm text-gray-500">
+        <p className="text-sm text-gray-500" role="status">
           Loading dashboard data...
         </p>
       )}
