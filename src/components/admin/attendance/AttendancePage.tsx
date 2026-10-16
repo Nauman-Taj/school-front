@@ -93,6 +93,7 @@ export default function AttendancePage() {
     {
       title: "Attendance Rate",
       value: `${attendanceRate}%`,
+      ispercentage: true,
       description: "Based on loaded records",
       icon: TrendingUp,
     },
@@ -155,7 +156,7 @@ export default function AttendancePage() {
                   </p>
 
                   <h2 className="mt-2 text-2xl font-bold text-gray-900">
-                    {loading ? "—" : stat.value}
+                    {loading ? "0" : stat.value}
                   </h2>
                 </div>
 

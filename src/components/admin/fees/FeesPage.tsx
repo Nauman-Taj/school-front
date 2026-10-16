@@ -176,7 +176,7 @@ export default function FeesPage() {
                   </p>
 
                   <h2 className="mt-2 break-words text-xl font-bold text-gray-900 sm:text-2xl">
-                    {loading ? "Loading..." : stat.value}
+                    {loading ? "0" : stat.value}
                   </h2>
                 </div>
 
