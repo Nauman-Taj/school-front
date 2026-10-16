@@ -1,3 +1,4 @@
+
 "use client";
 
 import Link from "next/link";
@@ -7,6 +8,8 @@ import { useState } from "react";
 
 import { Fee } from "@/types/fee";
 import { students } from "@/data/students";
+import { apiRequest } from "@/lib/api";
+import { getAuthToken } from "@/lib/auth";
 
 type FeeFormProps = {
   fee?: Fee;
@@ -24,57 +27,95 @@ export default function FeeForm({ fee }: FeeFormProps) {
   );
 
   const [amount, setAmount] = useState(
-    fee?.amount ? String(fee.amount) : ""
-  );
-
-  const [paidAmount, setPaidAmount] = useState(
-    fee?.paidAmount !== undefined ? String(fee.paidAmount) : "0"
+    fee ? String(fee.amount) : ""
   );
 
   const [dueDate, setDueDate] = useState(fee?.dueDate || "");
-
-  const [status, setStatus] = useState<Fee["status"]>(
-    fee?.status || "Pending"
-  );
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState("");
 
   const selectedStudent = students.find(
     (student) => student.id === Number(studentId)
   );
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const paidAmount = Number(fee?.paidAmount ?? 0);
+  const amountValue = Number(amount);
+  const remainingAmount = Math.max(amountValue - paidAmount, 0);
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setError("");
 
-    if (!selectedStudent) return;
+    if (!fee && !selectedStudent) {
+      setError("Please select a student.");
+      return;
+    }
 
-    const amountValue = Number(amount);
-    const paidAmountValue = Number(paidAmount);
-    const remainingAmountValue = Math.max(
-      amountValue - paidAmountValue,
-      0
-    );
+    if (!Number.isFinite(amountValue) || amountValue <= 0) {
+      setError("Fee amount must be greater than zero.");
+      return;
+    }
 
-    const feeData: Fee = {
-      id: fee?.id || `F${Date.now()}`,
-      studentId: selectedStudent.id,
-      student: selectedStudent.name,
-      className: selectedStudent.className,
-      section: selectedStudent.section,
+    if (fee && amountValue + 0.000001 < paidAmount) {
+      setError(
+        `Fee amount cannot be less than the amount already paid (Rs. ${paidAmount.toLocaleString()}).`
+      );
+      return;
+    }
+
+    if (!fee && !studentId) {
+      setError("Please select a student.");
+      return;
+    }
+
+    const token = getAuthToken();
+
+    if (!token) {
+      setError("Your session has expired. Please log in again.");
+      return;
+    }
+
+    const payload = {
       feeType,
       amount: amountValue,
-      paidAmount: paidAmountValue,
-      remainingAmount: remainingAmountValue,
       dueDate,
-      status,
+      ...(!fee && selectedStudent
+        ? { studentId: selectedStudent.id }
+        : {}),
     };
 
-    console.log(feeData);
+    setSaving(true);
 
-    router.push("/admin/fees");
+    try {
+      if (fee) {
+        await apiRequest<Fee>(`/fees/${encodeURIComponent(fee.id)}`, {
+          method: "PATCH",
+          token,
+          body: JSON.stringify(payload),
+        });
+      } else {
+        await apiRequest<Fee>("/fees", {
+          method: "POST",
+          token,
+          body: JSON.stringify(payload),
+        });
+      }
+
+      router.push("/admin/fees");
+      router.refresh();
+    } catch (err) {
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Unable to save the fee. Please try again."
+      );
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
     <div className="space-y-5">
-      {/* Back */}
       <Link
         href="/admin/fees"
         className="inline-flex items-center gap-2 text-sm font-medium text-gray-600 hover:text-[#01796F]"
@@ -83,53 +124,67 @@ export default function FeeForm({ fee }: FeeFormProps) {
         Back to Fees
       </Link>
 
-      {/* Header */}
       <div>
         <h1 className="text-2xl font-bold text-gray-900">
           {fee ? "Edit Fee" : "Add Fee"}
         </h1>
       </div>
 
-      {/* Form */}
       <form
         onSubmit={handleSubmit}
         className="max-w-5xl rounded-2xl border border-gray-200 bg-white p-6"
       >
+        {error && (
+          <div
+            role="alert"
+            className="mb-5 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
+          >
+            {error}
+          </div>
+        )}
+
         <div className="grid gap-5 sm:grid-cols-2">
-          {/* Student */}
           <div>
             <label className="mb-2 block text-sm font-medium text-gray-700">
               Student
             </label>
 
-            <select
-              value={studentId}
-              onChange={(e) => setStudentId(e.target.value)}
-              required
-              className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm outline-none transition focus:border-[#01796F] focus:ring-2 focus:ring-[#01796F]/10"
-            >
-              <option value="">Select student</option>
-
-              {students.map((student) => (
-                <option key={student.id} value={student.id}>
-                  {student.name} ({student.className}-{student.section})
-                </option>
-              ))}
-            </select>
+            {fee ? (
+              <input
+                type="text"
+                value={`${fee.student} (${fee.className}-${fee.section})`}
+                readOnly
+                className="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-gray-600 outline-none"
+              />
+            ) : (
+              <select
+                value={studentId}
+                onChange={(e) => setStudentId(e.target.value)}
+                required
+                className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm outline-none transition focus:border-[#01796F] focus:ring-2 focus:ring-[#01796F]/10"
+              >
+                <option value="">Select student</option>
+                {students.map((student) => (
+                  <option key={student.id} value={student.id}>
+                    {student.name} ({student.className}-{student.section})
+                  </option>
+                ))}
+              </select>
+            )}
           </div>
 
-          {/* Class */}
           <div>
             <label className="mb-2 block text-sm font-medium text-gray-700">
               Class
             </label>
-
             <input
               type="text"
               value={
-                selectedStudent
-                  ? `${selectedStudent.className}-${selectedStudent.section}`
-                  : ""
+                fee
+                  ? `${fee.className}-${fee.section}`
+                  : selectedStudent
+                    ? `${selectedStudent.className}-${selectedStudent.section}`
+                    : ""
               }
               readOnly
               placeholder="Select student first"
@@ -137,12 +192,10 @@ export default function FeeForm({ fee }: FeeFormProps) {
             />
           </div>
 
-          {/* Fee Type */}
           <div>
             <label className="mb-2 block text-sm font-medium text-gray-700">
               Fee Type
             </label>
-
             <select
               value={feeType}
               onChange={(e) =>
@@ -151,74 +204,62 @@ export default function FeeForm({ fee }: FeeFormProps) {
               required
               className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm outline-none transition focus:border-[#01796F] focus:ring-2 focus:ring-[#01796F]/10"
             >
+              {!["Tuition Fee", "Admission Fee", "Exam Fee"].includes(feeType) && (
+                <option value={feeType}>{feeType}</option>
+              )}
               <option value="Tuition Fee">Tuition Fee</option>
               <option value="Admission Fee">Admission Fee</option>
               <option value="Exam Fee">Exam Fee</option>
             </select>
           </div>
 
-          {/* Amount */}
           <div>
             <label className="mb-2 block text-sm font-medium text-gray-700">
-              Amount
+              Amount (Rs.)
             </label>
-
             <input
               type="number"
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
               placeholder="Enter amount"
-              min="0"
+              min={fee ? paidAmount : 0.01}
+              step="0.01"
               required
               className="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm outline-none transition focus:border-[#01796F] focus:ring-2 focus:ring-[#01796F]/10"
             />
           </div>
 
-          {/* Paid Amount */}
           <div>
             <label className="mb-2 block text-sm font-medium text-gray-700">
-              Paid Amount
+              Paid Amount (Rs.)
             </label>
-
-            <input
-              type="number"
-              value={paidAmount}
-              onChange={(e) => setPaidAmount(e.target.value)}
-              placeholder="Enter paid amount"
-              min="0"
-              required
-              className="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm outline-none transition focus:border-[#01796F] focus:ring-2 focus:ring-[#01796F]/10"
-            />
-          </div>
-
-          {/* Remaining Amount */}
-          <div>
-            <label className="mb-2 block text-sm font-medium text-gray-700">
-              Remaining Amount
-            </label>
-
             <input
               type="text"
-              value={
-                amount
-                  ? `Rs. ${Math.max(
-                      Number(amount) - Number(paidAmount || 0),
-                      0
-                    ).toLocaleString()}`
-                  : ""
-              }
+              value={paidAmount.toLocaleString()}
               readOnly
-              placeholder="Calculated automatically"
+              className="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-gray-600 outline-none"
+            />
+            <p className="mt-1 text-xs text-gray-500">
+              Calculated from recorded payments.
+            </p>
+          </div>
+
+          <div>
+            <label className="mb-2 block text-sm font-medium text-gray-700">
+              Remaining Amount (Rs.)
+            </label>
+            <input
+              type="text"
+              value={amount ? remainingAmount.toLocaleString() : ""}
+              readOnly
               className="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-gray-600 outline-none"
             />
           </div>
 
-          {/* Due Date */}
           <div>
             <label className="mb-2 block text-sm font-medium text-gray-700">
               Due Date
             </label>
-
             <input
               type="date"
               value={dueDate}
@@ -228,29 +269,22 @@ export default function FeeForm({ fee }: FeeFormProps) {
             />
           </div>
 
-          {/* Status */}
           <div>
             <label className="mb-2 block text-sm font-medium text-gray-700">
               Status
             </label>
-
-            <select
-              value={status}
-              onChange={(e) =>
-                setStatus(e.target.value as Fee["status"])
-              }
-              required
-              className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm outline-none transition focus:border-[#01796F] focus:ring-2 focus:ring-[#01796F]/10"
-            >
-              <option value="Paid">Paid</option>
-              <option value="Partial">Partial</option>
-              <option value="Pending">Pending</option>
-              <option value="Overdue">Overdue</option>
-            </select>
+            <input
+              type="text"
+              value={fee?.status ?? "Calculated when saved"}
+              readOnly
+              className="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-gray-600 outline-none"
+            />
+            <p className="mt-1 text-xs text-gray-500">
+              Status is determined by payments and due date.
+            </p>
           </div>
         </div>
 
-        {/* Buttons */}
         <div className="mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
           <Link
             href="/admin/fees"
@@ -261,9 +295,14 @@ export default function FeeForm({ fee }: FeeFormProps) {
 
           <button
             type="submit"
-            className="rounded-full bg-[#01796F] px-5 py-3 text-sm font-medium text-white transition hover:bg-[#015f58]"
+            disabled={saving}
+            className="rounded-full bg-[#01796F] px-5 py-3 text-sm font-medium text-white transition hover:bg-[#015f58] disabled:cursor-not-allowed disabled:opacity-60"
           >
-            {fee ? "Update Fee" : "Add Fee"}
+            {saving
+              ? "Saving..."
+              : fee
+                ? "Update Fee"
+                : "Add Fee"}
           </button>
         </div>
       </form>
