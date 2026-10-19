@@ -1,4 +1,3 @@
-
 "use client";
 
 import Link from "next/link";
@@ -12,7 +11,9 @@ import { apiRequest } from "@/lib/api";
 import { getAuthToken } from "@/lib/auth";
 
 type FeeFormProps = {
-  fee?: Fee;
+  fee?: Fee & {
+    invoiceNumber?: string;
+  };
 };
 
 export default function FeeForm({ fee }: FeeFormProps) {
@@ -88,11 +89,14 @@ export default function FeeForm({ fee }: FeeFormProps) {
 
     try {
       if (fee) {
-        await apiRequest<Fee>(`/fees/${encodeURIComponent(fee.id)}`, {
-          method: "PATCH",
-          token,
-          body: JSON.stringify(payload),
-        });
+        await apiRequest<Fee>(
+          `/fees/${encodeURIComponent(fee.id)}`,
+          {
+            method: "PATCH",
+            token,
+            body: JSON.stringify(payload),
+          }
+        );
       } else {
         await apiRequest<Fee>("/fees", {
           method: "POST",
@@ -128,6 +132,15 @@ export default function FeeForm({ fee }: FeeFormProps) {
         <h1 className="text-2xl font-bold text-gray-900">
           {fee ? "Edit Fee" : "Add Fee"}
         </h1>
+
+        {fee && (
+          <p className="mt-1 text-sm text-gray-500">
+            Invoice Number:{" "}
+            <span className="font-semibold text-[#01796F]">
+              {fee.invoiceNumber ?? "Unavailable"}
+            </span>
+          </p>
+        )}
       </div>
 
       <form

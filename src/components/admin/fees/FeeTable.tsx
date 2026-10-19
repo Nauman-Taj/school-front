@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useEffect, useState } from "react";
@@ -10,7 +9,8 @@ import { getAuthToken } from "@/lib/auth";
 import { Fee } from "@/types/fee";
 
 type ApiFee = {
-  id: string;
+  id: string; // Internal database ID (UUID)
+  invoiceNumber: string; // User-facing invoice number, e.g. F028
   studentId: number;
   student: string;
   className: string;
@@ -54,6 +54,8 @@ export default function FeeTable() {
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+  const [deletingFeeId, setDeletingFeeId] = useState<string | null>(null);
 
   useEffect(() => {
     let active = true;
@@ -89,7 +91,7 @@ export default function FeeTable() {
       }
     }
 
-    loadFees();
+    void loadFees();
 
     return () => {
       active = false;
@@ -98,7 +100,8 @@ export default function FeeTable() {
 
   const filteredFees = feeList.filter((fee) =>
     [
-      fee.id,
+      fee.invoiceNumber,
+      fee.id, // Keep UUID searchable for troubleshooting.
       fee.student,
       fee.studentId,
       fee.className,
@@ -108,10 +111,10 @@ export default function FeeTable() {
     ]
       .join(" ")
       .toLowerCase()
-      .includes(search.toLowerCase()),
+      .includes(search.trim().toLowerCase()),
   );
 
-  async function reloadFees() {
+  async function reloadFees(): Promise<boolean> {
     setLoading(true);
     setError("");
 
@@ -124,15 +127,104 @@ export default function FeeTable() {
 
       const data = await apiRequest<ApiFee[]>("/fees", { token });
       setFeeList(data);
+
+      return true;
     } catch (err) {
       setError(
         err instanceof Error
           ? err.message
           : "Failed to load fee records.",
       );
+
+      return false;
     } finally {
       setLoading(false);
     }
+  }
+
+  async function handleDeleteFee(fee: ApiFee) {
+    if (deletingFeeId !== null) return;
+
+    const confirmed = window.confirm(
+      `Are you sure you want to delete invoice ${fee.invoiceNumber} for ${fee.student}?\n\n` +
+        "Invoices with payment history cannot be deleted.",
+    );
+
+    if (!confirmed) return;
+
+    // Use the database ID to track and delete the correct record.
+    setDeletingFeeId(fee.id);
+    setError("");
+    setSuccess("");
+
+    try {
+      const token = getAuthToken();
+
+      if (!token) {
+        throw new Error("Your session has expired. Please log in again.");
+      }
+
+      // IMPORTANT: API operations must continue using the UUID.
+      await apiRequest<unknown>(
+        `/fees/${encodeURIComponent(fee.id)}`,
+        {
+          method: "DELETE",
+          token,
+        },
+      );
+
+      const refreshed = await reloadFees();
+
+      if (refreshed) {
+        setSuccess(
+          `Invoice ${fee.invoiceNumber} was deleted successfully.`,
+        );
+      } else {
+        setSuccess(
+          `Invoice ${fee.invoiceNumber} was deleted, but the fee list could not be refreshed. Please try again.`,
+        );
+      }
+    } catch (err) {
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Failed to delete the invoice. Please try again.",
+      );
+    } finally {
+      setDeletingFeeId(null);
+    }
+  }
+
+  function renderDeleteButton(fee: ApiFee) {
+    const isDeleting = deletingFeeId === fee.id;
+    const deleteInProgress = deletingFeeId !== null;
+
+    return (
+      <button
+        type="button"
+        onClick={() => void handleDeleteFee(fee)}
+        disabled={deleteInProgress}
+        className={`flex h-9 w-9 items-center justify-center rounded-lg transition ${
+          deleteInProgress
+            ? "cursor-not-allowed text-gray-300"
+            : "text-gray-500 hover:bg-red-50 hover:text-red-600"
+        }`}
+        title={
+          isDeleting
+            ? `Deleting invoice ${fee.invoiceNumber}...`
+            : deleteInProgress
+              ? "Another invoice is being deleted"
+              : `Delete invoice ${fee.invoiceNumber}`
+        }
+        aria-label={`Delete invoice ${fee.invoiceNumber}`}
+      >
+        {isDeleting ? (
+          <RefreshCw size={17} className="animate-spin" />
+        ) : (
+          <Trash2 size={17} />
+        )}
+      </button>
+    );
   }
 
   return (
@@ -146,12 +238,22 @@ export default function FeeTable() {
 
         <input
           type="text"
-          placeholder="Search by student, class, fee type, status or invoice ID"
+          placeholder="Search by invoice number, student, class, fee type or status"
           value={search}
           onChange={(event) => setSearch(event.target.value)}
           className="w-full rounded-full border border-gray-200 bg-white py-3 pl-11 pr-4 text-sm text-gray-900 outline-none transition placeholder:text-gray-400 focus:border-[#01796f] focus:ring-2 focus:ring-[#01796f]/10"
         />
       </div>
+
+      {/* Success feedback */}
+      {success && (
+        <div
+          role="status"
+          className="rounded-xl border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-700"
+        >
+          {success}
+        </div>
+      )}
 
       {/* Loading */}
       {loading && (
@@ -169,11 +271,13 @@ export default function FeeTable() {
       {/* Error */}
       {!loading && error && (
         <div className="rounded-2xl border border-red-200 bg-white p-6 text-center">
-          <p className="text-sm text-red-600">{error}</p>
+          <p role="alert" className="text-sm text-red-600">
+            {error}
+          </p>
 
           <button
             type="button"
-            onClick={reloadFees}
+            onClick={() => void reloadFees()}
             className="mt-4 rounded-full bg-[#01796f] px-5 py-2 text-sm font-medium text-white transition hover:bg-[#015f58]"
           >
             Try again
@@ -228,7 +332,8 @@ export default function FeeTable() {
                           {fee.student}
                         </p>
                         <p className="text-xs text-gray-400">
-                          Student ID: {fee.studentId} · Invoice: {fee.id}
+                          Student ID: {fee.studentId} · Invoice:{" "}
+                          {fee.invoiceNumber}
                         </p>
                       </td>
 
@@ -260,29 +365,24 @@ export default function FeeTable() {
                       <td className="px-5 py-4">
                         <div className="flex items-center justify-center gap-2">
                           <Link
-                            href={`/admin/fees/${fee.id}`}
+                            href={`/admin/fees/${fee.invoiceNumber}`}
                             className="flex h-9 w-9 items-center justify-center rounded-lg text-gray-500 transition hover:bg-[#e6f4f2] hover:text-[#01796f]"
-                            title="View"
+                            title={`View invoice ${fee.invoiceNumber}`}
+                            aria-label={`View invoice ${fee.invoiceNumber}`}
                           >
                             <Eye size={17} />
                           </Link>
 
                           <Link
-                            href={`/admin/fees/${fee.id}/edit`}
+                            href={`/admin/fees/${fee.invoiceNumber}/edit`}
                             className="flex h-9 w-9 items-center justify-center rounded-lg text-gray-500 transition hover:bg-[#e6f4f2] hover:text-[#01796f]"
-                            title="Edit"
+                            title={`Edit invoice ${fee.invoiceNumber}`}
+                            aria-label={`Edit invoice ${fee.invoiceNumber}`}
                           >
                             <Pencil size={17} />
                           </Link>
 
-                          <button
-                            type="button"
-                            disabled
-                            className="flex h-9 w-9 cursor-not-allowed items-center justify-center rounded-lg text-gray-300"
-                            title="Delete API not implemented yet"
-                          >
-                            <Trash2 size={17} />
-                          </button>
+                          {renderDeleteButton(fee)}
                         </div>
                       </td>
                     </tr>
@@ -304,12 +404,14 @@ export default function FeeTable() {
                     <h3 className="font-semibold text-gray-900">
                       {fee.student}
                     </h3>
+
                     <p className="mt-1 text-xs text-gray-400">
                       Student ID: {fee.studentId} · {fee.className}
                       {fee.section ? `-${fee.section}` : ""}
                     </p>
+
                     <p className="mt-1 text-xs text-gray-400">
-                      Invoice: {fee.id}
+                      Invoice: {fee.invoiceNumber}
                     </p>
                   </div>
 
@@ -359,29 +461,24 @@ export default function FeeTable() {
 
                 <div className="mt-4 flex items-center justify-center gap-2 border-t border-gray-100 pt-3">
                   <Link
-                    href={`/admin/fees/${fee.id}`}
+                    href={`/admin/fees/${fee.invoiceNumber}`}
                     className="flex h-9 w-9 items-center justify-center rounded-lg text-gray-500 transition hover:bg-[#e6f4f2] hover:text-[#01796f]"
-                    title="View"
+                    title={`View invoice ${fee.invoiceNumber}`}
+                    aria-label={`View invoice ${fee.invoiceNumber}`}
                   >
                     <Eye size={17} />
                   </Link>
 
                   <Link
-                    href={`/admin/fees/${fee.id}/edit`}
+                    href={`/admin/fees/${fee.invoiceNumber}/edit`}
                     className="flex h-9 w-9 items-center justify-center rounded-lg text-gray-500 transition hover:bg-[#e6f4f2] hover:text-[#01796f]"
-                    title="Edit"
+                    title={`Edit invoice ${fee.invoiceNumber}`}
+                    aria-label={`Edit invoice ${fee.invoiceNumber}`}
                   >
                     <Pencil size={17} />
                   </Link>
 
-                  <button
-                    type="button"
-                    disabled
-                    className="flex h-9 w-9 cursor-not-allowed items-center justify-center rounded-lg text-gray-300"
-                    title="Delete API not implemented yet"
-                  >
-                    <Trash2 size={17} />
-                  </button>
+                  {renderDeleteButton(fee)}
                 </div>
               </div>
             ))}

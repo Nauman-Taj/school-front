@@ -21,6 +21,7 @@ type ApiPayment = {
 };
 
 type ApiFee = Fee & {
+    invoiceNumber: string;
     payments: ApiPayment[];
 };
 

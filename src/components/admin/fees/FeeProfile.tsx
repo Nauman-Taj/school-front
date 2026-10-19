@@ -30,6 +30,8 @@ type FeePayment = {
 
 type FeeProfileProps = {
   fee: Fee & {
+    id: string;
+    invoiceNumber: string;
     payments?: FeePayment[];
   };
   onPaymentRecorded?: () => void;
@@ -77,8 +79,10 @@ function getStatusClass(status: string) {
   }
 }
 
-export default function FeeProfile({ fee, onPaymentRecorded }: FeeProfileProps) {
-
+export default function FeeProfile({
+  fee,
+  onPaymentRecorded,
+}: FeeProfileProps) {
   const payments = fee.payments ?? [];
   const remainingAmount = Number(fee.remainingAmount);
 
@@ -141,22 +145,28 @@ export default function FeeProfile({ fee, onPaymentRecorded }: FeeProfileProps) 
         throw new Error("Your session has expired. Please log in again.");
       }
 
-      await apiRequest<FeePayment>(`/fees/${fee.id}/payments`, {
-        method: "POST",
-        token,
-        body: JSON.stringify({
-          amount,
-          paymentMethod: form.paymentMethod,
-          paymentDate: form.paymentDate,
-          ...(form.transactionId.trim()
-            ? { transactionId: form.transactionId.trim() }
-            : {}),
-        }),
-      });
+      // Use the UUID database ID for the payment endpoint.
+      await apiRequest<FeePayment>(
+        `/fees/${encodeURIComponent(fee.id)}/payments`,
+        {
+          method: "POST",
+          token,
+          body: JSON.stringify({
+            amount,
+            paymentMethod: form.paymentMethod,
+            paymentDate: form.paymentDate,
+            ...(form.transactionId.trim()
+              ? { transactionId: form.transactionId.trim() }
+              : {}),
+          }),
+        },
+      );
 
       setShowPaymentForm(false);
       resetPaymentForm();
-      setPaymentSuccess("Payment recorded successfully.");
+      setPaymentSuccess(
+        `Payment recorded successfully for invoice ${fee.invoiceNumber}.`,
+      );
 
       onPaymentRecorded?.();
     } catch (error) {
@@ -193,7 +203,7 @@ export default function FeeProfile({ fee, onPaymentRecorded }: FeeProfileProps) 
                 {fee.student}
               </h1>
               <p className="mt-1 text-sm text-gray-500">
-                Invoice: {fee.id} · Student ID: {fee.studentId} ·{" "}
+                Invoice: {fee.invoiceNumber} · Student ID: {fee.studentId} ·{" "}
                 {fee.className}-{fee.section}
               </p>
             </div>
@@ -267,12 +277,11 @@ export default function FeeProfile({ fee, onPaymentRecorded }: FeeProfileProps) 
 
       {/* Fee Details */}
       <div className="rounded-2xl border border-gray-200 bg-white p-6">
-        <h2 className="text-lg font-semibold text-gray-900">
-          Fee Details
-        </h2>
+        <h2 className="text-lg font-semibold text-gray-900">Fee Details</h2>
 
         <div className="mt-5 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {[
+            ["Invoice Number", fee.invoiceNumber],
             ["Student", fee.student],
             ["Student ID", String(fee.studentId)],
             ["Class", `${fee.className}-${fee.section}`],
@@ -299,7 +308,8 @@ export default function FeeProfile({ fee, onPaymentRecorded }: FeeProfileProps) 
               Record Payment
             </h2>
             <p className="mt-1 text-sm text-gray-500">
-              Remaining balance: {formatAmount(remainingAmount)}
+              Invoice {fee.invoiceNumber} · Remaining balance:{" "}
+              {formatAmount(remainingAmount)}
             </p>
           </div>
 
@@ -320,13 +330,16 @@ export default function FeeProfile({ fee, onPaymentRecorded }: FeeProfileProps) 
         </div>
 
         {paymentSuccess && (
-          <p className="mt-4 rounded-xl bg-green-50 p-3 text-sm text-green-700">
+          <p
+            role="status"
+            className="mt-4 rounded-xl bg-green-50 p-3 text-sm text-green-700"
+          >
             {paymentSuccess}
           </p>
         )}
 
         {paymentError && !showPaymentForm && (
-          <p className="mt-4 rounded-xl bg-red-50 p-3 text-sm text-red-700">
+          <p role="alert" className="mt-4 rounded-xl bg-red-50 p-3 text-sm text-red-700">
             {paymentError}
           </p>
         )}
@@ -343,7 +356,7 @@ export default function FeeProfile({ fee, onPaymentRecorded }: FeeProfileProps) 
             className="mt-6 space-y-5 border-t border-gray-100 pt-6"
           >
             {paymentError && (
-              <p className="rounded-xl bg-red-50 p-3 text-sm text-red-700">
+              <p role="alert" className="rounded-xl bg-red-50 p-3 text-sm text-red-700">
                 {paymentError}
               </p>
             )}
@@ -478,7 +491,8 @@ export default function FeeProfile({ fee, onPaymentRecorded }: FeeProfileProps) 
               Payment History
             </h2>
             <p className="text-sm text-gray-500">
-              {payments.length} payment{payments.length === 1 ? "" : "s"} recorded
+              Invoice {fee.invoiceNumber} · {payments.length} payment
+              {payments.length === 1 ? "" : "s"} recorded
             </p>
           </div>
         </div>

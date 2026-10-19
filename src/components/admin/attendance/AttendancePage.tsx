@@ -243,7 +243,10 @@ export default function AttendancePage() {
             Loading attendance records...
           </div>
         ) : (
-          <AttendanceTable records={attendanceRecords} />
+          <AttendanceTable
+            records={attendanceRecords}
+            onDeleted={() => void loadAttendance()}
+          />
         )}
       </div>
     </div>
