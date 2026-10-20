@@ -76,7 +76,7 @@ export const books: Book[] = [
     publisher: "Ilmi Kitab Khana",
     quantity: 10,
     availableCopies: 0,
-    status: "Borrowed",
+    status: "Unavailable",
   },
   {
     id: 8,

@@ -4,7 +4,7 @@ export const libraryBorrowings: LibraryBorrowing[] = [
   {
     id: "LB001",
     bookId: 1,
-    book: "Introduction to Programming",
+    book: "Advanced Mathematics",
     studentId: 1,
     student: "Ali Asif",
     issueDate: "2026-09-10",
@@ -15,7 +15,7 @@ export const libraryBorrowings: LibraryBorrowing[] = [
   {
     id: "LB002",
     bookId: 2,
-    book: "Advanced Mathematics",
+    book: "General Science",
     studentId: 2,
     student: "Hassan Asif",
     issueDate: "2026-09-12",
@@ -25,7 +25,7 @@ export const libraryBorrowings: LibraryBorrowing[] = [
   {
     id: "LB003",
     bookId: 3,
-    book: "General Science",
+    book: "English Grammar and Composition",
     studentId: 10,
     student: "Usman Tariq",
     issueDate: "2026-09-11",
@@ -35,7 +35,7 @@ export const libraryBorrowings: LibraryBorrowing[] = [
   {
     id: "LB004",
     bookId: 4,
-    book: "English Grammar",
+    book: "Computer Science Fundamentals",
     studentId: 13,
     student: "Saif Ullah",
     issueDate: "2026-09-13",
@@ -45,7 +45,7 @@ export const libraryBorrowings: LibraryBorrowing[] = [
   {
     id: "LB005",
     bookId: 5,
-    book: "Computer Science Basics",
+    book: "Urdu Adab",
     studentId: 5,
     student: "Abdullah Sajid",
     issueDate: "2026-09-14",
@@ -56,7 +56,7 @@ export const libraryBorrowings: LibraryBorrowing[] = [
   {
     id: "LB006",
     bookId: 6,
-    book: "World History",
+    book: "Social Studies",
     studentId: 16,
     student: "Muneeb Shah",
     issueDate: "2026-09-15",
@@ -66,7 +66,7 @@ export const libraryBorrowings: LibraryBorrowing[] = [
   {
     id: "LB007",
     bookId: 7,
-    book: "Islamic Studies",
+    book: "Islamiyat Studies",
     studentId: 21,
     student: "Abdul Hadi",
     issueDate: "2026-09-16",
@@ -77,7 +77,7 @@ export const libraryBorrowings: LibraryBorrowing[] = [
   {
     id: "LB008",
     bookId: 8,
-    book: "Basic Physics",
+    book: "Fundamentals of Physics",
     studentId: 7,
     student: "Saad Bilal",
     issueDate: "2026-09-17",
