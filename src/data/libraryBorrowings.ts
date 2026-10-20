@@ -57,7 +57,7 @@ export const libraryBorrowings: LibraryBorrowing[] = [
     id: "LB006",
     bookId: 6,
     book: "Social Studies",
-    studentId: 16,
+    studentId: 18,
     student: "Muneeb Shah",
     issueDate: "2026-09-15",
     dueDate: "2026-09-25",

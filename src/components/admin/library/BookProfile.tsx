@@ -9,10 +9,9 @@ import {
   Pencil,
 } from "lucide-react";
 
-import { Book } from "@/types/library";
-
+import type { LibraryBook } from "./BookTable";
 type BookProfileProps = {
-  book: Book;
+  book: LibraryBook;
 };
 
 export default function BookProfile({
@@ -108,23 +107,40 @@ export default function BookProfile({
           />
         </div>
 
+
         {/* Status */}
         <div className="mt-6 border-t border-gray-100 pt-6">
           <p className="text-sm font-medium text-gray-500">
             Status
           </p>
 
-          <span
-            className={`mt-2 inline-flex rounded-full px-3 py-1 text-xs font-medium ${book.status === "Available"
-              ? "bg-green-50 text-green-600"
-              : book.status === "Borrowed"
-                ? "bg-yellow-50 text-yellow-600"
-                : "bg-red-50 text-red-600"
-              }`}
-          >
-            {book.status}
-          </span>
+          {(() => {
+            const normalizedStatus = String(book.status).toUpperCase();
+
+            const displayStatus =
+              normalizedStatus === "AVAILABLE"
+                ? "Available"
+                : normalizedStatus === "BORROWED"
+                  ? "Borrowed"
+                  : "Unavailable";
+
+            const statusClass =
+              normalizedStatus === "AVAILABLE"
+                ? "bg-green-50 text-green-600"
+                : normalizedStatus === "BORROWED"
+                  ? "bg-yellow-50 text-yellow-600"
+                  : "bg-red-50 text-red-600";
+
+            return (
+              <span
+                className={`mt-2 inline-flex rounded-full px-3 py-1 text-xs font-medium ${statusClass}`}
+              >
+                {displayStatus}
+              </span>
+            );
+          })()}
         </div>
+
       </div>
     </div>
   );

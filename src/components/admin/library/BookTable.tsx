@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState } from "react";
@@ -10,32 +11,78 @@ import {
   BookOpen,
 } from "lucide-react";
 
-import { books } from "@/data/library";
-import { Book } from "@/types/library";
+import { apiRequest } from "@/lib/api";
+import { getAuthToken } from "@/lib/auth";
 
-export default function BookTable() {
-  const [bookList, setBookList] = useState<Book[]>(books);
+export type LibraryBook = {
+  id: number;
+  title: string;
+  author: string;
+  isbn: string;
+  category: string;
+  publisher: string;
+  quantity: number;
+  availableCopies: number;
+  status: "AVAILABLE" | "BORROWED" | "UNAVAILABLE";
+};
+
+type BookTableProps = {
+  books: LibraryBook[];
+  onBookDeleted: (id: number) => void;
+};
+
+export default function BookTable({
+  books,
+  onBookDeleted,
+}: BookTableProps) {
   const [search, setSearch] = useState("");
+  const [deletingId, setDeletingId] = useState<number | null>(null);
+  const [error, setError] = useState("");
 
-  const filteredBooks = bookList.filter(
-    (book) =>
-      book.title.toLowerCase().includes(search.toLowerCase()) ||
-      book.author.toLowerCase().includes(search.toLowerCase()) ||
-      book.category.toLowerCase().includes(search.toLowerCase()) ||
-      book.isbn.toLowerCase().includes(search.toLowerCase())
-  );
+  const filteredBooks = books.filter((book) => {
+    const query = search.toLowerCase();
 
-  const handleDelete = (id: number) => {
+    return (
+      book.title.toLowerCase().includes(query) ||
+      book.author.toLowerCase().includes(query) ||
+      book.category.toLowerCase().includes(query) ||
+      book.isbn.toLowerCase().includes(query)
+    );
+  });
+
+  async function handleDelete(id: number) {
     const confirmed = window.confirm(
-      "Are you sure you want to delete this book?"
+      "Are you sure you want to delete this book?",
     );
 
     if (!confirmed) return;
 
-    setBookList((current) =>
-      current.filter((book) => book.id !== id)
-    );
-  };
+    try {
+      setError("");
+      setDeletingId(id);
+
+      const token = getAuthToken();
+
+      if (!token) {
+        throw new Error("Your session has expired. Please log in again.");
+      }
+
+      await apiRequest(`/books/${id}`, {
+        method: "DELETE",
+        token,
+      });
+
+      onBookDeleted(id);
+    } catch (err) {
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Failed to delete the book.",
+      );
+    } finally {
+      setDeletingId(null);
+    }
+  }
 
   return (
     <div className="space-y-5">
@@ -51,9 +98,18 @@ export default function BookTable() {
           placeholder="Search books"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-            className="w-full rounded-full border border-gray-200 bg-white py-3 pl-11 pr-4 text-sm text-gray-900 outline-none transition placeholder:text-gray-400 focus:border-[#01796f] focus:ring-2 focus:ring-[#01796f]/10"
+          className="w-full rounded-full border border-gray-200 bg-white py-3 pl-11 pr-4 text-sm text-gray-900 outline-none transition placeholder:text-gray-400 focus:border-[#01796f] focus:ring-2 focus:ring-[#01796f]/10"
         />
       </div>
+
+      {error && (
+        <div
+          role="alert"
+          className="rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-700"
+        >
+          {error}
+        </div>
+      )}
 
       {/* Desktop Table */}
       <div className="hidden overflow-hidden rounded-2xl border border-gray-200 bg-white md:block">
@@ -61,49 +117,37 @@ export default function BookTable() {
           <table className="w-full min-w-[900px] text-left">
             <thead className="border-b border-gray-200 bg-gray-50">
               <tr>
-                <th className="px-6 py-4 text-sm font-semibold text-gray-600">
-                  Book
-                </th>
-
-                <th className="px-6 py-4 text-sm font-semibold text-gray-600">
-                  Author
-                </th>
-
-                <th className="px-6 py-4 text-sm font-semibold text-gray-600">
-                  Category
-                </th>
-
-                <th className="px-6 py-4 text-sm font-semibold text-gray-600">
-                  ISBN
-                </th>
-
-                <th className="px-6 py-4 text-sm font-semibold text-gray-600">
-                  Copies
-                </th>
-
-                <th className="px-6 py-4 text-sm font-semibold text-gray-600">
-                  Status
-                </th>
-
-                <th className="px-6 py-4 text-center text-sm font-semibold text-gray-600">
-                  Action
-                </th>
+                {[
+                  "Book",
+                  "Author",
+                  "Category",
+                  "ISBN",
+                  "Copies",
+                  "Status",
+                  "Action",
+                ].map((heading) => (
+                  <th
+                    key={heading}
+                    className={`px-6 py-4 text-sm font-semibold text-gray-600 ${
+                      heading === "Action" ? "text-center" : ""
+                    }`}
+                  >
+                    {heading}
+                  </th>
+                ))}
               </tr>
             </thead>
 
             <tbody className="divide-y divide-gray-100">
               {filteredBooks.map((book) => (
-                <tr
-                  key={book.id}
-                  className="hover:bg-gray-50"
-                >
+                <tr key={book.id} className="hover:bg-gray-50">
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-3">
-                      <div className="flex  shrink-0 items-center justify-center rounded-xl text-[#01796F]">
+                      <div className="flex shrink-0 items-center justify-center text-[#01796F]">
                         <BookOpen size={19} />
                       </div>
 
-                      <span className="font-medium text-sm text-gray-900">
+                      <span className="text-sm font-medium text-gray-900">
                         {book.title}
                       </span>
                     </div>
@@ -132,6 +176,7 @@ export default function BookTable() {
                   <td className="px-6 py-4">
                     <BookActions
                       bookId={book.id}
+                      deleting={deletingId === book.id}
                       onDelete={handleDelete}
                     />
                   </td>
@@ -149,7 +194,6 @@ export default function BookTable() {
             key={book.id}
             className="rounded-2xl border border-gray-200 bg-white p-4"
           >
-            {/* Book Header */}
             <div className="flex items-start gap-3">
               <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[#e6f4f2] text-[#01796F]">
                 <BookOpen size={20} />
@@ -168,43 +212,33 @@ export default function BookTable() {
               <StatusBadge status={book.status} />
             </div>
 
-            {/* Details */}
             <div className="mt-4 grid grid-cols-2 gap-3 border-t border-gray-100 pt-4">
               <div>
-                <p className="text-xs text-gray-400">
-                  Category
-                </p>
-
+                <p className="text-xs text-gray-400">Category</p>
                 <p className="mt-1 text-sm font-medium text-gray-700">
                   {book.category}
                 </p>
               </div>
 
               <div>
-                <p className="text-xs text-gray-400">
-                  Copies
-                </p>
-
+                <p className="text-xs text-gray-400">Copies</p>
                 <p className="mt-1 text-sm font-medium text-gray-700">
                   {book.availableCopies} / {book.quantity}
                 </p>
               </div>
 
               <div className="col-span-2">
-                <p className="text-xs text-gray-400">
-                  ISBN
-                </p>
-
+                <p className="text-xs text-gray-400">ISBN</p>
                 <p className="mt-1 text-sm font-medium text-gray-700">
                   {book.isbn}
                 </p>
               </div>
             </div>
 
-            {/* Actions */}
             <div className="mt-4 flex justify-center border-t border-gray-100 pt-3">
               <BookActions
                 bookId={book.id}
+                deleting={deletingId === book.id}
                 onDelete={handleDelete}
               />
             </div>
@@ -222,37 +256,44 @@ export default function BookTable() {
   );
 }
 
-function StatusBadge({
-  status,
-}: {
-  status: Book["status"];
-}) {
+function StatusBadge({ status }: { status: LibraryBook["status"] }) {
+  const label =
+    status === "AVAILABLE"
+      ? "Available"
+      : status === "BORROWED"
+        ? "Borrowed"
+        : "Unavailable";
+
+  const styles =
+    status === "AVAILABLE"
+      ? "bg-green-50 text-green-600"
+      : status === "BORROWED"
+        ? "bg-yellow-50 text-yellow-600"
+        : "bg-red-50 text-red-600";
+
   return (
     <span
-      className={`inline-flex rounded-full px-3 py-1 text-xs font-medium ${
-        status === "Available"
-          ? "bg-green-50 text-green-600"
-          : status === "Borrowed"
-            ? "bg-yellow-50 text-yellow-600"
-            : "bg-red-50 text-red-600"
-      }`}
+      className={`inline-flex whitespace-nowrap rounded-full px-3 py-1 text-xs font-medium ${styles}`}
     >
-      {status}
+      {label}
     </span>
   );
 }
 
 function BookActions({
   bookId,
+  deleting,
   onDelete,
 }: {
   bookId: number;
+  deleting: boolean;
   onDelete: (id: number) => void;
 }) {
   return (
     <div className="flex items-center justify-center gap-2">
       <Link
         href={`/admin/library/${bookId}`}
+        aria-label="View book"
         className="rounded-lg p-2 text-gray-500 transition hover:bg-[#01796F]/10 hover:text-[#01796F]"
       >
         <Eye size={17} />
@@ -260,16 +301,24 @@ function BookActions({
 
       <Link
         href={`/admin/library/${bookId}/edit`}
+        aria-label="Edit book"
         className="rounded-lg p-2 text-gray-500 transition hover:bg-[#01796F]/10 hover:text-[#01796F]"
       >
         <Pencil size={17} />
       </Link>
 
       <button
+        type="button"
+        disabled={deleting}
         onClick={() => onDelete(bookId)}
-        className="rounded-lg p-2 text-gray-500 transition hover:bg-red-50 hover:text-red-500"
+        aria-label="Delete book"
+        className="rounded-lg p-2 text-gray-500 transition hover:bg-red-50 hover:text-red-500 disabled:cursor-not-allowed disabled:opacity-50"
       >
-        <Trash2 size={17} />
+        {deleting ? (
+          <span className="text-xs">...</span>
+        ) : (
+          <Trash2 size={17} />
+        )}
       </button>
     </div>
   );

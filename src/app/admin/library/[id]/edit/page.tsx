@@ -1,7 +1,5 @@
-import { notFound } from "next/navigation";
 
-import { books } from "@/data/library";
-import BookForm from "@/components/admin/library/BookForm";
+import BookFormLoader from "@/components/admin/library/BookFormLoader";
 
 type EditBookPageProps = {
   params: Promise<{
@@ -14,13 +12,5 @@ export default async function EditBookPage({
 }: EditBookPageProps) {
   const { id } = await params;
 
-  const book = books.find(
-    (book) => book.id === Number(id)
-  );
-
-  if (!book) {
-    notFound();
-  }
-
-  return <BookForm mode="edit" book={book} />;
+  return <BookFormLoader id={id} />;
 }

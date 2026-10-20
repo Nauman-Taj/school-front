@@ -1,7 +1,5 @@
-import { notFound } from "next/navigation";
 
-import { books } from "@/data/library";
-import BookProfile from "@/components/admin/library/BookProfile";
+import BookProfileLoader from "@/components/admin/library/BookProfileLoader";
 
 type BookPageProps = {
   params: Promise<{
@@ -14,13 +12,5 @@ export default async function BookPage({
 }: BookPageProps) {
   const { id } = await params;
 
-  const book = books.find(
-    (book) => book.id === Number(id)
-  );
-
-  if (!book) {
-    notFound();
-  }
-
-  return <BookProfile book={book} />;
+  return <BookProfileLoader id={id} />;
 }

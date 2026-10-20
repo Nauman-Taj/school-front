@@ -1,5 +1,7 @@
+
 "use client";
 
+import { useEffect, useState } from "react";
 import {
   BookOpen,
   BookCheck,
@@ -7,29 +9,79 @@ import {
   LibraryBig,
   Plus,
 } from "lucide-react";
-
 import Link from "next/link";
-import { books } from "@/data/library";
-import BookTable from "./BookTable";
+
+import BookTable, { type LibraryBook } from "./BookTable";
+import { apiRequest } from "@/lib/api";
+import { getAuthToken } from "@/lib/auth";
+
 
 export default function LibraryPage() {
+  const [books, setBooks] = useState<LibraryBook[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadBooks() {
+      try {
+        setLoading(true);
+        setError("");
+
+        const token = getAuthToken();
+
+        if (!token) {
+          throw new Error("Your session has expired. Please log in again.");
+        }
+
+        const data = await apiRequest<LibraryBook[]>("/books", {
+          method: "GET",
+          token,
+        });
+
+        if (!cancelled) {
+          setBooks(data);
+        }
+      } catch (err) {
+        if (!cancelled) {
+          setError(
+            err instanceof Error
+              ? err.message
+              : "Something went wrong while loading books.",
+          );
+        }
+      } finally {
+        if (!cancelled) {
+          setLoading(false);
+        }
+      }
+    }
+
+    loadBooks();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   const totalBooks = books.reduce(
     (total, book) => total + book.quantity,
-    0
+    0,
   );
 
   const availableBooks = books.reduce(
     (total, book) => total + book.availableCopies,
-    0
+    0,
   );
 
   const borrowedBooks = books.reduce(
     (total, book) => total + (book.quantity - book.availableCopies),
-    0
+    0,
   );
 
   const unavailableBooks = books.filter(
-    (book) => book.status === "Unavailable"
+    (book) => book.status === "UNAVAILABLE",
   ).length;
 
   const stats = [
@@ -116,7 +168,25 @@ export default function LibraryPage() {
         })}
       </div>
 
-      <BookTable />
+      {loading ? (
+        <div className="rounded-2xl border border-gray-200 bg-white p-8 text-center text-sm text-gray-500">
+          Loading library books...
+        </div>
+      ) : error ? (
+        <div
+          role="alert"
+          className="rounded-2xl border border-red-200 bg-red-50 p-4 text-sm text-red-700"
+        >
+          {error}
+        </div>
+      ) : (
+        <BookTable
+          books={books}
+          onBookDeleted={(id) =>
+            setBooks((current) => current.filter((book) => book.id !== id))
+          }
+        />
+      )}
     </div>
   );
 }

@@ -1,43 +1,159 @@
+
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 
 import { Book } from "@/types/library";
+import { apiRequest } from "@/lib/api";
+import { getAuthToken } from "@/lib/auth";
 
 type BookFormProps = {
   mode?: "add" | "edit";
   book?: Book;
 };
 
+type BookFormData = {
+  title: string;
+  author: string;
+  isbn: string;
+  category: string;
+  publisher: string;
+  quantity: string;
+  availableCopies: string;
+};
+
+const emptyForm: BookFormData = {
+  title: "",
+  author: "",
+  isbn: "",
+  category: "",
+  publisher: "",
+  quantity: "",
+  availableCopies: "",
+};
+
 export default function BookForm({
   mode = "add",
   book,
 }: BookFormProps) {
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<BookFormData>({
     title: book?.title ?? "",
     author: book?.author ?? "",
     isbn: book?.isbn ?? "",
     category: book?.category ?? "",
     publisher: book?.publisher ?? "",
-    quantity: book?.quantity.toString() ?? "",
-    availableCopies: book?.availableCopies.toString() ?? "",
+    quantity: book?.quantity?.toString() ?? "",
+    availableCopies: book?.availableCopies?.toString() ?? "",
   });
+
+  const [error, setError] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Keep the form synchronized if the book loads after the component mounts.
+  useEffect(() => {
+    if (!book) return;
+
+    setFormData({
+      title: book.title,
+      author: book.author,
+      isbn: book.isbn,
+      category: book.category,
+      publisher: book.publisher,
+      quantity: book.quantity.toString(),
+      availableCopies: book.availableCopies.toString(),
+    });
+  }, [book]);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
+    const { name, value } = e.target;
+
+    setFormData((current) => ({
+      ...current,
+      [name]: value,
+    }));
+
+    if (error) setError("");
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setError("");
 
-    window.location.href = "/admin/library";
+    const quantity = Number(formData.quantity);
+    const availableCopies = Number(formData.availableCopies);
+
+    if (
+      !Number.isInteger(quantity) ||
+      quantity < 1
+    ) {
+      setError("Total quantity must be a whole number greater than zero.");
+      return;
+    }
+
+    if (
+      !Number.isInteger(availableCopies) ||
+      availableCopies < 0 ||
+      availableCopies > quantity
+    ) {
+      setError(
+        "Available copies must be a whole number between zero and total quantity."
+      );
+      return;
+    }
+
+    if (mode === "edit" && !book?.id) {
+      setError("The book ID is missing. Please reopen the edit page.");
+      return;
+    }
+
+    const token = getAuthToken();
+
+    if (!token) {
+      setError("Your session has expired. Please log in again.");
+      return;
+    }
+
+    const payload = {
+      title: formData.title.trim(),
+      author: formData.author.trim(),
+      isbn: formData.isbn.trim(),
+      category: formData.category,
+      publisher: formData.publisher.trim(),
+      quantity,
+      availableCopies,
+    };
+
+    try {
+      setIsSubmitting(true);
+
+      if (mode === "edit") {
+        await apiRequest(`/books/${book!.id}`, {
+          method: "PATCH",
+          token,
+          body: JSON.stringify(payload),
+        });
+      } else {
+        await apiRequest("/books", {
+          method: "POST",
+          token,
+          body: JSON.stringify(payload),
+        });
+      }
+
+      window.location.href = "/admin/library";
+    } catch (err) {
+      setError(
+        err instanceof Error
+          ? err.message
+          : `Unable to ${mode === "edit" ? "update" : "add"} the book. Please try again.`
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -56,27 +172,33 @@ export default function BookForm({
         <h1 className="text-2xl font-bold text-gray-900">
           {mode === "edit" ? "Edit Book" : "Add Book"}
         </h1>
-
-        {/* <p className="mt-1 text-sm text-gray-500">
-          {mode === "edit"
-            ? "Update the book information."
-            : "Add a new book to the school library."}
-        </p> */}
       </div>
 
       {/* Form */}
       <form
         onSubmit={handleSubmit}
-        className="rounded-2xl max-w-5xl border border-gray-200 bg-white p-5 sm:p-6"
+        className="max-w-5xl rounded-2xl border border-gray-200 bg-white p-5 sm:p-6"
       >
+        {error && (
+          <div
+            role="alert"
+            className="mb-5 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
+          >
+            {error}
+          </div>
+        )}
+
         <div className="grid gap-5 md:grid-cols-2">
           {/* Title */}
           <div>
-            <label className="mb-1.5 block text-sm font-medium text-gray-700">
+            <label
+              htmlFor="title"
+              className="mb-1.5 block text-sm font-medium text-gray-700"
+            >
               Book Title
             </label>
-
             <input
+              id="title"
               type="text"
               name="title"
               value={formData.title}
@@ -89,11 +211,14 @@ export default function BookForm({
 
           {/* Author */}
           <div>
-            <label className="mb-1.5 block text-sm font-medium text-gray-700">
+            <label
+              htmlFor="author"
+              className="mb-1.5 block text-sm font-medium text-gray-700"
+            >
               Author
             </label>
-
             <input
+              id="author"
               type="text"
               name="author"
               value={formData.author}
@@ -106,11 +231,14 @@ export default function BookForm({
 
           {/* ISBN */}
           <div>
-            <label className="mb-1.5 block text-sm font-medium text-gray-700">
+            <label
+              htmlFor="isbn"
+              className="mb-1.5 block text-sm font-medium text-gray-700"
+            >
               ISBN
             </label>
-
             <input
+              id="isbn"
               type="text"
               name="isbn"
               value={formData.isbn}
@@ -123,11 +251,14 @@ export default function BookForm({
 
           {/* Category */}
           <div>
-            <label className="mb-1.5 block text-sm font-medium text-gray-700">
+            <label
+              htmlFor="category"
+              className="mb-1.5 block text-sm font-medium text-gray-700"
+            >
               Category
             </label>
-
             <select
+              id="category"
               name="category"
               value={formData.category}
               onChange={handleChange}
@@ -138,13 +269,9 @@ export default function BookForm({
               <option value="Mathematics">Mathematics</option>
               <option value="Science">Science</option>
               <option value="English">English</option>
-              <option value="Computer Science">
-                Computer Science
-              </option>
+              <option value="Computer Science">Computer Science</option>
               <option value="Urdu">Urdu</option>
-              <option value="Social Studies">
-                Social Studies
-              </option>
+              <option value="Social Studies">Social Studies</option>
               <option value="Islamiyat">Islamiyat</option>
               <option value="Physics">Physics</option>
             </select>
@@ -152,11 +279,14 @@ export default function BookForm({
 
           {/* Publisher */}
           <div>
-            <label className="mb-1.5 block text-sm font-medium text-gray-700">
+            <label
+              htmlFor="publisher"
+              className="mb-1.5 block text-sm font-medium text-gray-700"
+            >
               Publisher
             </label>
-
             <input
+              id="publisher"
               type="text"
               name="publisher"
               value={formData.publisher}
@@ -169,14 +299,18 @@ export default function BookForm({
 
           {/* Quantity */}
           <div>
-            <label className="mb-1.5 block text-sm font-medium text-gray-700">
+            <label
+              htmlFor="quantity"
+              className="mb-1.5 block text-sm font-medium text-gray-700"
+            >
               Total Quantity
             </label>
-
             <input
+              id="quantity"
               type="number"
               name="quantity"
               min="1"
+              step="1"
               value={formData.quantity}
               onChange={handleChange}
               placeholder="Enter quantity"
@@ -185,17 +319,21 @@ export default function BookForm({
             />
           </div>
 
-          {/* Available */}
+          {/* Available Copies */}
           <div>
-            <label className="mb-1.5 block text-sm font-medium text-gray-700">
+            <label
+              htmlFor="availableCopies"
+              className="mb-1.5 block text-sm font-medium text-gray-700"
+            >
               Available Copies
             </label>
-
             <input
+              id="availableCopies"
               type="number"
               name="availableCopies"
               min="0"
               max={formData.quantity || undefined}
+              step="1"
               value={formData.availableCopies}
               onChange={handleChange}
               placeholder="Enter available copies"
@@ -216,9 +354,16 @@ export default function BookForm({
 
           <button
             type="submit"
-            className="rounded-full bg-[#01796F] px-5 py-2.5 text-sm font-medium text-white transition hover:bg-[#015f58]"
+            disabled={isSubmitting}
+            className="rounded-full bg-[#01796F] px-5 py-2.5 text-sm font-medium text-white transition hover:bg-[#015f58] disabled:cursor-not-allowed disabled:opacity-60"
           >
-            {mode === "edit" ? "Update Book" : "Add Book"}
+            {isSubmitting
+              ? mode === "edit"
+                ? "Updating..."
+                : "Adding..."
+              : mode === "edit"
+                ? "Update Book"
+                : "Add Book"}
           </button>
         </div>
       </form>
