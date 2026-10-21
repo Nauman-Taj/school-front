@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState } from "react";
@@ -5,6 +6,8 @@ import {
   CalendarDays,
   ChevronLeft,
   ChevronRight,
+  Pencil,
+  Trash2,
 } from "lucide-react";
 
 import { CalendarEvent } from "@/types/calendar";
@@ -14,6 +17,9 @@ type CalendarViewType = "Month" | "Week" | "Day";
 type CalendarViewProps = {
   view: CalendarViewType;
   events: CalendarEvent[];
+  onEdit: (event: CalendarEvent) => void;
+  onDelete: (event: CalendarEvent) => void;
+  deletingId: number | null;
 };
 
 const eventStyles: Record<CalendarEvent["type"], string> = {
@@ -25,9 +31,70 @@ const eventStyles: Record<CalendarEvent["type"], string> = {
   "School Activity": "bg-teal-50 text-teal-700 border-teal-100",
 };
 
+type EventActionsProps = {
+  event: CalendarEvent;
+  onEdit: (event: CalendarEvent) => void;
+  onDelete: (event: CalendarEvent) => void;
+  deletingId: number | null;
+  compact?: boolean;
+};
+
+
+function EventActions({
+  event,
+  onEdit,
+  onDelete,
+  deletingId,
+  compact = false,
+}: EventActionsProps) {
+  const isDeleting = deletingId === event.id;
+  const isDeletePending = deletingId !== null;
+
+  return (
+    <div
+      className={`mt-3 flex w-full flex-wrap items-center justify-end gap-2 border-t border-current/10 pt-2 ${compact ? "mt-2 gap-1 pt-1" : ""
+        }`}
+    >
+      <button
+        type="button"
+        onClick={(e) => {
+          e.stopPropagation();
+          onEdit(event);
+        }}
+        disabled={isDeletePending}
+        aria-label={`Edit ${event.title}`}
+        title="Edit event"
+        className="inline-flex shrink-0 items-center justify-center gap-1 rounded-full border border-current/20 px-3 py-1.5 text-xs font-medium transition hover:bg-white/70 disabled:cursor-not-allowed disabled:opacity-50"
+      >
+        <Pencil size={compact ? 11 : 13} />
+        <span>Edit</span>
+      </button>
+
+      <button
+        type="button"
+        onClick={(e) => {
+          e.stopPropagation();
+          onDelete(event);
+        }}
+        disabled={isDeletePending}
+        aria-label={`Delete ${event.title}`}
+        title="Delete event"
+        className="inline-flex shrink-0 items-center justify-center gap-1 rounded-full border border-red-200 px-3 py-1.5 text-xs font-medium text-red-700 transition hover:bg-red-100 disabled:cursor-not-allowed disabled:opacity-50"
+      >
+        <Trash2 size={compact ? 11 : 13} />
+        <span>{isDeleting ? "Deleting..." : "Delete"}</span>
+      </button>
+    </div>
+  );
+}
+
+
 export default function CalendarView({
   view,
   events,
+  onEdit,
+  onDelete,
+  deletingId,
 }: CalendarViewProps) {
   const [currentDate, setCurrentDate] = useState<Date>(() => {
     const today = new Date();
@@ -46,17 +113,8 @@ export default function CalendarView({
     month: "long",
   });
 
-  const daysInMonth = new Date(
-    year,
-    month + 1,
-    0
-  ).getDate();
-
-  const firstDay = new Date(
-    year,
-    month,
-    1
-  ).getDay();
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const firstDay = new Date(year, month, 1).getDay();
 
   const days = Array.from(
     { length: daysInMonth },
@@ -64,13 +122,9 @@ export default function CalendarView({
   );
 
   const getEvents = (day: number) => {
-    const date = formatDate(
-      new Date(year, month, day)
-    );
+    const date = formatDate(new Date(year, month, day));
 
-    return events.filter(
-      (event) => event.date === date
-    );
+    return events.filter((event) => event.date === date);
   };
 
   const goPrevious = () => {
@@ -148,6 +202,9 @@ export default function CalendarView({
           firstDay={firstDay}
           days={days}
           getEvents={getEvents}
+          onEdit={onEdit}
+          onDelete={onDelete}
+          deletingId={deletingId}
         />
       )}
 
@@ -155,6 +212,9 @@ export default function CalendarView({
         <WeekView
           currentDate={currentDate}
           events={events}
+          onEdit={onEdit}
+          onDelete={onDelete}
+          deletingId={deletingId}
         />
       )}
 
@@ -162,6 +222,9 @@ export default function CalendarView({
         <DayView
           currentDate={currentDate}
           events={events}
+          onEdit={onEdit}
+          onDelete={onDelete}
+          deletingId={deletingId}
         />
       )}
     </div>
@@ -178,45 +241,43 @@ function MonthView({
   firstDay,
   days,
   getEvents,
+  onEdit,
+  onDelete,
+  deletingId,
 }: {
   year: number;
   monthName: string;
   firstDay: number;
   days: number[];
   getEvents: (day: number) => CalendarEvent[];
+  onEdit: (event: CalendarEvent) => void;
+  onDelete: (event: CalendarEvent) => void;
+  deletingId: number | null;
 }) {
   return (
     <>
       {/* Desktop */}
       <div className="mt-6 hidden md:block">
         <div className="grid grid-cols-7 border-b border-gray-200">
-          {[
-            "Sun",
-            "Mon",
-            "Tue",
-            "Wed",
-            "Thu",
-            "Fri",
-            "Sat",
-          ].map((day) => (
-            <div
-              key={day}
-              className="px-3 py-3 text-center text-xs font-semibold uppercase text-gray-500"
-            >
-              {day}
-            </div>
-          ))}
+          {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map(
+            (day) => (
+              <div
+                key={day}
+                className="px-3 py-3 text-center text-xs font-semibold uppercase text-gray-500"
+              >
+                {day}
+              </div>
+            )
+          )}
         </div>
 
         <div className="grid grid-cols-7">
-          {Array.from({ length: firstDay }).map(
-            (_, index) => (
-              <div
-                key={`empty-${index}`}
-                className="min-h-32 border-b border-r border-gray-100 bg-gray-50/50"
-              />
-            )
-          )}
+          {Array.from({ length: firstDay }).map((_, index) => (
+            <div
+              key={`empty-${index}`}
+              className="min-h-32 border-b border-r border-gray-100 bg-gray-50/50"
+            />
+          ))}
 
           {days.map((day) => {
             const dayEvents = getEvents(day);
@@ -230,16 +291,24 @@ function MonthView({
                   {day}
                 </div>
 
-                <div className="mt-1 space-y-1">
+                <div className="mt-1 space-y-2">
                   {dayEvents.map((event) => (
                     <div
                       key={event.id}
-                      className={`rounded-md border px-2 py-1 text-xs ${eventStyles[event.type]
+                      className={`rounded-md border px-2 py-2 text-xs ${eventStyles[event.type]
                         }`}
                     >
                       <p className="truncate font-medium">
                         {event.title}
                       </p>
+
+                      <EventActions
+                        event={event}
+                        onEdit={onEdit}
+                        onDelete={onDelete}
+                        deletingId={deletingId}
+                        compact
+                      />
                     </div>
                   ))}
                 </div>
@@ -282,13 +351,18 @@ function MonthView({
                         {event.title}
                       </p>
 
-                      <p className="mt-1 text-xs">
-                        {event.type}
-                      </p>
+                      <p className="mt-1 text-xs">{event.type}</p>
 
                       <p className="mt-1 text-xs opacity-75">
                         {event.description}
                       </p>
+
+                      <EventActions
+                        event={event}
+                        onEdit={onEdit}
+                        onDelete={onDelete}
+                        deletingId={deletingId}
+                      />
                     </div>
                   ))}
                 </div>
@@ -308,9 +382,15 @@ function MonthView({
 function WeekView({
   currentDate,
   events,
+  onEdit,
+  onDelete,
+  deletingId,
 }: {
   currentDate: Date;
   events: CalendarEvent[];
+  onEdit: (event: CalendarEvent) => void;
+  onDelete: (event: CalendarEvent) => void;
+  deletingId: number | null;
 }) {
   const startOfWeek = new Date(currentDate);
 
@@ -318,18 +398,13 @@ function WeekView({
     currentDate.getDate() - currentDate.getDay()
   );
 
-  const weekDays = Array.from(
-    { length: 7 },
-    (_, index) => {
-      const date = new Date(startOfWeek);
+  const weekDays = Array.from({ length: 7 }, (_, index) => {
+    const date = new Date(startOfWeek);
 
-      date.setDate(
-        startOfWeek.getDate() + index
-      );
+    date.setDate(startOfWeek.getDate() + index);
 
-      return date;
-    }
-  );
+    return date;
+  });
 
   return (
     <div className="mt-6 grid grid-cols-1 gap-2 sm:grid-cols-2 md:grid-cols-7">
@@ -362,13 +437,17 @@ function WeekView({
                   className={`rounded-lg border p-2 text-xs ${eventStyles[event.type]
                     }`}
                 >
-                  <p className="font-semibold">
-                    {event.title}
-                  </p>
+                  <p className="font-semibold">{event.title}</p>
 
-                  <p className="mt-1 opacity-75">
-                    {event.type}
-                  </p>
+                  <p className="mt-1 opacity-75">{event.type}</p>
+
+                  <EventActions
+                    event={event}
+                    onEdit={onEdit}
+                    onDelete={onDelete}
+                    deletingId={deletingId}
+                    compact
+                  />
                 </div>
               ))}
             </div>
@@ -386,9 +465,15 @@ function WeekView({
 function DayView({
   currentDate,
   events,
+  onEdit,
+  onDelete,
+  deletingId,
 }: {
   currentDate: Date;
   events: CalendarEvent[];
+  onEdit: (event: CalendarEvent) => void;
+  onDelete: (event: CalendarEvent) => void;
+  deletingId: number | null;
 }) {
   const dateString = formatDate(currentDate);
 
@@ -405,17 +490,20 @@ function DayView({
             className={`rounded-xl border p-4 ${eventStyles[event.type]
               }`}
           >
-            <p className="font-semibold">
-              {event.title}
-            </p>
+            <p className="font-semibold">{event.title}</p>
 
-            <p className="mt-1 text-sm">
-              {event.type}
-            </p>
+            <p className="mt-1 text-sm">{event.type}</p>
 
             <p className="mt-2 text-sm opacity-75">
               {event.description}
             </p>
+
+            <EventActions
+              event={event}
+              onEdit={onEdit}
+              onDelete={onDelete}
+              deletingId={deletingId}
+            />
           </div>
         ))
       ) : (
@@ -498,29 +586,19 @@ function formatDate(date: Date) {
 function getWeekTitle(date: Date) {
   const start = new Date(date);
 
-  start.setDate(
-    date.getDate() - date.getDay()
-  );
+  start.setDate(date.getDate() - date.getDay());
 
   const end = new Date(start);
 
-  end.setDate(
-    start.getDate() + 6
-  );
+  end.setDate(start.getDate() + 6);
 
-  const startMonth = start.toLocaleString(
-    "default",
-    {
-      month: "short",
-    }
-  );
+  const startMonth = start.toLocaleString("default", {
+    month: "short",
+  });
 
-  const endMonth = end.toLocaleString(
-    "default",
-    {
-      month: "short",
-    }
-  );
+  const endMonth = end.toLocaleString("default", {
+    month: "short",
+  });
 
   if (
     start.getFullYear() === end.getFullYear() &&
@@ -531,4 +609,3 @@ function getWeekTitle(date: Date) {
 
   return `${startMonth} ${start.getDate()} – ${endMonth} ${end.getDate()}, ${end.getFullYear()}`;
 }
-
