@@ -1,3 +1,4 @@
+
 import Link from "next/link";
 import {
   UserRound,
@@ -39,10 +40,11 @@ export default function StudentCard({
         </div>
 
         <span
-          className={`rounded-full px-2.5 py-1 text-xs font-medium ${student.status === "Active"
-            ? "bg-green-50 text-green-700"
-            : "bg-gray-100 text-gray-600"
-            }`}
+          className={`rounded-full px-2.5 py-1 text-xs font-medium ${
+            student.status === "Active"
+              ? "bg-green-50 text-green-700"
+              : "bg-gray-100 text-gray-600"
+          }`}
         >
           {student.status}
         </span>
@@ -85,6 +87,7 @@ export default function StudentCard({
       <div className="mt-5 flex justify-center gap-2 border-t border-gray-100 pt-4">
         <Link
           href={`/admin/students/${student.id}`}
+          aria-label={`View ${student.name}`}
           className="flex items-center justify-center rounded-lg border-gray-200 px-3 py-2.5 text-gray-700 transition hover:border-[#01796f] hover:bg-[#01796f]/10 hover:text-[#01796f]"
         >
           <UserRound size={17} strokeWidth={1.8} />
@@ -101,9 +104,9 @@ export default function StudentCard({
         <button
           type="button"
           onClick={() => onDelete(student.id, student.name)}
-          disabled={student.status === "Inactive"}
-          className="flex items-center justify-center rounded-full border border-gray-200 px-3 py-2.5 text-gray-500 transition hover:border-red-200 hover:bg-red-50 hover:text-red-600 disabled:cursor-not-allowed disabled:opacity-40"
-          aria-label={`Mark ${student.name} inactive`}
+          className="flex items-center justify-center rounded-full border border-gray-200 px-3 py-2.5 text-gray-500 transition hover:border-red-200 hover:bg-red-50 hover:text-red-600"
+          title="Permanently delete student"
+          aria-label={`Permanently delete ${student.name}`}
         >
           <Trash2 size={17} strokeWidth={1.8} />
         </button>

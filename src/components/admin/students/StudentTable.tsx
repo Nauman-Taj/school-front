@@ -83,8 +83,8 @@ export default function StudentTable() {
 
   const handleDelete = async (id: number, name: string) => {
     const confirmed = window.confirm(
-      `Are you sure you want to mark ${name} as inactive?`,
-    );
+      `Permanently delete ${name}?. Attendance history will be preserved, but parent links will be removed. Students with fee invoices or library borrowing records cannot be deleted.`,
+    );;
 
     if (!confirmed) return;
 
@@ -103,11 +103,8 @@ export default function StudentTable() {
         token,
       });
 
-      // The backend uses a soft delete, so keep the student in the list.
       setStudents((currentStudents) =>
-        currentStudents.map((student) =>
-          student.id === id ? { ...student, status: "Inactive" } : student,
-        ),
+        currentStudents.filter((student) => student.id !== id),
       );
     } catch (err) {
       setError(
@@ -323,8 +320,8 @@ export default function StudentTable() {
 
                         <button
                           type="button"
-                          title="Mark student inactive"
-                          aria-label={`Mark ${student.name} inactive`}
+                          title="Permanently delete student"
+                          aria-label={`Permanently delete ${student.name}`}
                           disabled={
                             deletingId === student.id ||
                             student.status === "Inactive"
@@ -358,9 +355,9 @@ export default function StudentTable() {
 
 
           </div>
-            <div className="border-t border-gray-100 px-5 py-4 text-sm text-gray-500">
-              Showing {filteredStudents.length} of {students.length} students
-            </div>
+          <div className="border-t border-gray-100 px-5 py-4 text-sm text-gray-500">
+            Showing {filteredStudents.length} of {students.length} students
+          </div>
         </div>
       )}
 
@@ -376,7 +373,7 @@ export default function StudentTable() {
 
               {deletingId === student.id && (
                 <div className="absolute inset-0 flex items-center justify-center rounded-2xl bg-white/70 text-sm font-medium text-gray-700">
-                  Updating status...
+                  Deleting student...
                 </div>
               )}
             </div>
