@@ -292,11 +292,10 @@ export default function StudentTable() {
 
                     <td className="px-5 py-4">
                       <span
-                        className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold ${
-                          student.status === "Active"
-                            ? "bg-[#e6f4f2] text-[#01796F]"
-                            : "bg-gray-100 text-gray-600"
-                        }`}
+                        className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold ${student.status === "Active"
+                          ? "bg-[#e6f4f2] text-[#01796F]"
+                          : "bg-gray-100 text-gray-600"
+                          }`}
                       >
                         {student.status}
                       </span>
@@ -356,7 +355,12 @@ export default function StudentTable() {
                 )}
               </tbody>
             </table>
+
+
           </div>
+            <div className="border-t border-gray-100 px-5 py-4 text-sm text-gray-500">
+              Showing {filteredStudents.length} of {students.length} students
+            </div>
         </div>
       )}
 

@@ -6,4 +6,5 @@ export type Teacher = {
   subject: string;
   qualification: string;
   joiningDate: string;
+  status?: "Active" | "Inactive";
 };
