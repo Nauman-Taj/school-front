@@ -1,3 +1,7 @@
+
+"use client";
+
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import {
   ArrowLeft,
@@ -9,24 +13,138 @@ import {
   Users,
 } from "lucide-react";
 
-import { Parent } from "@/types/parent";
-import { parentChildren } from "@/data/parentChildren";
-import { students } from "@/data/students";
+import type { Parent } from "@/types/parent";
+import { apiRequest } from "@/lib/api";
+import { getAuthToken } from "@/lib/auth";
 
 type ParentProfileProps = {
-  parent: Parent;
+  parentId: number;
+};
+
+type ParentApiResponse = {
+  id: number;
+  name: string;
+  email: string | null;
+  phone: string | null;
+  address: string | null;
+  occupation: string | null;
+  status: string;
+  children: {
+    student: {
+      id: number;
+      name: string;
+      className: string;
+      section: string;
+      rollNo: string | number;
+      status: string;
+    };
+  }[];
 };
 
 export default function ParentProfile({
-  parent,
+  parentId,
 }: ParentProfileProps) {
-  const childIds = parentChildren
-    .filter((relation) => relation.parentId === parent.id)
-    .map((relation) => relation.studentId);
+  const [parent, setParent] = useState<Parent | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
-  const children = students.filter((student) =>
-    childIds.includes(student.id)
-  );
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadParent() {
+      setLoading(true);
+      setError("");
+
+      const token = getAuthToken();
+
+      if (!token) {
+        if (!cancelled) {
+          setError("Your session has expired. Please log in again.");
+          setLoading(false);
+        }
+        return;
+      }
+
+      try {
+        const data = await apiRequest<ParentApiResponse>(
+          `/parents/${parentId}`,
+          { token }
+        );
+
+        const normalizedParent: Parent = {
+          id: data.id,
+          name: data.name,
+          email: data.email ?? "",
+          phone: data.phone ?? "",
+          address: data.address ?? "",
+          occupation: data.occupation ?? "",
+          status:
+            data.status === "ACTIVE" || data.status === "Active"
+              ? "Active"
+              : "Inactive",
+          children: (data.children ?? []).map(
+            (relationship) => ({
+              ...relationship.student,
+              rollNo: String(relationship.student.rollNo),
+            })
+          ),
+        };
+
+        if (!cancelled) {
+          setParent(normalizedParent);
+        }
+      } catch (err) {
+        if (!cancelled) {
+          setError(
+            err instanceof Error
+              ? err.message
+              : "Unable to load parent profile."
+          );
+        }
+      } finally {
+        if (!cancelled) {
+          setLoading(false);
+        }
+      }
+    }
+
+    loadParent();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [parentId]);
+
+  if (loading) {
+    return (
+      <div className="rounded-2xl border border-gray-200 bg-white p-6 text-sm text-gray-500">
+        Loading parent profile...
+      </div>
+    );
+  }
+
+  if (error || !parent) {
+    return (
+      <div className="space-y-4">
+        <Link
+          href="/admin/parents"
+          className="inline-flex items-center gap-2 text-sm font-medium text-gray-500 transition hover:text-[#01796f]"
+        >
+          <ArrowLeft size={17} />
+          Back to Parents
+        </Link>
+
+        <div
+          role="alert"
+          className="rounded-2xl border border-red-100 bg-red-50 p-5 text-sm text-red-700"
+        >
+          {error || "Parent not found."}
+        </div>
+      </div>
+    );
+  }
+
+  const children = parent.children ?? [];
 
   return (
     <div className="space-y-5">
@@ -45,9 +163,11 @@ export default function ParentProfile({
           <div className="flex h-16 w-16 items-center justify-center rounded-full bg-[#e6f4f2] text-xl font-bold text-[#01796f]">
             {parent.name
               .split(" ")
+              .filter(Boolean)
               .map((name) => name[0])
               .slice(0, 2)
-              .join("")}
+              .join("")
+              .toUpperCase()}
           </div>
 
           <div>
@@ -88,8 +208,8 @@ export default function ParentProfile({
                 <p className="text-xs font-medium text-gray-400">
                   Email
                 </p>
-                <p className="mt-1 text-sm text-gray-700">
-                  {parent.email}
+                <p className="mt-1 break-all text-sm text-gray-700">
+                  {parent.email || "Not provided"}
                 </p>
               </div>
             </div>
@@ -104,7 +224,7 @@ export default function ParentProfile({
                   Phone
                 </p>
                 <p className="mt-1 text-sm text-gray-700">
-                  {parent.phone}
+                  {parent.phone || "Not provided"}
                 </p>
               </div>
             </div>
@@ -118,8 +238,8 @@ export default function ParentProfile({
                 <p className="text-xs font-medium text-gray-400">
                   Address
                 </p>
-                <p className="mt-1 text-sm text-gray-700">
-                  {parent.address}
+                <p className="mt-1 whitespace-pre-wrap text-sm text-gray-700">
+                  {parent.address || "Not provided"}
                 </p>
               </div>
             </div>
@@ -134,7 +254,7 @@ export default function ParentProfile({
                   Occupation
                 </p>
                 <p className="mt-1 text-sm text-gray-700">
-                  {parent.occupation}
+                  {parent.occupation || "Not provided"}
                 </p>
               </div>
             </div>

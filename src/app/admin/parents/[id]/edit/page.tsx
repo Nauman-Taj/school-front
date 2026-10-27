@@ -1,7 +1,7 @@
+
 import { notFound } from "next/navigation";
 
-import ParentForm from "@/components/admin/parents/ParentForm";
-import { parents } from "@/data/parents";
+import ParentEditLoader from "@/components/admin/parents/ParentEditLoader";
 
 type EditParentPageProps = {
   params: Promise<{
@@ -13,14 +13,11 @@ export default async function EditParentPage({
   params,
 }: EditParentPageProps) {
   const { id } = await params;
+  const parentId = Number(id);
 
-  const parent = parents.find(
-    (parent) => parent.id === Number(id)
-  );
-
-  if (!parent) {
+  if (!Number.isSafeInteger(parentId) || parentId <= 0) {
     notFound();
   }
 
-  return <ParentForm parent={parent} mode="edit" />;
+  return <ParentEditLoader id={String(parentId)} />;
 }

@@ -1,7 +1,7 @@
+
 import { notFound } from "next/navigation";
 
 import ParentProfile from "@/components/admin/parents/ParentProfile";
-import { parents } from "@/data/parents";
 
 type ParentPageProps = {
   params: Promise<{
@@ -13,14 +13,11 @@ export default async function ParentPage({
   params,
 }: ParentPageProps) {
   const { id } = await params;
+  const parentId = Number(id);
 
-  const parent = parents.find(
-    (parent) => parent.id === Number(id)
-  );
-
-  if (!parent) {
+  if (!Number.isInteger(parentId) || parentId < 1) {
     notFound();
   }
 
-  return <ParentProfile parent={parent} />;
+  return <ParentProfile parentId={parentId} />;
 }

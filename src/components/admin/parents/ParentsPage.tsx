@@ -1,107 +1,209 @@
+
 "use client";
 
-import { useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { UserPlus, Users } from "lucide-react";
+import { RefreshCw, UserPlus, Users } from "lucide-react";
 
 import ParentTable from "./ParentTable";
-import { parents } from "@/data/parents";
-import { parentChildren } from "@/data/parentChildren";
+import type { Parent } from "@/types/parent";
+import { apiRequest } from "@/lib/api";
+import { getAuthToken } from "@/lib/auth";
+
+type BackendParent = {
+  id: number;
+  name: string;
+  email: string | null;
+  phone: string | null;
+  address: string | null;
+  occupation: string | null;
+  status: "ACTIVE" | "INACTIVE";
+  children: {
+    student: {
+      id: number;
+      name: string;
+      className: string;
+      section: string;
+      rollNo: string;
+      status: string;
+    };
+  }[];
+};
 
 export default function ParentsPage() {
-  const [parentList, setParentList] = useState(parents);
+  const [parentList, setParentList] = useState<Parent[]>([]);
+  const [totalChildren, setTotalChildren] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
-  const activeParents = parentList.filter(
-    (parent) => parent.status === "Active"
-  ).length;
+  const loadParents = useCallback(async () => {
+    setLoading(true);
+    setError("");
 
-  const inactiveParents = parentList.filter(
-    (parent) => parent.status === "Inactive"
-  ).length;
+    try {
+      const token = getAuthToken();
 
-  const totalChildren = parentChildren.filter((child) =>
-    parentList.some((parent) => parent.id === child.parentId)
-  ).length;
-  
+      if (!token) {
+        throw new Error(
+          "Your session has expired. Please log in again.",
+        );
+      }
+
+      const response = await apiRequest<BackendParent[]>("/parents", {
+        method: "GET",
+        token,
+      });
+
+      const mappedParents: Parent[] = response.map((parent) => ({
+        id: parent.id,
+        name: parent.name,
+        email: parent.email ?? "",
+        phone: parent.phone ?? "",
+        address: parent.address ?? "",
+        occupation: parent.occupation ?? "",
+        status: parent.status === "ACTIVE" ? "Active" : "Inactive",
+        children: parent.children.map(
+          (relationship) => relationship.student,
+        ),
+      }));
+
+      const childrenCount = response.reduce(
+        (total, parent) => total + parent.children.length,
+        0,
+      );
+
+      setParentList(mappedParents);
+      setTotalChildren(childrenCount);
+    } catch (err) {
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Unable to load parents from the server.",
+      );
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    void loadParents();
+  }, [loadParents]);
+
+  const activeParents = useMemo(
+    () =>
+      parentList.filter((parent) => parent.status === "Active").length,
+    [parentList],
+  );
+
+  const inactiveParents = useMemo(
+    () =>
+      parentList.filter((parent) => parent.status === "Inactive").length,
+    [parentList],
+  );
+
   const stats = [
     {
       title: "Total Parents",
       value: parentList.length,
-      icon: Users,
+      valueClass: "text-gray-800",
     },
     {
       title: "Active Parents",
       value: activeParents,
-      icon: Users,
+      valueClass: "text-[#01796F]",
     },
     {
       title: "Inactive Parents",
       value: inactiveParents,
-      icon: Users,
+      valueClass: "text-gray-600",
     },
     {
       title: "Total Children",
       value: totalChildren,
-      icon: Users,
+      valueClass: "text-gray-800",
     },
   ];
 
   return (
     <div className="space-y-5">
-      {/* Header */}
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+      {/* Page heading */}
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-900 sm:text-3xl">
             Parents
           </h1>
 
           <p className="mt-1 text-sm text-gray-500 sm:text-base">
-            Manage parents and their children
+            Manage parents and their children.
           </p>
         </div>
 
         <Link
           href="/admin/parents/add"
-          className="inline-flex w-fit items-center justify-center gap-2 rounded-full bg-[#01796f] px-4 py-2.5 text-sm font-medium text-white transition hover:bg-[#01665d]"
+          className="inline-flex items-center justify-center gap-2 rounded-full bg-[#01796F] px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-[#015f58]"
         >
-          <UserPlus size={17} />
+          <UserPlus size={18} />
           Add Parent
         </Link>
       </div>
 
-      {/* Stats */}
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {stats.map((stat) => {
-          const Icon = stat.icon;
+      {/* Summary cards */}
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        {stats.map((stat) => (
+          <div
+            key={stat.title}
+            className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm"
+          >
+            <p className="text-sm text-gray-500">{stat.title}</p>
 
-          return (
-            <div
-              key={stat.title}
-              className="rounded-2xl border border-gray-200 bg-white p-5"
+            <p
+              className={`mt-2 text-2xl font-bold ${stat.valueClass}`}
             >
-              <div className="flex items-center justify-between">
-                <p className="text-sm font-medium text-gray-500">
-                  {stat.title}
-                </p>
-
-                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#e6f4f2] text-[#01796f]">
-                  <Icon size={20} />
-                </div>
-              </div>
-
-              <h2 className="mt-3 text-2xl font-bold text-gray-900">
-                {stat.value}
-              </h2>
-            </div>
-          );
-        })}
+              {loading ? "—" : stat.value}
+            </p>
+          </div>
+        ))}
       </div>
 
-      {/* Table */}
-      <ParentTable
-        parentList={parentList}
-        setParentList={setParentList}
-      />
+      {/* Backend error */}
+      {error && (
+        <div
+          role="alert"
+          className="flex flex-col gap-3 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700 sm:flex-row sm:items-center sm:justify-between"
+        >
+          <p>{error}</p>
+
+          <button
+            type="button"
+            onClick={() => void loadParents()}
+            disabled={loading}
+            className="self-start rounded-full border border-red-200 px-4 py-2 font-medium transition hover:bg-red-100 disabled:cursor-not-allowed disabled:opacity-60 sm:self-auto"
+          >
+            Try again
+          </button>
+        </div>
+      )}
+
+      {/* Refresh and list */}
+      <div className="space-y-4">
+
+        {loading ? (
+          <div className="rounded-2xl border border-gray-100 bg-white p-10 text-center shadow-sm">
+            <div className="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-gray-200 border-t-[#01796F]" />
+
+            <p className="mt-4 text-sm text-gray-500">
+              Loading parents...
+            </p>
+          </div>
+        ) : !error ? (
+          <ParentTable
+            parentList={parentList}
+            setParentList={setParentList}
+            onRefresh={loadParents}
+            loading={loading}
+          />
+        ) : null}
+      </div>
     </div>
   );
 }
