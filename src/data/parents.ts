@@ -12,8 +12,8 @@ export const parents: Parent[] = [
   },
   {
     id: 2,
-    name: "Ahmad Raza",
-    email: "ahmadraza@gmail.com",
+    name: "Ahmad Aslam",
+    email: "ahmadaslam@gmail.com",
     phone: "+92 301 2223344",
     address: "Gulgasht Colony, Multan",
     occupation: "Civil Engineer",
@@ -66,8 +66,8 @@ export const parents: Parent[] = [
   },
   {
     id: 8,
-    name: "Faisal Nadeem",
-    email: "faisalnadeem@gmail.com",
+    name: "Bilal Nadeem",
+    email: "bilalnadeem@gmail.com",
     phone: "+92 307 8889900",
     address: "Shujabad Road, Multan",
     occupation: "Software Engineer",
@@ -129,8 +129,8 @@ export const parents: Parent[] = [
   },
   {
     id: 15,
-    name: "Sohail Ahmad",
-    email: "sohailahmad@gmail.com",
+    name: "Ahmad Sohail",
+    email: "ahmadsohail@gmail.com",
     phone: "+92 314 9990077",
     address: "Bosan Road, Multan",
     occupation: "Accountant",
