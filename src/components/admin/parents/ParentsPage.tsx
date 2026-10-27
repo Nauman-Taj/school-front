@@ -159,7 +159,7 @@ export default function ParentsPage() {
             <p
               className={`mt-2 text-2xl font-bold ${stat.valueClass}`}
             >
-              {loading ? "—" : stat.value}
+              {loading ? "0" : stat.value}
             </p>
           </div>
         ))}
