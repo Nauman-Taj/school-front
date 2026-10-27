@@ -37,8 +37,7 @@ export default function ParentTable({
 
   const handleDelete = async (id: number, name: string) => {
     const confirmed = window.confirm(
-      `Permanently delete ${name} (ID: ${id})?\n\n` +
-      "This action cannot be undone. Continue?",
+      `Are you sure you want to permanently delete ${name} (ID: ${id})?`
     );
 
     if (!confirmed) return;
