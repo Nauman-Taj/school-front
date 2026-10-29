@@ -1,7 +1,5 @@
-import { notFound } from "next/navigation";
 
-import ClassProfile from "@/components/admin/classes/ClassProfile";
-import { classes } from "@/data/classes";
+import ClassRecordLoader from "@/components/admin/classes/ClassRecordLoader";
 
 type ClassProfilePageProps = {
   params: Promise<{
@@ -14,13 +12,5 @@ export default async function ClassProfilePage({
 }: ClassProfilePageProps) {
   const { id } = await params;
 
-  const schoolClass = classes.find(
-    (item) => item.id === Number(id)
-  );
-
-  if (!schoolClass) {
-    notFound();
-  }
-
-  return <ClassProfile schoolClass={schoolClass} />;
+  return <ClassRecordLoader id={id} />;
 }

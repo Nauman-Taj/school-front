@@ -1,3 +1,4 @@
+
 import Link from "next/link";
 import {
   ArrowLeft,
@@ -7,22 +8,18 @@ import {
   Users,
 } from "lucide-react";
 
-import { SchoolClass } from "@/types/class";
-import { students } from "@/data/students";
+import type { SchoolClass } from "@/types/class";
+import type { Student } from "@/types/student";
 
 type ClassProfileProps = {
   schoolClass: SchoolClass;
+  students: Student[];
 };
 
 export default function ClassProfile({
   schoolClass,
+  students: classStudents,
 }: ClassProfileProps) {
-  const classStudents = students.filter(
-    (student) =>
-      student.className === schoolClass.name &&
-      student.section === schoolClass.section
-  );
-
   return (
     <div className="space-y-5">
       {/* Back */}
@@ -81,7 +78,7 @@ export default function ClassProfile({
             <div>
               <p className="text-sm text-gray-500">Class Teacher</p>
               <p className="text-base font-semibold text-gray-900">
-                {schoolClass.teacher}
+                {schoolClass.teacher || "Not assigned"}
               </p>
             </div>
           </div>
@@ -141,7 +138,7 @@ export default function ClassProfile({
                 </p>
 
                 <p className="mt-1 text-sm text-gray-500">
-                  {student.email}
+                  {student.email || "No email provided"}
                 </p>
               </div>
 
@@ -151,7 +148,7 @@ export default function ClassProfile({
                 </p>
 
                 <p className="mt-1 text-sm text-gray-500">
-                  {student.phone}
+                  {student.phone || "No phone provided"}
                 </p>
               </div>
             </div>

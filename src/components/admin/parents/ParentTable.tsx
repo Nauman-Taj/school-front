@@ -167,6 +167,15 @@ export default function ParentTable({
       </div>
 
 
+      {/* Loading */}
+      {loading && (
+        <div className="rounded-2xl border border-gray-100 bg-white p-10 text-center shadow-sm">
+          <div className="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-gray-200 border-t-[#01796F]" />
+          <p className="mt-4 text-sm text-gray-500">Loading parents...</p>
+        </div>
+      )}
+
+
 
       {/* Desktop table */}
       <div className="hidden overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm lg:block">

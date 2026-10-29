@@ -3,7 +3,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { RefreshCw, UserPlus, Users } from "lucide-react";
+import { UserPlus } from "lucide-react";
 
 import ParentTable from "./ParentTable";
 import type { Parent } from "@/types/parent";
@@ -33,11 +33,17 @@ type BackendParent = {
 export default function ParentsPage() {
   const [parentList, setParentList] = useState<Parent[]>([]);
   const [totalChildren, setTotalChildren] = useState(0);
-  const [loading, setLoading] = useState(true);
+  const [initialLoading, setInitialLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState("");
 
-  const loadParents = useCallback(async () => {
-    setLoading(true);
+  const loadParents = useCallback(async (isRefresh = false) => {
+    if (isRefresh) {
+      setRefreshing(true);
+    } else {
+      setInitialLoading(true);
+    }
+
     setError("");
 
     try {
@@ -62,13 +68,13 @@ export default function ParentsPage() {
         address: parent.address ?? "",
         occupation: parent.occupation ?? "",
         status: parent.status === "ACTIVE" ? "Active" : "Inactive",
-        children: parent.children.map(
+        children: (parent.children ?? []).map(
           (relationship) => relationship.student,
         ),
       }));
 
       const childrenCount = response.reduce(
-        (total, parent) => total + parent.children.length,
+        (total, parent) => total + (parent.children?.length ?? 0),
         0,
       );
 
@@ -81,7 +87,8 @@ export default function ParentsPage() {
           : "Unable to load parents from the server.",
       );
     } finally {
-      setLoading(false);
+      setInitialLoading(false);
+      setRefreshing(false);
     }
   }, []);
 
@@ -90,14 +97,12 @@ export default function ParentsPage() {
   }, [loadParents]);
 
   const activeParents = useMemo(
-    () =>
-      parentList.filter((parent) => parent.status === "Active").length,
+    () => parentList.filter((parent) => parent.status === "Active").length,
     [parentList],
   );
 
   const inactiveParents = useMemo(
-    () =>
-      parentList.filter((parent) => parent.status === "Inactive").length,
+    () => parentList.filter((parent) => parent.status === "Inactive").length,
     [parentList],
   );
 
@@ -156,10 +161,8 @@ export default function ParentsPage() {
           >
             <p className="text-sm text-gray-500">{stat.title}</p>
 
-            <p
-              className={`mt-2 text-2xl font-bold ${stat.valueClass}`}
-            >
-              {loading ? "0" : stat.value}
+            <p className={`mt-2 text-2xl font-bold ${stat.valueClass}`}>
+              {initialLoading ? "0" : stat.value}
             </p>
           </div>
         ))}
@@ -173,37 +176,45 @@ export default function ParentsPage() {
         >
           <p>{error}</p>
 
-          <button
-            type="button"
-            onClick={() => void loadParents()}
-            disabled={loading}
-            className="self-start rounded-full border border-red-200 px-4 py-2 font-medium transition hover:bg-red-100 disabled:cursor-not-allowed disabled:opacity-60 sm:self-auto"
-          >
-            Try again
-          </button>
+          <div className="flex flex-wrap items-center gap-2">
+            {error.toLowerCase().includes("session has expired") && (
+              <Link
+                href="/login"
+                className="rounded-full border border-red-200 px-4 py-2 font-medium transition hover:bg-red-100"
+              >
+                Log In
+              </Link>
+            )}
+
+            <button
+              type="button"
+              onClick={() => void loadParents(!initialLoading)}
+              disabled={initialLoading || refreshing}
+              className="rounded-full border border-red-200 px-4 py-2 font-medium transition hover:bg-red-100 disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              Try again
+            </button>
+          </div>
         </div>
       )}
 
-      {/* Refresh and list */}
-      <div className="space-y-4">
+      {/* Parent table and cards */}
+      {initialLoading ? (
+        <div className="rounded-2xl border border-gray-100 bg-white p-10 text-center shadow-sm">
+          <div className="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-gray-200 border-t-[#01796F]" />
 
-        {loading ? (
-          <div className="rounded-2xl border border-gray-100 bg-white p-10 text-center shadow-sm">
-            <div className="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-gray-200 border-t-[#01796F]" />
-
-            <p className="mt-4 text-sm text-gray-500">
-              Loading parents...
-            </p>
-          </div>
-        ) : !error ? (
-          <ParentTable
-            parentList={parentList}
-            setParentList={setParentList}
-            onRefresh={loadParents}
-            loading={loading}
-          />
-        ) : null}
-      </div>
+          <p className="mt-4 text-sm text-gray-500">
+            Loading parents...
+          </p>
+        </div>
+      ) : (
+        <ParentTable
+          parentList={parentList}
+          setParentList={setParentList}
+          onRefresh={() => loadParents(true)}
+          loading={refreshing}
+        />
+      )}
     </div>
   );
 }
