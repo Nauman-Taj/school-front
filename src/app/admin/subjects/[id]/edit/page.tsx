@@ -1,7 +1,5 @@
-import { notFound } from "next/navigation";
 
-import { subjects } from "@/data/subjects";
-import SubjectForm from "@/components/admin/subjects/SubjectForm";
+import SubjectLoader from "@/components/admin/subjects/SubjectLoader";
 
 type EditSubjectPageProps = {
   params: Promise<{
@@ -14,11 +12,5 @@ export default async function EditSubjectPage({
 }: EditSubjectPageProps) {
   const { id } = await params;
 
-  const subject = subjects.find((subject) => subject.id === id);
-
-  if (!subject) {
-    notFound();
-  }
-
-  return <SubjectForm subject={subject} isEdit />;
+  return <SubjectLoader subjectId={id} mode="edit" />;
 }

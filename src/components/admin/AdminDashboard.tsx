@@ -159,7 +159,7 @@ export default function AdminDashboard() {
     },
     {
       title: "Fee Collection",
-      value: feeSummary ? `${feeSummary.collectionRate}%` : "—",
+      value: feeSummary ? `${feeSummary.collectionRate}%` : "0%",
       change: feeSummary
         ? `Rs. ${feeSummary.collected.toLocaleString()}`
         : "—",

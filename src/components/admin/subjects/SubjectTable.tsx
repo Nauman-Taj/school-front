@@ -1,49 +1,163 @@
+
 "use client";
 
-import { useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import {
-  Plus,
+  Pencil,
   Search,
   Eye,
-  Pencil,
+  Plus,
   Trash2,
-  BookOpen,
-  UserRound,
+  RefreshCw,
 } from "lucide-react";
 
-import { subjects } from "@/data/subjects";
+import { apiRequest } from "@/lib/api";
+import { getAuthToken } from "@/lib/auth";
+import type { Subject } from "@/types/subject";
+import SubjectCard from "@/components/admin/subjects/SubjectCard";
+
+type ApiSubject = {
+  id: string;
+  name: string;
+  code: string;
+  teacherId: string;
+  teacher?: string | { id?: string; name?: string } | null;
+  className?: string;
+  section?: string;
+  schoolClass?: {
+    name?: string;
+    section?: string;
+  } | null;
+  status: "ACTIVE" | "INACTIVE";
+};
+
+function mapApiSubject(subject: ApiSubject): Subject {
+  const teacherName =
+    typeof subject.teacher === "string"
+      ? subject.teacher
+      : subject.teacher?.name || subject.teacherId;
+
+  return {
+    id: subject.id,
+    name: subject.name,
+    code: subject.code,
+    teacherId: subject.teacherId,
+    teacher: teacherName,
+    className: subject.schoolClass?.name || subject.className || "",
+    section: subject.schoolClass?.section || subject.section || "",
+    status: subject.status === "ACTIVE" ? "Active" : "Inactive",
+  };
+}
 
 export default function SubjectTable() {
-  const [subjectList, setSubjectList] = useState(subjects);
+  const [subjects, setSubjects] = useState<Subject[]>([]);
   const [search, setSearch] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
-  const filteredSubjects = subjectList.filter((subject) =>
-    `${subject.name} ${subject.code} ${subject.className} ${subject.teacher}`
-      .toLowerCase()
-      .includes(search.toLowerCase())
-  );
+  const fetchSubjects = useCallback(async () => {
+    setLoading(true);
+    setError("");
 
-  const handleDelete = (id: string) => {
-    const subject = subjectList.find((subject) => subject.id === id);
+    try {
+      const token = getAuthToken();
 
-    if (!subject) return;
+      if (!token) {
+        throw new Error("Your session has expired. Please log in again.");
+      }
 
+      const response = await apiRequest<ApiSubject[]>("/subjects", {
+        method: "GET",
+        token,
+      });
+
+      setSubjects(response.map(mapApiSubject));
+    } catch (err) {
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Unable to load subjects from the server.",
+      );
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    void fetchSubjects();
+  }, [fetchSubjects]);
+
+  const handleDelete = async (id: string, name: string) => {
     const confirmed = window.confirm(
-      `Are you sure you want to delete ${subject.name}?`
+      `Permanently delete ${name} (${id})?\n\nContinue?`,
     );
 
     if (!confirmed) return;
 
-    setSubjectList((currentSubjects) =>
-      currentSubjects.filter((subject) => subject.id !== id)
-    );
+    setDeletingId(id);
+    setError("");
+
+    try {
+      const token = getAuthToken();
+
+      if (!token) {
+        throw new Error("Your session has expired. Please log in again.");
+      }
+
+      await apiRequest<ApiSubject>(
+        `/subjects/${encodeURIComponent(id)}`,
+        {
+          method: "DELETE",
+          token,
+        },
+      );
+
+      setSubjects((currentSubjects) =>
+        currentSubjects.filter((subject) => subject.id !== id),
+      );
+    } catch (err) {
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Unable to delete this subject.",
+      );
+    } finally {
+      setDeletingId(null);
+    }
   };
+
+  const filteredSubjects = useMemo(() => {
+    const searchValue = search.trim().toLowerCase();
+
+    if (!searchValue) return subjects;
+
+    return subjects.filter((subject) =>
+      [
+        subject.id,
+        subject.name,
+        subject.code,
+        subject.teacher,
+        subject.className,
+        subject.section,
+        subject.status ?? "",
+      ].some((value) => value.toLowerCase().includes(searchValue)),
+    );
+  }, [subjects, search]);
+
+  const activeCount = subjects.filter(
+    (subject) => subject.status === "Active",
+  ).length;
+
+  const inactiveCount = subjects.filter(
+    (subject) => subject.status === "Inactive",
+  ).length;
 
   return (
     <div className="space-y-5">
-      {/* Header */}
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+      {/* Page heading */}
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-900 sm:text-3xl">
             Subjects
@@ -55,222 +169,245 @@ export default function SubjectTable() {
 
         <Link
           href="/admin/subjects/add"
-          className="inline-flex w-fit items-center gap-2 rounded-full bg-[#01796F] px-4 py-2.5 text-sm font-medium text-white transition hover:bg-[#015f58]"
+          className="inline-flex items-center justify-center gap-2 rounded-full bg-[#01796F] px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-[#015f58]"
         >
-          <Plus size={17} />
+          <Plus size={18} />
           Add Subject
         </Link>
       </div>
 
-      {/* Search */}
-      <div className="relative">
-        <Search
-          size={17}
-          className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
-        />
-
-        <input
-          type="text"
-          placeholder="Search subjects"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="w-full rounded-full border border-gray-200 bg-white py-3 pl-11 pr-4 text-sm text-gray-900 outline-none transition placeholder:text-gray-400 focus:border-[#01796f] focus:ring-2 focus:ring-[#01796f]/10"
-        />
-      </div>
-
-      {/* Table */}
-      <div className="hidden overflow-hidden rounded-2xl border border-gray-200 bg-white md:block">
-        <div className="overflow-x-auto">
-          <table className="w-full min-w-[750px]">
-            <thead>
-              <tr className="border-b border-gray-200 bg-gray-50">
-                <th className="px-6 py-4 text-left text-sm font-semibold text-gray-600">
-                  Subject
-                </th>
-
-                <th className="px-6 py-4 text-left text-sm font-semibold text-gray-600">
-                  Code
-                </th>
-
-                <th className="px-6 py-4 text-left text-sm font-semibold text-gray-600">
-                  Class
-                </th>
-
-                <th className="px-6 py-4 text-left text-sm font-semibold text-gray-600">
-                  Teacher
-                </th>
-
-                <th className="px-6 py-4 text-center text-sm font-semibold text-gray-600">
-                  Actions
-                </th>
-              </tr>
-            </thead>
-
-            <tbody>
-              {filteredSubjects.map((subject) => (
-                <tr
-                  key={subject.id}
-                  className="border-b border-gray-100 last:border-0 hover:bg-gray-50/70"
-                >
-                  {/* Subject */}
-                  <td className="px-6 py-4">
-                    <div className="flex items-center gap-3">
-                      <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#e6f4f2] text-[#01796F]">
-                        <BookOpen size={19} />
-                      </div>
-
-                      <div>
-                        <p className="font-medium text-gray-900">
-                          {subject.name}
-                        </p>
-
-                        <p className="text-xs text-gray-500">
-                          {subject.id}
-                        </p>
-                      </div>
-                    </div>
-                  </td>
-
-                  {/* Code */}
-                  <td className="px-6 py-4 text-sm text-gray-600">
-                    {subject.code}
-                  </td>
-
-                  {/* Class */}
-                  <td className="px-6 py-4 text-sm text-gray-600">
-                    {subject.className}
-                  </td>
-
-                  {/* Teacher */}
-                  <td className="px-6 py-4">
-                    <div className="flex items-center gap-2 text-sm text-gray-600">
-                      <UserRound size={16} className="text-gray-400" />
-                      {subject.teacher}
-                    </div>
-                  </td>
-
-                  {/* Actions */}
-                  <td className="px-6 py-4">
-                    <div className="flex items-center justify-center gap-2">
-                      <Link
-                        href={`/admin/subjects/${subject.id}`}
-                        title="View"
-                        className="flex h-9 w-9 items-center justify-center rounded-lg text-gray-500 transition hover:bg-[#01796F]/10 hover:text-[#01796F]"
-                      >
-                        <Eye size={17} />
-                      </Link>
-
-                      <Link
-                        href={`/admin/subjects/${subject.id}/edit`}
-                        title="Edit"
-                        className="flex h-9 w-9 items-center justify-center rounded-lg text-gray-500 transition hover:bg-[#01796F]/10 hover:text-[#01796F]"
-                      >
-                        <Pencil size={17} />
-                      </Link>
-
-                      <button
-                        type="button"
-                        title="Delete"
-                        onClick={() => handleDelete(subject.id)}
-                        className="flex h-9 w-9 items-center justify-center rounded-lg text-gray-500 transition hover:bg-red-50 hover:text-red-600"
-                      >
-                        <Trash2 size={17} />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+      {/* Summary cards */}
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+        <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
+          <p className="text-sm text-gray-500">Total Subjects</p>
+          <p className="mt-2 text-2xl font-bold text-gray-800">
+            {subjects.length}
+          </p>
         </div>
 
-        {/* No results */}
-        {filteredSubjects.length === 0 && (
-          <div className="px-6 py-12 text-center">
-            <BookOpen className="mx-auto mb-3 text-gray-400" size={30} />
+        <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
+          <p className="text-sm text-gray-500">Active Subjects</p>
+          <p className="mt-2 text-2xl font-bold text-[#01796F]">
+            {activeCount}
+          </p>
+        </div>
 
-            <p className="text-sm font-medium text-gray-700">
-              No subjects found
-            </p>
-
-            <p className="mt-1 text-xs text-gray-500">
-              Try searching with a different keyword.
-            </p>
-          </div>
-        )}
+        <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
+          <p className="text-sm text-gray-500">Inactive Subjects</p>
+          <p className="mt-2 text-2xl font-bold text-gray-600">
+            {inactiveCount}
+          </p>
+        </div>
       </div>
 
-      {/* Mobile Cards */}
-      <div className="grid gap-4 md:hidden">
-        {filteredSubjects.map((subject) => (
-          <div
-            key={subject.id}
-            className="rounded-2xl border border-gray-200 bg-white p-5"
+      {/* Search and refresh */}
+      <div className="rounded-2xl border border-gray-100 bg-white p-4 shadow-sm">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+          <div className="relative flex-1">
+            <Search
+              size={18}
+              className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
+            />
+            <input
+              type="text"
+              value={search}
+              onChange={(event) => setSearch(event.target.value)}
+              placeholder="Search by name, code, class, teacher"
+              className="w-full rounded-full border border-gray-200 bg-gray-50 py-3 pl-11 pr-4 text-sm outline-none transition focus:border-[#01796F] focus:bg-white focus:ring-2 focus:ring-[#01796F]/10"
+            />
+          </div>
+
+          <button
+            type="button"
+            onClick={() => void fetchSubjects()}
+            disabled={loading}
+            className="inline-flex items-center justify-center gap-2 rounded-full border border-gray-200 px-5 py-3 text-sm font-medium text-gray-700 transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-60"
           >
-            <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#e6f4f2] text-[#01796F]">
-                <BookOpen size={19} />
-              </div>
-
-              <div>
-                <h3 className="font-semibold text-gray-900">
-                  {subject.name}
-                </h3>
-
-                <p className="text-xs text-gray-500">
-                  {subject.code}
-                </p>
-              </div>
-            </div>
-
-            <div className="mt-4 space-y-2 text-sm">
-              <div className="flex justify-between">
-                <span className="text-gray-500">Class</span>
-
-                <span className="font-medium text-gray-800">
-                  {subject.className}
-                </span>
-              </div>
-
-              <div className="flex justify-between gap-4">
-                <span className="text-gray-500">Teacher</span>
-
-                <span className="text-right font-medium text-gray-800">
-                  {subject.teacher}
-                </span>
-              </div>
-            </div>
-
-            {/* Mobile Actions */}
-            <div className="mt-4 flex items-center justify-center gap-2 border-t border-gray-100 pt-4">
-              <Link
-                href={`/admin/subjects/${subject.id}`}
-                title="View"
-                className="flex h-9 w-9 items-center justify-center rounded-lg text-gray-500 transition hover:bg-[#01796F]/10 hover:text-[#01796F]"
-              >
-                <Eye size={17} />
-              </Link>
-
-              <Link
-                href={`/admin/subjects/${subject.id}/edit`}
-                title="Edit"
-                className="flex h-9 w-9 items-center justify-center rounded-lg text-gray-500 transition hover:bg-[#01796F]/10 hover:text-[#01796F]"
-              >
-                <Pencil size={17} />
-              </Link>
-
-              <button
-                type="button"
-                title="Delete"
-                onClick={() => handleDelete(subject.id)}
-                className="flex h-9 w-9 items-center justify-center rounded-lg text-gray-500 transition hover:bg-red-50 hover:text-red-600"
-              >
-                <Trash2 size={17} />
-              </button>
-            </div>
-          </div>
-        ))}
+            <RefreshCw
+              size={16}
+              className={loading ? "animate-spin" : ""}
+            />
+            Refresh
+          </button>
+        </div>
       </div>
+
+      {/* Error message */}
+      {error && (
+        <div
+          role="alert"
+          className="flex flex-col gap-3 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700 sm:flex-row sm:items-center sm:justify-between"
+        >
+          <p>{error}</p>
+
+          <button
+            type="button"
+            onClick={() => void fetchSubjects()}
+            className="self-start rounded-full border border-red-200 px-4 py-2 font-medium transition hover:bg-red-100 sm:self-auto"
+          >
+            Try again
+          </button>
+        </div>
+      )}
+
+      {/* Loading */}
+      {loading && (
+        <div className="rounded-2xl border border-gray-100 bg-white p-10 text-center shadow-sm">
+          <div className="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-gray-200 border-t-[#01796F]" />
+          <p className="mt-4 text-sm text-gray-500">
+            Loading subjects...
+          </p>
+        </div>
+      )}
+
+      {/* Desktop table */}
+      {!loading && (
+        <div className="hidden overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm lg:block">
+          <div className="overflow-x-auto">
+            <table className="w-full min-w-[1000px] text-left text-sm">
+              <thead className="bg-gray-50 text-gray-700">
+                <tr>
+                  <th className="px-5 py-4 font-semibold">Subject</th>
+                  <th className="px-5 py-4 font-semibold">Code</th>
+                  <th className="px-5 py-4 font-semibold">Class</th>
+                  <th className="px-5 py-4 font-semibold">
+                    Assigned Teacher
+                  </th>
+                  <th className="px-5 py-4 font-semibold">Status</th>
+                  <th className="px-5 py-4 text-center font-semibold">
+                    Actions
+                  </th>
+                </tr>
+              </thead>
+
+              <tbody className="divide-y divide-gray-100">
+                {filteredSubjects.map((subject) => (
+                  <tr
+                    key={subject.id}
+                    className="transition hover:bg-gray-50"
+                  >
+                    <td className="px-5 py-4">
+                      <Link
+                        href={`/admin/subjects/${encodeURIComponent(subject.id)}`}
+                        className="font-semibold text-gray-800 transition hover:text-[#01796F]"
+                      >
+                        {subject.name}
+                      </Link>
+                      <p className="mt-1 text-xs text-gray-500">
+                        {subject.id}
+                      </p>
+                    </td>
+
+                    <td className="px-5 py-4 text-gray-600">
+                      {subject.code}
+                    </td>
+
+                    <td className="px-5 py-4 text-gray-600">
+                      {subject.className}-{subject.section}
+                    </td>
+
+                    <td className="px-5 py-4 text-gray-600">
+                      {subject.teacher}
+                    </td>
+
+                    <td className="px-5 py-4">
+                      <span
+                        className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold ${
+                          subject.status === "Active"
+                            ? "bg-[#e6f4f2] text-[#01796F]"
+                            : "bg-gray-100 text-gray-600"
+                        }`}
+                      >
+                        {subject.status ?? "Unknown"}
+                      </span>
+                    </td>
+
+                    <td className="px-5 py-4">
+                      <div className="flex items-center justify-center gap-2">
+                        <Link
+                          href={`/admin/subjects/${encodeURIComponent(subject.id)}`}
+                          title="View subject"
+                          aria-label={`View ${subject.name}`}
+                          className="rounded-full p-2 text-gray-500 transition hover:bg-[#e6f4f2] hover:text-[#01796F]"
+                        >
+                          <Eye size={17} />
+                        </Link>
+
+                        <Link
+                          href={`/admin/subjects/${encodeURIComponent(subject.id)}/edit`}
+                          title="Edit subject"
+                          aria-label={`Edit ${subject.name}`}
+                          className="rounded-full p-2 text-gray-500 transition hover:bg-blue-50 hover:text-blue-500"
+                        >
+                          <Pencil size={17} />
+                        </Link>
+
+                        <button
+                          type="button"
+                          title="Permanently delete subject"
+                          aria-label={`Delete ${subject.name}`}
+                          disabled={deletingId === subject.id}
+                          onClick={() =>
+                            void handleDelete(subject.id, subject.name)
+                          }
+                          className="rounded-full p-2 text-gray-500 transition hover:bg-red-50 hover:text-red-500 disabled:cursor-not-allowed disabled:opacity-40"
+                        >
+                          <Trash2 size={17} />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+
+                {filteredSubjects.length === 0 && (
+                  <tr>
+                    <td
+                      colSpan={6}
+                      className="px-5 py-12 text-center text-gray-500"
+                    >
+                      {search
+                        ? "No subjects match your search."
+                        : "No subjects were returned by the backend."}
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+
+          <div className="border-t border-gray-100 px-5 py-4 text-sm text-gray-500">
+            Showing {filteredSubjects.length} of {subjects.length} subjects
+          </div>
+        </div>
+      )}
+
+      {/* Mobile and tablet cards */}
+      {!loading && (
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:hidden">
+          {filteredSubjects.map((subject) => (
+            <div key={subject.id} className="relative">
+              <SubjectCard
+                subject={subject}
+                onDelete={(id, name) => void handleDelete(id, name)}
+              />
+
+              {deletingId === subject.id && (
+                <div className="absolute inset-0 flex items-center justify-center rounded-2xl bg-white/70 text-sm font-medium text-gray-700">
+                  Deleting subject...
+                </div>
+              )}
+            </div>
+          ))}
+
+          {filteredSubjects.length === 0 && (
+            <div className="col-span-full rounded-2xl border border-gray-100 bg-white p-10 text-center text-sm text-gray-500 shadow-sm">
+              {search
+                ? "No subjects match your search."
+                : "No subjects were returned by the backend."}
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }
