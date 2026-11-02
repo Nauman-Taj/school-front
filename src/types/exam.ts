@@ -5,6 +5,7 @@ export type Exam = {
   subject: string;
   className: string;
   section: string;
+  sections?: { className: string; section: string }[];
   teacherId: string;
   teacher: string;
   examDate: string;

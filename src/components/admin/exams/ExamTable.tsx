@@ -1,61 +1,125 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import {
-  CalendarDays,
-  ClipboardCheck,
-  Pencil,
-  Plus,
-  Search,
-  Trash2,
-  UserRound,
-} from "lucide-react";
+import { Eye, Pencil, Plus, RefreshCw, Search, Trash2 } from "lucide-react";
 
-import { exams } from "@/data/exams";
+import ExamCard from "@/components/admin/exams/ExamCard";
+import { apiRequest } from "@/lib/api";
+import { getAuthToken } from "@/lib/auth";
+import type { Exam } from "@/types/exam";
 
-const statusStyles = {
+type ApiExam = Omit<Exam, "status"> & { status: string };
+
+function mapApiExam(exam: ApiExam): Exam {
+  return {
+    ...exam,
+    status:
+      exam.status === "COMPLETED" || exam.status === "Completed"
+        ? "Completed"
+        : "Upcoming",
+  };
+}
+
+const statusStyles: Record<Exam["status"], string> = {
   Upcoming: "bg-blue-50 text-blue-700",
-  Completed: "bg-green-50 text-green-700",
+  Completed: "bg-[#e6f4f2] text-[#01796F]",
 };
 
 export default function ExamTable() {
-  const [examList, setExamList] = useState(exams);
+  const [exams, setExams] = useState<Exam[]>([]);
   const [search, setSearch] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
-  const filteredExams = examList.filter((exam) =>
-    [
-      exam.name,
-      exam.subject,
-      exam.className,
-      exam.teacher,
-      exam.status,
-    ]
-      .join(" ")
-      .toLowerCase()
-      .includes(search.toLowerCase())
-  );
+  const fetchExams = useCallback(async () => {
+    setLoading(true);
+    setError("");
 
-  const handleDelete = (id: string) => {
-    const exam = examList.find((exam) => exam.id === id);
+    try {
+      const token = getAuthToken();
+      if (!token) {
+        throw new Error("Your session has expired. Please log in again.");
+      }
 
-    if (!exam) return;
+      const response = await apiRequest<ApiExam[]>("/exams", {
+        method: "GET",
+        token,
+      });
+      setExams(response.map(mapApiExam));
+    } catch (err) {
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Unable to load exams from the server.",
+      );
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
+  useEffect(() => {
+    void fetchExams();
+  }, [fetchExams]);
+
+  const handleDelete = async (id: string, name: string) => {
     const confirmed = window.confirm(
-      `Are you sure you want to delete ${exam.name}?`
+      `Permanently delete ${name} (${id})?\n\nContinue?`,
     );
-
     if (!confirmed) return;
 
-    setExamList((currentExams) =>
-      currentExams.filter((exam) => exam.id !== id)
-    );
+    setDeletingId(id);
+    setError("");
+
+    try {
+      const token = getAuthToken();
+      if (!token) {
+        throw new Error("Your session has expired. Please log in again.");
+      }
+
+      await apiRequest<Exam>(`/exams/${encodeURIComponent(id)}`, {
+        method: "DELETE",
+        token,
+      });
+      setExams((current) => current.filter((exam) => exam.id !== id));
+    } catch (err) {
+      setError(
+        err instanceof Error ? err.message : "Unable to delete this exam.",
+      );
+    } finally {
+      setDeletingId(null);
+    }
   };
+
+  const filteredExams = useMemo(() => {
+    const searchValue = search.trim().toLowerCase();
+    if (!searchValue) return exams;
+
+    return exams.filter((exam) =>
+      [
+        exam.id,
+        exam.name,
+        exam.subject,
+        exam.className,
+        exam.sections?.[0]?.section ?? exam.section,
+        exam.teacher,
+        exam.examDate,
+        exam.status,
+      ].some((value) => value.toLowerCase().includes(searchValue)),
+    );
+  }, [exams, search]);
+
+  const upcomingCount = exams.filter(
+    (exam) => exam.status === "Upcoming",
+  ).length;
+  const completedCount = exams.filter(
+    (exam) => exam.status === "Completed",
+  ).length;
 
   return (
     <div className="space-y-5">
-      {/* Header */}
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-900 sm:text-3xl">
             Exams
@@ -67,260 +131,213 @@ export default function ExamTable() {
 
         <Link
           href="/admin/exams/add"
-          className="inline-flex w-fit items-center justify-center gap-2 rounded-full bg-[#01796F] px-4 py-2.5 text-sm font-medium text-white transition hover:bg-[#015f58]"
+          className="inline-flex items-center justify-center gap-2 rounded-full bg-[#01796F] px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-[#015f58]"
         >
-          <Plus size={17} />
+          <Plus size={18} />
           Add Exam
         </Link>
       </div>
 
-      {/* Search */}
-      <div className="relative">
-        <Search
-          size={17}
-          className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
-        />
-
-        <input
-          type="text"
-          placeholder="Search exams"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="w-full rounded-full border border-gray-200 bg-white py-3 pl-11 pr-4 text-sm text-gray-900 outline-none transition placeholder:text-gray-400 focus:border-[#01796f] focus:ring-2 focus:ring-[#01796f]/10"
-        />
-      </div>
-
-      {/* Desktop Table */}
-      <div className="hidden overflow-hidden rounded-2xl border border-gray-200 bg-white md:block">
-        <div className="overflow-x-auto">
-          <table className="w-full min-w-[950px]">
-            <thead>
-              <tr className="border-b border-gray-200 bg-gray-50">
-                <th className="px-6 py-4 text-left text-sm font-semibold text-gray-600">
-                  Exam
-                </th>
-
-                <th className="px-6 py-4 text-left text-sm font-semibold text-gray-600">
-                  Subject
-                </th>
-
-                <th className="px-6 py-4 text-left text-sm font-semibold text-gray-600">
-                  Class
-                </th>
-
-                <th className="px-6 py-4 text-left text-sm font-semibold text-gray-600">
-                  Teacher
-                </th>
-
-                <th className="px-6 py-4 text-left text-sm font-semibold text-gray-600">
-                  Exam Date
-                </th>
-
-                <th className="px-6 py-4 text-left text-sm font-semibold text-gray-600">
-                  Marks
-                </th>
-
-                <th className="px-6 py-4 text-left text-sm font-semibold text-gray-600">
-                  Status
-                </th>
-
-                <th className="px-6 py-4 text-center text-sm font-semibold text-gray-600">
-                  Actions
-                </th>
-              </tr>
-            </thead>
-
-            <tbody>
-              {filteredExams.map((exam) => (
-                <tr
-                  key={exam.id}
-                  className="border-b border-gray-100 last:border-0"
-                >
-                  <td className="px-6 py-4">
-                    <div className="flex items-center gap-3">
-                      {/* <div className="flex h-10 w-13 items-center justify-center rounded-xl bg-[#e6f4f2] text-[#01796F]">
-                        <ClipboardCheck size={18} />
-                      </div> */}
-
-                      <div>
-                        <p className="font-medium text-sm text-gray-900">
-                          {exam.name}
-                        </p>
-                        <p className="text-xs text-gray-500">
-                          {exam.id}
-                        </p>
-                      </div>
-                    </div>
-                  </td>
-
-                  <td className="px-6 py-4 text-sm text-gray-600">
-                    {exam.subject}
-                  </td>
-
-                  <td className="px-6 py-4 text-sm text-gray-600">
-                    {exam.className}
-                  </td>
-
-                  <td className="px-6 py-4 text-sm text-gray-600">
-                    {exam.teacher}
-                  </td>
-
-                  <td className="px-6 py-4">
-                    <div className="flex items-center gap-2 text-sm text-gray-600">
-                      <CalendarDays size={15} className="text-[#01796F]" />
-                      {exam.examDate}
-                    </div>
-                  </td>
-
-                  <td className="px-6 py-4 text-sm font-medium text-gray-700">
-                    {exam.totalMarks}
-                  </td>
-
-                  <td className="px-6 py-4">
-                    <span
-                      className={`inline-flex rounded-full px-3 py-1 text-xs font-medium ${statusStyles[exam.status]}`}
-                    >
-                      {exam.status}
-                    </span>
-                  </td>
-
-                  {/* Actions */}
-                  <td className="px-6 py-4">
-                    <div className="flex items-center justify-center gap-2">
-                      <Link
-                        href={`/admin/exams/${exam.id}`}
-                        title="View"
-                        className="rounded-lg p-2 text-gray-500 transition hover:bg-[#01796F]/10 hover:text-[#01796F]"
-                      >
-                        <UserRound size={17} />
-                      </Link>
-
-                      <Link
-                        href={`/admin/exams/${exam.id}/edit`}
-                        title="Edit"
-                        className="rounded-lg p-2 text-gray-500 transition hover:bg-[#01796F]/10 hover:text-[#01796F]"
-                      >
-                        <Pencil size={17} />
-                      </Link>
-
-                      <button
-                        type="button"
-                        title="Delete"
-                        onClick={() => handleDelete(exam.id)}
-                        className="rounded-lg p-2 text-gray-500 transition hover:bg-red-50 hover:text-red-600"
-                      >
-                        <Trash2 size={17} />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+        <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
+          <p className="text-sm text-gray-500">Total Exams</p>
+          <p className="mt-2 text-2xl font-bold text-gray-800">
+            {exams.length}
+          </p>
+        </div>
+        <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
+          <p className="text-sm text-gray-500">Upcoming Exams</p>
+          <p className="mt-2 text-2xl font-bold text-[#01796F]">
+            {upcomingCount}
+          </p>
+        </div>
+        <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
+          <p className="text-sm text-gray-500">Completed Exams</p>
+          <p className="mt-2 text-2xl font-bold text-gray-600">
+            {completedCount}
+          </p>
         </div>
       </div>
 
-      {/* Mobile Cards */}
-      <div className="space-y-4 md:hidden">
-        {filteredExams.map((exam) => (
-          <div
-            key={exam.id}
-            className="rounded-2xl border border-gray-200 bg-white p-5"
+      <div className="rounded-2xl border border-gray-100 bg-white p-4 shadow-sm">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+          <div className="relative flex-1">
+            <Search
+              size={18}
+              className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
+            />
+            <input
+              type="text"
+              value={search}
+              onChange={(event) => setSearch(event.target.value)}
+              placeholder="Search by exam, subject, class, teacher"
+              className="w-full rounded-full border border-gray-200 bg-gray-50 py-3 pl-11 pr-4 text-sm outline-none transition focus:border-[#01796F] focus:bg-white focus:ring-2 focus:ring-[#01796F]/10"
+            />
+          </div>
+          <button
+            type="button"
+            onClick={() => void fetchExams()}
+            disabled={loading}
+            className="inline-flex items-center justify-center gap-2 rounded-full border border-gray-200 px-5 py-3 text-sm font-medium text-gray-700 transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-60"
           >
-            <div className="flex items-start justify-between gap-3">
-              <div className="flex items-center gap-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#e6f4f2] text-[#01796F]">
-                  <ClipboardCheck size={18} />
-                </div>
-
-                <div>
-                  <h3 className="font-semibold text-gray-900">
-                    {exam.name}
-                  </h3>
-                  <p className="text-xs text-gray-500">{exam.id}</p>
-                </div>
-              </div>
-
-              <span
-                className={`rounded-full px-3 py-1 text-xs font-medium ${statusStyles[exam.status]}`}
-              >
-                {exam.status}
-              </span>
-            </div>
-
-            <div className="mt-4 grid grid-cols-2 gap-3 text-sm">
-              <div>
-                <p className="text-xs text-gray-400">Subject</p>
-                <p className="mt-1 font-medium text-gray-700">
-                  {exam.subject}
-                </p>
-              </div>
-
-              <div>
-                <p className="text-xs text-gray-400">Class</p>
-                <p className="mt-1 font-medium text-gray-700">
-                  {exam.className}
-                </p>
-              </div>
-
-              <div>
-                <p className="text-xs text-gray-400">Teacher</p>
-                <p className="mt-1 font-medium text-gray-700">
-                  {exam.teacher}
-                </p>
-              </div>
-
-              <div>
-                <p className="text-xs text-gray-400">Exam Date</p>
-                <p className="mt-1 font-medium text-gray-700">
-                  {exam.examDate}
-                </p>
-              </div>
-
-              <div>
-                <p className="text-xs text-gray-400">Total Marks</p>
-                <p className="mt-1 font-medium text-gray-700">
-                  {exam.totalMarks}
-                </p>
-              </div>
-            </div>
-
-            {/* Mobile Actions */}
-            <div className="mt-5 flex items-center justify-center gap-2 border-t border-gray-100 pt-4">
-              <Link
-                href={`/admin/exams/${exam.id}`}
-                title="View"
-                className="rounded-lg p-2 text-gray-500 transition hover:bg-[#01796F]/10 hover:text-[#01796F]"
-              >
-                <UserRound size={17} />
-              </Link>
-
-              <Link
-                href={`/admin/exams/${exam.id}/edit`}
-                title="Edit"
-                className="rounded-lg p-2 text-gray-500 transition hover:bg-[#01796F]/10 hover:text-[#01796F]"
-              >
-                <Pencil size={17} />
-              </Link>
-
-              <button
-                type="button"
-                title="Delete"
-                onClick={() => handleDelete(exam.id)}
-                className="rounded-lg p-2 text-gray-500 transition hover:bg-red-50 hover:text-red-600"
-              >
-                <Trash2 size={17} />
-              </button>
-            </div>
-          </div>
-        ))}
-
-        {filteredExams.length === 0 && (
-          <div className="rounded-2xl border border-gray-200 bg-white p-8 text-center text-sm text-gray-500">
-            No exams found.
-          </div>
-        )}
+            <RefreshCw size={16} className={loading ? "animate-spin" : ""} />
+            Refresh
+          </button>
+        </div>
       </div>
+
+      {error && (
+        <div
+          role="alert"
+          className="flex flex-col gap-3 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700 sm:flex-row sm:items-center sm:justify-between"
+        >
+          <p>{error}</p>
+          <button
+            type="button"
+            onClick={() => void fetchExams()}
+            className="self-start rounded-full border border-red-200 px-4 py-2 font-medium transition hover:bg-red-100 sm:self-auto"
+          >
+            Try again
+          </button>
+        </div>
+      )}
+
+      {loading && (
+        <div className="rounded-2xl border border-gray-100 bg-white p-10 text-center shadow-sm">
+          <div className="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-gray-200 border-t-[#01796F]" />
+          <p className="mt-4 text-sm text-gray-500">Loading exams...</p>
+        </div>
+      )}
+
+      {!loading && (
+        <>
+          <div className="hidden overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm lg:block">
+            <div className="overflow-x-auto">
+              <table className="w-full min-w-[1000px] text-left text-sm">
+                <thead className="bg-gray-50 text-gray-700">
+                  <tr>
+                    <th className="px-5 py-4 font-semibold">Exam</th>
+                    <th className="px-5 py-4 font-semibold">Subject</th>
+                    <th className="px-5 py-4 font-semibold">Class</th>
+                    <th className="px-5 py-4 font-semibold">
+                      Assigned Teacher
+                    </th>
+                    <th className="px-5 py-4 font-semibold">Exam Date</th>
+                    <th className="px-5 py-4 font-semibold">Total Marks</th>
+                    <th className="px-5 py-4 font-semibold">Status</th>
+                    <th className="px-5 py-4 text-center font-semibold">
+                      Actions
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-100">
+                  {filteredExams.map((exam) => (
+                    <tr key={exam.id} className="transition hover:bg-gray-50">
+                      <td className="px-5 py-4">
+                        <Link
+                          href={`/admin/exams/${encodeURIComponent(exam.id)}`}
+                          className="font-semibold text-gray-800 transition hover:text-[#01796F]"
+                        >
+                          {exam.name}
+                        </Link>
+                        <p className="mt-1 text-xs text-gray-500">{exam.id}</p>
+                      </td>
+                      <td className="px-5 py-4 text-gray-600">
+                        {exam.subject}
+                      </td>
+                      <td className="px-5 py-4 text-gray-600">
+                        {exam.className}-
+                        {exam.sections?.[0]?.section ?? exam.section}
+                      </td>
+                      <td className="px-5 py-4 text-gray-600">
+                        {exam.teacher}
+                      </td>
+                      <td className="px-5 py-4 text-gray-600">
+                        {exam.examDate}
+                      </td>
+                      <td className="px-5 py-4 text-gray-600">
+                        {exam.totalMarks}
+                      </td>
+                      <td className="px-5 py-4">
+                        <span
+                          className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold ${statusStyles[exam.status]}`}
+                        >
+                          {exam.status}
+                        </span>
+                      </td>
+                      <td className="px-5 py-4">
+                        <div className="flex items-center justify-center gap-2">
+                          <Link
+                            href={`/admin/exams/${encodeURIComponent(exam.id)}`}
+                            title="View exam"
+                            aria-label={`View ${exam.name}`}
+                            className="rounded-full p-2 text-gray-500 transition hover:bg-[#e6f4f2] hover:text-[#01796F]"
+                          >
+                            <Eye size={17} />
+                          </Link>
+                          <Link
+                            href={`/admin/exams/${encodeURIComponent(exam.id)}/edit`}
+                            title="Edit exam"
+                            aria-label={`Edit ${exam.name}`}
+                            className="rounded-full p-2 text-gray-500 transition hover:bg-blue-50 hover:text-blue-500"
+                          >
+                            <Pencil size={17} />
+                          </Link>
+                          <button
+                            type="button"
+                            title="Delete exam"
+                            aria-label={`Delete ${exam.name}`}
+                            disabled={deletingId === exam.id}
+                            onClick={() =>
+                              void handleDelete(exam.id, exam.name)
+                            }
+                            className="rounded-full p-2 text-gray-500 transition hover:bg-red-50 hover:text-red-500 disabled:cursor-not-allowed disabled:opacity-40"
+                          >
+                            <Trash2 size={17} />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                  {filteredExams.length === 0 && (
+                    <tr>
+                      <td
+                        colSpan={8}
+                        className="px-5 py-12 text-center text-gray-500"
+                      >
+                        {search.trim()
+                          ? "No exams match your search."
+                          : "No exams were returned by the backend."}
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+            <div className="border-t border-gray-100 px-5 py-4 text-sm text-gray-500">
+              Showing {filteredExams.length} of {exams.length} exams
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:hidden">
+            {filteredExams.map((exam) => (
+              <ExamCard
+                key={exam.id}
+                exam={exam}
+                onDelete={(id, name) => void handleDelete(id, name)}
+                deleting={deletingId === exam.id}
+              />
+            ))}
+            {filteredExams.length === 0 && (
+              <div className="col-span-full rounded-2xl border border-gray-100 bg-white p-10 text-center text-sm text-gray-500 shadow-sm">
+                {search.trim()
+                  ? "No exams match your search."
+                  : "No exams were returned by the backend."}
+              </div>
+            )}
+          </div>
+        </>
+      )}
     </div>
   );
 }

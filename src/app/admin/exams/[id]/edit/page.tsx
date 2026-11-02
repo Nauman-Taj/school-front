@@ -1,7 +1,4 @@
-import { notFound } from "next/navigation";
-
-import { exams } from "@/data/exams";
-import ExamForm from "@/components/admin/exams/ExamForm";
+import ExamLoader from "@/components/admin/exams/ExamLoader";
 
 type EditExamPageProps = {
   params: Promise<{
@@ -14,11 +11,5 @@ export default async function EditExamPage({
 }: EditExamPageProps) {
   const { id } = await params;
 
-  const exam = exams.find((exam) => exam.id === id);
-
-  if (!exam) {
-    notFound();
-  }
-
-  return <ExamForm exam={exam} isEdit />;
+  return <ExamLoader id={id} mode="edit" />;
 }

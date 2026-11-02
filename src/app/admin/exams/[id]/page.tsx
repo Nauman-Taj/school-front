@@ -1,7 +1,4 @@
-import { notFound } from "next/navigation";
-
-import { exams } from "@/data/exams";
-import ExamProfile from "@/components/admin/exams/ExamProfile";
+import ExamLoader from "@/components/admin/exams/ExamLoader";
 
 type ExamPageProps = {
   params: Promise<{
@@ -14,11 +11,5 @@ export default async function ExamPage({
 }: ExamPageProps) {
   const { id } = await params;
 
-  const exam = exams.find((exam) => exam.id === id);
-
-  if (!exam) {
-    notFound();
-  }
-
-  return <ExamProfile exam={exam} />;
+  return <ExamLoader id={id} mode="profile" />;
 }

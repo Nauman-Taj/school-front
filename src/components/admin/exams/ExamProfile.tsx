@@ -41,13 +41,9 @@ export default function ExamProfile({ exam }: ExamProfileProps) {
             </div>
 
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">
-                {exam.name}
-              </h1>
+              <h1 className="text-2xl font-bold text-gray-900">{exam.name}</h1>
 
-              <p className="mt-1 text-sm text-gray-500">
-                Exam ID: {exam.id}
-              </p>
+              <p className="mt-1 text-sm text-gray-500">Exam ID: {exam.id}</p>
             </div>
           </div>
 
@@ -74,23 +70,19 @@ export default function ExamProfile({ exam }: ExamProfileProps) {
 
             <div>
               <p className="text-xs text-gray-400">Subject</p>
-              <p className="mt-1 font-medium text-gray-800">
-                {exam.subject}
-              </p>
+              <p className="mt-1 font-medium text-gray-800">{exam.subject}</p>
             </div>
           </div>
 
           {/* Class */}
           <div className="flex items-start gap-3">
-            <GraduationCap
-              size={20}
-              className="mt-0.5 text-[#01796F]"
-            />
+            <GraduationCap size={20} className="mt-0.5 text-[#01796F]" />
 
             <div>
               <p className="text-xs text-gray-400">Class</p>
               <p className="mt-1 font-medium text-gray-800">
-                {exam.className}
+                {exam.className} · Section{" "}
+                {exam.sections?.[0]?.section ?? exam.section}
               </p>
             </div>
           </div>
@@ -101,33 +93,23 @@ export default function ExamProfile({ exam }: ExamProfileProps) {
 
             <div>
               <p className="text-xs text-gray-400">Teacher</p>
-              <p className="mt-1 font-medium text-gray-800">
-                {exam.teacher}
-              </p>
+              <p className="mt-1 font-medium text-gray-800">{exam.teacher}</p>
             </div>
           </div>
 
           {/* Exam Date */}
           <div className="flex items-start gap-3">
-            <CalendarDays
-              size={20}
-              className="mt-0.5 text-[#01796F]"
-            />
+            <CalendarDays size={20} className="mt-0.5 text-[#01796F]" />
 
             <div>
               <p className="text-xs text-gray-400">Exam Date</p>
-              <p className="mt-1 font-medium text-gray-800">
-                {exam.examDate}
-              </p>
+              <p className="mt-1 font-medium text-gray-800">{exam.examDate}</p>
             </div>
           </div>
 
           {/* Total Marks */}
           <div className="flex items-start gap-3">
-            <ClipboardCheck
-              size={20}
-              className="mt-0.5 text-[#01796F]"
-            />
+            <ClipboardCheck size={20} className="mt-0.5 text-[#01796F]" />
 
             <div>
               <p className="text-xs text-gray-400">Total Marks</p>
@@ -139,10 +121,7 @@ export default function ExamProfile({ exam }: ExamProfileProps) {
 
           {/* Status */}
           <div className="flex items-start gap-3">
-            <ClipboardCheck
-              size={20}
-              className="mt-0.5 text-[#01796F]"
-            />
+            <ClipboardCheck size={20} className="mt-0.5 text-[#01796F]" />
 
             <div>
               <p className="text-xs text-gray-400">Status</p>
