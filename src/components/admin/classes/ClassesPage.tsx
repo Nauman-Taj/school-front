@@ -2,7 +2,9 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { Plus } from "lucide-react";
 import Link from "next/link";
+
 
 import ClassTable from "@/components/admin/classes/ClassTable";
 import { apiRequest } from "@/lib/api";
@@ -97,8 +99,9 @@ export default function ClassesPage() {
 
         <Link
           href="/admin/classes/add"
-          className="inline-flex items-center justify-center rounded-full bg-[#01796F] px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-[#015f58]"
+          className="inline-flex items-center justify-center gap-2 rounded-full bg-[#01796F] px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-[#015f58]"
         >
+          <Plus size={18} />
           Add Class
         </Link>
       </div>
