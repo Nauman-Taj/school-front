@@ -1,13 +1,6 @@
 "use client";
 
-import {
-  CircleDollarSign,
-  Clock3,
-  Plus,
-  CreditCard,
-  AlertCircle,
-  RefreshCw,
-} from "lucide-react";
+import { Plus, RefreshCw } from "lucide-react";
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
@@ -96,26 +89,18 @@ export default function FeesPage() {
     {
       title: "Total Fees",
       value: formatCurrency(summary.totalFees),
-      icon: CircleDollarSign,
-      description: "Total invoiced fee amount",
     },
     {
       title: "Collected",
       value: formatCurrency(summary.collected),
-      icon: CreditCard,
-      description: "Payments received",
     },
     {
       title: "Pending",
       value: formatCurrency(summary.pending),
-      icon: Clock3,
-      description: "Outstanding fees not yet overdue",
     },
     {
       title: "Overdue",
       value: formatCurrency(summary.overdue),
-      icon: AlertCircle,
-      description: "Outstanding past-due fees",
     },
   ];
 
@@ -160,33 +145,16 @@ export default function FeesPage() {
       )}
 
       {/* Fee statistics */}
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {stats.map((stat) => {
-          const Icon = stat.icon;
-
           return (
             <div
               key={stat.title}
-              className="rounded-2xl border border-gray-200 bg-white p-5"
+              className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm"
             >
-              <div className="flex items-start justify-between gap-3">
-                <div className="min-w-0">
-                  <p className="text-sm font-medium text-gray-500">
-                    {stat.title}
-                  </p>
-
-                  <h2 className="mt-2 break-words text-xl font-bold text-gray-900 sm:text-2xl">
-                    {loading ? "0" : stat.value}
-                  </h2>
-                </div>
-
-                <div className="shrink-0 rounded-xl bg-[#e6f4f2] p-2.5 text-[#01796f]">
-                  <Icon size={20} />
-                </div>
-              </div>
-
-              <p className="mt-3 text-sm text-gray-500">
-                {stat.description}
+              <p className="text-sm text-gray-500">{stat.title}</p>
+              <p className="mt-2 break-words text-2xl font-bold text-gray-800">
+                {loading ? "0" : stat.value}
               </p>
             </div>
           );
@@ -201,7 +169,6 @@ export default function FeesPage() {
         </p>
       )}
 
-      {/* We'll connect this table to the API in the next step. */}
       <FeeTable />
     </div>
   );

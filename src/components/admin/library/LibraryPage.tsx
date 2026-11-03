@@ -1,14 +1,8 @@
 
 "use client";
 
-import { useEffect, useState } from "react";
-import {
-  BookOpen,
-  BookCheck,
-  BookX,
-  LibraryBig,
-  Plus,
-} from "lucide-react";
+import { useCallback, useEffect, useState } from "react";
+import { Plus, RefreshCw } from "lucide-react";
 import Link from "next/link";
 
 import BookTable, { type LibraryBook } from "./BookTable";
@@ -19,51 +13,39 @@ import { getAuthToken } from "@/lib/auth";
 export default function LibraryPage() {
   const [books, setBooks] = useState<LibraryBook[]>([]);
   const [loading, setLoading] = useState(true);
+  const [hasLoaded, setHasLoaded] = useState(false);
   const [error, setError] = useState("");
 
-  useEffect(() => {
-    let cancelled = false;
+  const loadBooks = useCallback(async () => {
+    setLoading(true);
+    setError("");
 
-    async function loadBooks() {
-      try {
-        setLoading(true);
-        setError("");
-
-        const token = getAuthToken();
-
-        if (!token) {
-          throw new Error("Your session has expired. Please log in again.");
-        }
-
-        const data = await apiRequest<LibraryBook[]>("/books", {
-          method: "GET",
-          token,
-        });
-
-        if (!cancelled) {
-          setBooks(data);
-        }
-      } catch (err) {
-        if (!cancelled) {
-          setError(
-            err instanceof Error
-              ? err.message
-              : "Something went wrong while loading books.",
-          );
-        }
-      } finally {
-        if (!cancelled) {
-          setLoading(false);
-        }
+    try {
+      const token = getAuthToken();
+      if (!token) {
+        throw new Error("Your session has expired. Please log in again.");
       }
+
+      const data = await apiRequest<LibraryBook[]>("/books", {
+        method: "GET",
+        token,
+      });
+      setBooks(data);
+    } catch (err) {
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Something went wrong while loading books.",
+      );
+    } finally {
+      setLoading(false);
+      setHasLoaded(true);
     }
-
-    loadBooks();
-
-    return () => {
-      cancelled = true;
-    };
   }, []);
+
+  useEffect(() => {
+    void loadBooks();
+  }, [loadBooks]);
 
   const totalBooks = books.reduce(
     (total, book) => total + book.quantity,
@@ -88,26 +70,18 @@ export default function LibraryPage() {
     {
       title: "Total Books",
       value: totalBooks,
-      icon: LibraryBig,
-      description: "Books in library",
     },
     {
       title: "Available",
       value: availableBooks,
-      icon: BookCheck,
-      description: "Books available",
     },
     {
       title: "Borrowed",
       value: borrowedBooks,
-      icon: BookOpen,
-      description: "Currently borrowed",
     },
     {
       title: "Unavailable",
       value: unavailableBooks,
-      icon: BookX,
-      description: "Currently unavailable",
     },
   ];
 
@@ -137,51 +111,49 @@ export default function LibraryPage() {
       {/* Stats */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {stats.map((stat) => {
-          const Icon = stat.icon;
-
           return (
             <div
               key={stat.title}
-              className="rounded-2xl border border-gray-200 bg-white p-5"
+              className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm"
             >
-              <div className="flex items-start justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-500">
-                    {stat.title}
-                  </p>
-
-                  <h2 className="mt-2 text-2xl font-bold text-gray-900">
-                    {stat.value}
-                  </h2>
-                </div>
-
-                <div className="rounded-xl bg-[#e6f4f2] p-2.5 text-[#01796f]">
-                  <Icon size={20} />
-                </div>
-              </div>
-
-              <p className="mt-3 text-sm text-gray-500">
-                {stat.description}
+              <p className="text-sm text-gray-500">{stat.title}</p>
+              <p className="mt-2 text-2xl font-bold text-gray-800">
+                {loading ? "0" : stat.value}
               </p>
             </div>
           );
         })}
       </div>
 
-      {loading ? (
-        <div className="rounded-2xl border border-gray-200 bg-white p-8 text-center text-sm text-gray-500">
-          Loading library books...
+      {loading && !hasLoaded && (
+        <div className="rounded-2xl border border-gray-100 bg-white p-10 text-center shadow-sm">
+          <div className="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-gray-200 border-t-[#01796F]" />
+          <p className="mt-4 text-sm text-gray-500">Loading library books...</p>
         </div>
-      ) : error ? (
+      )}
+
+      {error && (
         <div
           role="alert"
-          className="rounded-2xl border border-red-200 bg-red-50 p-4 text-sm text-red-700"
+          className="flex flex-col gap-3 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700 sm:flex-row sm:items-center sm:justify-between"
         >
-          {error}
+          <p>{error}</p>
+          <button
+            type="button"
+            onClick={() => void loadBooks()}
+            className="inline-flex w-fit items-center gap-2 rounded-full border border-red-200 bg-white px-4 py-2 font-medium transition hover:bg-red-100"
+          >
+            <RefreshCw size={15} />
+            Try again
+          </button>
         </div>
-      ) : (
+      )}
+
+      {hasLoaded && (
         <BookTable
           books={books}
+          loading={loading}
+          onRefresh={loadBooks}
           onBookDeleted={(id) =>
             setBooks((current) => current.filter((book) => book.id !== id))
           }

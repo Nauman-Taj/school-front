@@ -191,7 +191,7 @@ export default function FeeProfile({
       </Link>
 
       {/* Student Header */}
-      <div className="rounded-2xl border border-gray-200 bg-white p-6">
+      <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm sm:p-6">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-4">
             <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-[#e6f4f2] text-[#01796f]">
@@ -241,7 +241,7 @@ export default function FeeProfile({
           return (
             <div
               key={item.label}
-              className="rounded-2xl border border-gray-200 bg-white p-5"
+              className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm"
             >
               <div className="flex items-center gap-3">
                 <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#e6f4f2] text-[#01796f]">
@@ -259,7 +259,7 @@ export default function FeeProfile({
           );
         })}
 
-        <div className="rounded-2xl border border-gray-200 bg-white p-5">
+        <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
           <div className="flex items-center gap-3">
             <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#e6f4f2] text-[#01796f]">
               <CalendarDays size={20} />
@@ -276,7 +276,7 @@ export default function FeeProfile({
       </div>
 
       {/* Fee Details */}
-      <div className="rounded-2xl border border-gray-200 bg-white p-6">
+      <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm sm:p-6">
         <h2 className="text-lg font-semibold text-gray-900">Fee Details</h2>
 
         <div className="mt-5 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
@@ -301,7 +301,7 @@ export default function FeeProfile({
       </div>
 
       {/* Record Payment */}
-      <div className="rounded-2xl border border-gray-200 bg-white p-6">
+      <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm sm:p-6">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h2 className="text-lg font-semibold text-gray-900">
@@ -480,7 +480,7 @@ export default function FeeProfile({
       </div>
 
       {/* Payment History */}
-      <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white">
+      <div className="overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm">
         <div className="flex items-center gap-3 border-b border-gray-100 p-6">
           <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#e6f4f2] text-[#01796f]">
             <ReceiptText size={20} />

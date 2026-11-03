@@ -2,13 +2,6 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import {
-  Users,
-  GraduationCap,
-  ClipboardCheck,
-  Wallet,
-} from "lucide-react";
-
 import { apiRequest } from "@/lib/api";
 import { getAuthToken } from "@/lib/auth";
 
@@ -141,21 +134,18 @@ export default function AdminDashboard() {
       value: data.students.length.toLocaleString(),
       change: activeStudents.toLocaleString(),
       description: "active students",
-      icon: Users,
     },
     {
       title: "Total Teachers",
       value: data.teachers.length.toLocaleString(),
       change: activeTeachers.toLocaleString(),
       description: "active teachers",
-      icon: GraduationCap,
     },
     {
       title: "Attendance Rate",
       value: `${attendanceRate}%`,
       change: `${attendanceRate}%`,
       description: "recorded attendance",
-      icon: ClipboardCheck,
     },
     {
       title: "Fee Collection",
@@ -168,7 +158,6 @@ export default function AdminDashboard() {
         : feeError
           ? "Unable to load fee summary"
           : "Loading fee summary",
-      icon: Wallet,
     },
   ];
 
@@ -237,7 +226,7 @@ export default function AdminDashboard() {
 
       <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-4">
         {statsData.map((stat) => (
-          <StatCard key={stat.title} {...stat} />
+          <StatCard key={stat.title} {...stat} loading={loading} />
         ))}
       </div>
 

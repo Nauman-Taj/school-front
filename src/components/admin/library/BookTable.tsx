@@ -9,6 +9,7 @@ import {
   Pencil,
   Trash2,
   BookOpen,
+  RefreshCw,
 } from "lucide-react";
 
 import { apiRequest } from "@/lib/api";
@@ -28,11 +29,15 @@ export type LibraryBook = {
 
 type BookTableProps = {
   books: LibraryBook[];
+  loading: boolean;
+  onRefresh: () => void;
   onBookDeleted: (id: number) => void;
 };
 
 export default function BookTable({
   books,
+  loading,
+  onRefresh,
   onBookDeleted,
 }: BookTableProps) {
   const [search, setSearch] = useState("");
@@ -87,19 +92,31 @@ export default function BookTable({
   return (
     <div className="space-y-5">
       {/* Search */}
-      <div className="relative">
-        <Search
-          size={17}
-          className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
-        />
-
-        <input
-          type="text"
-          placeholder="Search books"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="w-full rounded-full border border-gray-200 bg-white py-3 pl-11 pr-4 text-sm text-gray-900 outline-none transition placeholder:text-gray-400 focus:border-[#01796f] focus:ring-2 focus:ring-[#01796f]/10"
-        />
+      <div className="rounded-2xl border border-gray-100 bg-white p-4 shadow-sm">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+          <div className="relative flex-1">
+            <Search
+              size={18}
+              className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
+            />
+            <input
+              type="text"
+              placeholder="Search by title, author, category or ISBN"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="w-full rounded-full border border-gray-200 bg-gray-50 py-3 pl-11 pr-4 text-sm text-gray-900 outline-none transition placeholder:text-gray-400 focus:border-[#01796f] focus:bg-white focus:ring-2 focus:ring-[#01796f]/10"
+            />
+          </div>
+          <button
+            type="button"
+            onClick={onRefresh}
+            disabled={loading}
+            className="inline-flex items-center justify-center gap-2 rounded-full border border-gray-200 px-5 py-3 text-sm font-medium text-gray-700 transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            <RefreshCw size={16} className={loading ? "animate-spin" : ""} />
+            Refresh
+          </button>
+        </div>
       </div>
 
       {error && (
@@ -111,11 +128,15 @@ export default function BookTable({
         </div>
       )}
 
+      <p className="text-sm text-gray-500">
+        Showing {filteredBooks.length} of {books.length} books
+      </p>
+
       {/* Desktop Table */}
-      <div className="hidden overflow-hidden rounded-2xl border border-gray-200 bg-white md:block">
+      <div className="hidden overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm lg:block">
         <div className="overflow-x-auto">
           <table className="w-full min-w-[900px] text-left">
-            <thead className="border-b border-gray-200 bg-gray-50">
+            <thead className="bg-gray-50 text-gray-700">
               <tr>
                 {[
                   "Book",
@@ -128,7 +149,7 @@ export default function BookTable({
                 ].map((heading) => (
                   <th
                     key={heading}
-                    className={`px-6 py-4 text-sm font-semibold text-gray-600 ${
+                    className={`px-5 py-4 text-sm font-semibold text-gray-700 ${
                       heading === "Action" ? "text-center" : ""
                     }`}
                   >
@@ -140,8 +161,8 @@ export default function BookTable({
 
             <tbody className="divide-y divide-gray-100">
               {filteredBooks.map((book) => (
-                <tr key={book.id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4">
+                <tr key={book.id} className="transition hover:bg-gray-50">
+                  <td className="px-5 py-4">
                     <div className="flex items-center gap-3">
                       <div className="flex shrink-0 items-center justify-center text-[#01796F]">
                         <BookOpen size={19} />
@@ -153,27 +174,27 @@ export default function BookTable({
                     </div>
                   </td>
 
-                  <td className="px-6 py-4 text-sm text-gray-600">
+                  <td className="px-5 py-4 text-sm text-gray-600">
                     {book.author}
                   </td>
 
-                  <td className="px-6 py-4 text-sm text-gray-600">
+                  <td className="px-5 py-4 text-sm text-gray-600">
                     {book.category}
                   </td>
 
-                  <td className="px-6 py-4 text-sm text-gray-600">
+                  <td className="px-5 py-4 text-sm text-gray-600">
                     {book.isbn}
                   </td>
 
-                  <td className="px-6 py-4 text-sm text-gray-600">
+                  <td className="px-5 py-4 text-sm text-gray-600">
                     {book.availableCopies} / {book.quantity}
                   </td>
 
-                  <td className="px-6 py-4">
+                  <td className="px-5 py-4">
                     <StatusBadge status={book.status} />
                   </td>
 
-                  <td className="px-6 py-4">
+                  <td className="px-5 py-4">
                     <BookActions
                       bookId={book.id}
                       deleting={deletingId === book.id}
@@ -188,11 +209,11 @@ export default function BookTable({
       </div>
 
       {/* Mobile Cards */}
-      <div className="space-y-4 md:hidden">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:hidden">
         {filteredBooks.map((book) => (
           <div
             key={book.id}
-            className="rounded-2xl border border-gray-200 bg-white p-4"
+            className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm"
           >
             <div className="flex items-start gap-3">
               <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[#e6f4f2] text-[#01796F]">
@@ -248,8 +269,8 @@ export default function BookTable({
 
       {/* Empty State */}
       {filteredBooks.length === 0 && (
-        <div className="rounded-2xl border border-gray-200 bg-white px-6 py-12 text-center text-sm text-gray-500">
-          No books found.
+        <div className="rounded-2xl border border-gray-100 bg-white px-6 py-12 text-center text-sm text-gray-500 shadow-sm">
+          {search.trim() ? "No books match your search." : "No books were returned by the backend."}
         </div>
       )}
     </div>
@@ -294,7 +315,7 @@ function BookActions({
       <Link
         href={`/admin/library/${bookId}`}
         aria-label="View book"
-        className="rounded-lg p-2 text-gray-500 transition hover:bg-[#01796F]/10 hover:text-[#01796F]"
+        className="rounded-full p-2 text-gray-500 transition hover:bg-[#e6f4f2] hover:text-[#01796F]"
       >
         <Eye size={17} />
       </Link>
@@ -302,7 +323,7 @@ function BookActions({
       <Link
         href={`/admin/library/${bookId}/edit`}
         aria-label="Edit book"
-        className="rounded-lg p-2 text-gray-500 transition hover:bg-[#01796F]/10 hover:text-[#01796F]"
+        className="rounded-full p-2 text-gray-500 transition hover:bg-blue-50 hover:text-blue-500"
       >
         <Pencil size={17} />
       </Link>
@@ -312,7 +333,7 @@ function BookActions({
         disabled={deleting}
         onClick={() => onDelete(bookId)}
         aria-label="Delete book"
-        className="rounded-lg p-2 text-gray-500 transition hover:bg-red-50 hover:text-red-500 disabled:cursor-not-allowed disabled:opacity-50"
+        className="rounded-full p-2 text-gray-500 transition hover:bg-red-50 hover:text-red-500 disabled:cursor-not-allowed disabled:opacity-50"
       >
         {deleting ? (
           <span className="text-xs">...</span>

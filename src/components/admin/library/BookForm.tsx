@@ -204,7 +204,7 @@ export default function BookForm({
               value={formData.title}
               onChange={handleChange}
               placeholder="Enter book title"
-              className="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm outline-none transition focus:border-[#01796F] focus:ring-1 focus:ring-[#01796F]"
+              className="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm outline-none transition focus:border-[#01796F] focus:ring-2 focus:ring-[#01796F]/10"
               required
             />
           </div>
@@ -224,7 +224,7 @@ export default function BookForm({
               value={formData.author}
               onChange={handleChange}
               placeholder="Enter author name"
-              className="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm outline-none transition focus:border-[#01796F] focus:ring-1 focus:ring-[#01796F]"
+              className="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm outline-none transition focus:border-[#01796F] focus:ring-2 focus:ring-[#01796F]/10"
               required
             />
           </div>
@@ -244,7 +244,7 @@ export default function BookForm({
               value={formData.isbn}
               onChange={handleChange}
               placeholder="Enter ISBN"
-              className="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm outline-none transition focus:border-[#01796F] focus:ring-1 focus:ring-[#01796F]"
+              className="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm outline-none transition focus:border-[#01796F] focus:ring-2 focus:ring-[#01796F]/10"
               required
             />
           </div>
@@ -262,7 +262,7 @@ export default function BookForm({
               name="category"
               value={formData.category}
               onChange={handleChange}
-              className="w-full rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm text-gray-700 outline-none transition focus:border-[#01796F] focus:ring-1 focus:ring-[#01796F]"
+              className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-700 outline-none transition focus:border-[#01796F] focus:ring-2 focus:ring-[#01796F]/10"
               required
             >
               <option value="">Select category</option>
@@ -292,7 +292,7 @@ export default function BookForm({
               value={formData.publisher}
               onChange={handleChange}
               placeholder="Enter publisher"
-              className="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm outline-none transition focus:border-[#01796F] focus:ring-1 focus:ring-[#01796F]"
+              className="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm outline-none transition focus:border-[#01796F] focus:ring-2 focus:ring-[#01796F]/10"
               required
             />
           </div>
@@ -314,7 +314,7 @@ export default function BookForm({
               value={formData.quantity}
               onChange={handleChange}
               placeholder="Enter quantity"
-              className="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm outline-none transition focus:border-[#01796F] focus:ring-1 focus:ring-[#01796F]"
+              className="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm outline-none transition focus:border-[#01796F] focus:ring-2 focus:ring-[#01796F]/10"
               required
             />
           </div>
@@ -337,7 +337,7 @@ export default function BookForm({
               value={formData.availableCopies}
               onChange={handleChange}
               placeholder="Enter available copies"
-              className="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm outline-none transition focus:border-[#01796F] focus:ring-1 focus:ring-[#01796F]"
+              className="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm outline-none transition focus:border-[#01796F] focus:ring-2 focus:ring-[#01796F]/10"
               required
             />
           </div>
@@ -347,7 +347,7 @@ export default function BookForm({
         <div className="mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
           <Link
             href="/admin/library"
-            className="inline-flex items-center justify-center rounded-full border border-gray-200 px-5 py-2.5 text-sm font-medium text-gray-600 transition hover:bg-gray-50"
+            className="inline-flex items-center justify-center rounded-full border border-gray-200 px-5 py-3 text-sm font-medium text-gray-600 transition hover:bg-gray-50"
           >
             Cancel
           </Link>
@@ -355,7 +355,7 @@ export default function BookForm({
           <button
             type="submit"
             disabled={isSubmitting}
-            className="rounded-full bg-[#01796F] px-5 py-2.5 text-sm font-medium text-white transition hover:bg-[#015f58] disabled:cursor-not-allowed disabled:opacity-60"
+            className="rounded-full bg-[#01796F] px-5 py-3 text-sm font-medium text-white transition hover:bg-[#015f58] disabled:cursor-not-allowed disabled:opacity-60"
           >
             {isSubmitting
               ? mode === "edit"

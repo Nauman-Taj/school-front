@@ -230,19 +230,31 @@ export default function FeeTable() {
   return (
     <div className="space-y-5">
       {/* Search */}
-      <div className="relative">
-        <Search
-          size={17}
-          className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
-        />
-
-        <input
-          type="text"
-          placeholder="Search by invoice number, student, class, fee type or status"
-          value={search}
-          onChange={(event) => setSearch(event.target.value)}
-          className="w-full rounded-full border border-gray-200 bg-white py-3 pl-11 pr-4 text-sm text-gray-900 outline-none transition placeholder:text-gray-400 focus:border-[#01796f] focus:ring-2 focus:ring-[#01796f]/10"
-        />
+      <div className="rounded-2xl border border-gray-100 bg-white p-4 shadow-sm">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+          <div className="relative flex-1">
+            <Search
+              size={18}
+              className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
+            />
+            <input
+              type="text"
+              placeholder="Search by invoice, student, class, fee type or status"
+              value={search}
+              onChange={(event) => setSearch(event.target.value)}
+              className="w-full rounded-full border border-gray-200 bg-gray-50 py-3 pl-11 pr-4 text-sm text-gray-900 outline-none transition placeholder:text-gray-400 focus:border-[#01796f] focus:bg-white focus:ring-2 focus:ring-[#01796f]/10"
+            />
+          </div>
+          <button
+            type="button"
+            onClick={() => void reloadFees()}
+            disabled={loading}
+            className="inline-flex items-center justify-center gap-2 rounded-full border border-gray-200 px-5 py-3 text-sm font-medium text-gray-700 transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            <RefreshCw size={16} className={loading ? "animate-spin" : ""} />
+            Refresh
+          </button>
+        </div>
       </div>
 
       {/* Success feedback */}
@@ -257,7 +269,7 @@ export default function FeeTable() {
 
       {/* Loading */}
       {loading && (
-        <div className="rounded-2xl border border-gray-200 bg-white py-12 text-center">
+        <div className="rounded-2xl border border-gray-100 bg-white p-10 text-center shadow-sm">
           <RefreshCw
             size={22}
             className="mx-auto animate-spin text-[#01796f]"
@@ -292,10 +304,10 @@ export default function FeeTable() {
           </p>
 
           {/* Desktop Table */}
-          <div className="hidden overflow-hidden rounded-2xl border border-gray-200 bg-white md:block">
+          <div className="hidden overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm lg:block">
             <div className="overflow-x-auto">
-              <table className="w-full text-left text-sm">
-                <thead className="border-b border-gray-200 bg-gray-50">
+              <table className="w-full min-w-[900px] text-left text-sm">
+                <thead className="bg-gray-50 text-gray-700">
                   <tr>
                     <th className="px-5 py-4 font-semibold text-gray-600">
                       Student
@@ -366,7 +378,7 @@ export default function FeeTable() {
                         <div className="flex items-center justify-center gap-2">
                           <Link
                             href={`/admin/fees/${fee.invoiceNumber}`}
-                            className="flex h-9 w-9 items-center justify-center rounded-lg text-gray-500 transition hover:bg-[#e6f4f2] hover:text-[#01796f]"
+                            className="flex h-9 w-9 items-center justify-center rounded-full text-gray-500 transition hover:bg-[#e6f4f2] hover:text-[#01796f]"
                             title={`View invoice ${fee.invoiceNumber}`}
                             aria-label={`View invoice ${fee.invoiceNumber}`}
                           >
@@ -375,7 +387,7 @@ export default function FeeTable() {
 
                           <Link
                             href={`/admin/fees/${fee.invoiceNumber}/edit`}
-                            className="flex h-9 w-9 items-center justify-center rounded-lg text-gray-500 transition hover:bg-[#e6f4f2] hover:text-[#01796f]"
+                            className="flex h-9 w-9 items-center justify-center rounded-full text-gray-500 transition hover:bg-blue-50 hover:text-blue-500"
                             title={`Edit invoice ${fee.invoiceNumber}`}
                             aria-label={`Edit invoice ${fee.invoiceNumber}`}
                           >
@@ -393,11 +405,11 @@ export default function FeeTable() {
           </div>
 
           {/* Mobile Cards */}
-          <div className="space-y-3 md:hidden">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:hidden">
             {filteredFees.map((fee) => (
               <div
                 key={fee.id}
-                className="rounded-2xl border border-gray-200 bg-white p-4"
+                className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm"
               >
                 <div className="flex items-start justify-between gap-3">
                   <div>
@@ -462,7 +474,7 @@ export default function FeeTable() {
                 <div className="mt-4 flex items-center justify-center gap-2 border-t border-gray-100 pt-3">
                   <Link
                     href={`/admin/fees/${fee.invoiceNumber}`}
-                    className="flex h-9 w-9 items-center justify-center rounded-lg text-gray-500 transition hover:bg-[#e6f4f2] hover:text-[#01796f]"
+                    className="flex h-9 w-9 items-center justify-center rounded-full text-gray-500 transition hover:bg-[#e6f4f2] hover:text-[#01796f]"
                     title={`View invoice ${fee.invoiceNumber}`}
                     aria-label={`View invoice ${fee.invoiceNumber}`}
                   >
@@ -471,7 +483,7 @@ export default function FeeTable() {
 
                   <Link
                     href={`/admin/fees/${fee.invoiceNumber}/edit`}
-                    className="flex h-9 w-9 items-center justify-center rounded-lg text-gray-500 transition hover:bg-[#e6f4f2] hover:text-[#01796f]"
+                    className="flex h-9 w-9 items-center justify-center rounded-full text-gray-500 transition hover:bg-blue-50 hover:text-blue-500"
                     title={`Edit invoice ${fee.invoiceNumber}`}
                     aria-label={`Edit invoice ${fee.invoiceNumber}`}
                   >

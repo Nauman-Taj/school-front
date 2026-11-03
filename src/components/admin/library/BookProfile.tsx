@@ -50,7 +50,7 @@ export default function BookProfile({
       </div>
 
       {/* Profile Card */}
-      <div className="rounded-2xl border border-gray-200 bg-white p-5 sm:p-6">
+      <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm sm:p-6">
         {/* Book Heading */}
         <div className="flex flex-col gap-4 border-b border-gray-100 pb-6 sm:flex-row sm:items-center">
           <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-[#e6f4f2] text-[#01796F]">
