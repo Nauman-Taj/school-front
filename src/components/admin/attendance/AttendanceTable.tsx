@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Check, Clock3, Plane, Trash2, X } from "lucide-react";
+import { Check, Clock3, Plane, Search, Trash2, X } from "lucide-react";
 
 import { AttendanceRecord } from "@/types/attendance";
 import { apiRequest } from "@/lib/api";
@@ -54,6 +54,7 @@ export default function AttendanceTable({
   >([]);
 
   const [error, setError] = useState("");
+  const [search, setSearch] = useState("");
 
   const handleDelete = async (record: AttendanceRecord) => {
     const confirmed = window.confirm(
@@ -105,9 +106,18 @@ export default function AttendanceTable({
   const visibleRecords = records.filter(
     (record) => !deletedIds.includes(record.id)
   );
+  const filteredRecords = visibleRecords.filter((record) =>
+    (record.role === "Student"
+      ? [record.name, record.role, record.className, record.section, record.date, record.status]
+      : [record.name, record.role, record.department, record.date, record.status])
+      .filter(Boolean)
+      .join(" ")
+      .toLowerCase()
+      .includes(search.trim().toLowerCase()),
+  );
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-5">
       {error && (
         <div
           role="alert"
@@ -117,76 +127,91 @@ export default function AttendanceTable({
         </div>
       )}
 
-      <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white">
+      <div className="rounded-2xl border border-gray-100 bg-white p-4 shadow-sm">
+        <div className="relative">
+          <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
+          <input
+            type="search"
+            value={search}
+            onChange={(event) => setSearch(event.target.value)}
+            placeholder="Search by name, class, date or status"
+            className="w-full rounded-full border border-gray-200 bg-gray-50 py-3 pl-11 pr-4 text-sm outline-none transition focus:border-[#01796f] focus:bg-white focus:ring-2 focus:ring-[#01796f]/10"
+          />
+        </div>
+      </div>
+
+      <div className="hidden overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm lg:block">
         <div className="overflow-x-auto">
-          <table className="w-full min-w-[800px]">
-            <thead className="border-b border-gray-200 bg-gray-50">
+          <table className="w-full min-w-[800px] text-left text-sm">
+            <thead className="bg-gray-50 text-gray-700">
               <tr>
-                <th className="px-6 py-4 text-left text-sm font-semibold text-gray-600">
+                <th className="px-5 py-4 font-semibold">
                   Name
                 </th>
 
-                <th className="px-6 py-4 text-left text-sm font-semibold text-gray-600">
+                <th className="px-5 py-4 font-semibold">
                   Type
                 </th>
 
-                <th className="px-6 py-4 text-left text-sm font-semibold text-gray-600">
+                <th className="px-5 py-4 font-semibold">
                   Class / Department
                 </th>
 
-                <th className="px-6 py-4 text-left text-sm font-semibold text-gray-600">
+                <th className="px-5 py-4 font-semibold">
                   Date
                 </th>
 
-                <th className="px-6 py-4 text-center text-sm font-semibold text-gray-600">
+                <th className="px-5 py-4 text-center font-semibold">
                   Status
                 </th>
 
-                <th className="px-6 py-4 text-center text-sm font-semibold text-gray-600">
+                <th className="px-5 py-4 text-center font-semibold">
                   Actions
                 </th>
               </tr>
             </thead>
 
             <tbody className="divide-y divide-gray-100">
-              {visibleRecords.length === 0 ? (
+              {filteredRecords.length === 0 ? (
                 <tr>
                   <td
                     colSpan={6}
                     className="px-6 py-10 text-center text-sm text-gray-500"
                   >
-                    No attendance records found.
+                    {search.trim()
+                      ? "No attendance records match your search."
+                      : "No attendance records found."}
                   </td>
                 </tr>
               ) : (
-                visibleRecords.map((record) => (
+                filteredRecords.map((record) => (
                   <tr
                     key={record.id}
-                    className="hover:bg-gray-50"
+                    className="transition hover:bg-gray-50"
                   >
-                    <td className="px-6 py-4 text-sm font-medium text-gray-900">
+                    <td className="px-5 py-4 font-medium text-gray-900">
                       {record.name}
                     </td>
 
-                    <td className="px-6 py-4 text-sm text-gray-600">
+                    <td className="px-5 py-4 text-gray-600">
                       {record.role}
                     </td>
 
-                    <td className="px-6 py-4 text-sm text-gray-600">
+                    <td className="px-5 py-4 text-gray-600">
                       {record.role === "Student"
                         ? `${record.className}-${record.section}`
                         : record.department}
                     </td>
 
-                    <td className="px-6 py-4 text-sm text-gray-600">
+                    <td className="px-5 py-4 text-gray-600">
                       {record.date}
                     </td>
 
-                    <td className="px-6 py-4 text-center">
+                    <td className="px-5 py-4 text-center">
                       <StatusBadge status={record.status} />
                     </td>
 
-                    <td className="px-6 py-4 text-center">
+                    <td className="px-5 py-4 text-center">
                       <button
                         type="button"
                         onClick={() => handleDelete(record)}
@@ -213,9 +238,69 @@ export default function AttendanceTable({
                 ))
               )}
             </tbody>
+            {/* <tfoot className="border-t border-gray-100 bg-gray-50">
+              <tr>
+                <td colSpan={6} className="px-5 py-3 text-sm text-gray-500">
+                  Showing {filteredRecords.length} of {visibleRecords.length} records
+                </td>
+              </tr>
+            </tfoot> */}
           </table>
         </div>
+        <div className="border-t border-gray-100 px-5 py-4 text-sm text-gray-500">
+          Showing {filteredRecords.length} of {visibleRecords.length} records
+        </div>
       </div>
+
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:hidden">
+        {filteredRecords.map((record) => (
+          <article key={record.id} className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
+            <div className="flex items-start justify-between gap-3">
+              <div className="min-w-0">
+                <h3 className="font-semibold text-gray-900">{record.name}</h3>
+                <p className="mt-1 text-xs text-gray-500">{record.role}</p>
+              </div>
+              <StatusBadge status={record.status} />
+            </div>
+            <div className="mt-4 grid grid-cols-2 gap-3 border-t border-gray-100 pt-4">
+              <div>
+                <p className="text-xs text-gray-400">Class / Department</p>
+                <p className="mt-1 text-sm font-medium text-gray-700">
+                  {record.role === "Student"
+                    ? `${record.className}-${record.section}`
+                    : record.department || "—"}
+                </p>
+              </div>
+              <div>
+                <p className="text-xs text-gray-400">Date</p>
+                <p className="mt-1 text-sm font-medium text-gray-700">{record.date}</p>
+              </div>
+            </div>
+            <div className="mt-4 flex justify-center border-t border-gray-100 pt-3">
+              <button
+                type="button"
+                onClick={() => void handleDelete(record)}
+                disabled={deletingId !== null}
+                aria-label={`Delete attendance record for ${record.name}`}
+                className="inline-flex h-9 w-9 items-center justify-center rounded-full text-gray-500 transition hover:bg-red-50 hover:text-red-600 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                <Trash2 size={17} />
+              </button>
+            </div>
+          </article>
+        ))}
+        {filteredRecords.length === 0 && (
+          <div className="col-span-full rounded-2xl border border-gray-100 bg-white p-10 text-center text-sm text-gray-500 shadow-sm">
+            {search.trim()
+              ? "No attendance records match your search."
+              : "No attendance records found."}
+          </div>
+        )}
+      </div>
+
+      <p className="text-sm text-gray-500 lg:hidden">
+        Showing {filteredRecords.length} of {visibleRecords.length} records
+      </p>
     </div>
   );
 }

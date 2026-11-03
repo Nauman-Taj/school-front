@@ -148,7 +148,7 @@ export default function AttendanceMarkingPanel({ mode }: Props) {
   }
 
   return (
-    <section className="rounded-2xl border border-gray-200 bg-white p-5">
+    <section className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm sm:p-6">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h2 className="text-lg font-semibold text-gray-900">
@@ -163,30 +163,33 @@ export default function AttendanceMarkingPanel({ mode }: Props) {
           type="date"
           value={date}
           onChange={(event) => setDate(event.target.value)}
-          className="rounded-xl border border-gray-200 px-3 py-2 text-sm text-gray-700 outline-none focus:border-[#01796f]"
+          className="rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-700 outline-none transition focus:border-[#01796f] focus:ring-2 focus:ring-[#01796f]/10"
         />
       </div>
 
       {error && (
-        <p className="mt-4 rounded-xl bg-red-50 p-3 text-sm text-red-700">
+        <p role="alert" className="mt-4 rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-700">
           {error}
         </p>
       )}
 
       {message && (
-        <p className="mt-4 rounded-xl bg-[#e6f4f2] p-3 text-sm text-[#015f58]">
+        <p role="status" className="mt-4 rounded-xl border border-[#cce7e3] bg-[#e6f4f2] p-3 text-sm text-[#015f58]">
           {message}
         </p>
       )}
 
       {loading ? (
-        <p className="py-8 text-center text-sm text-gray-500">
-          Loading attendance...
-        </p>
+        <div className="py-10 text-center">
+          <div className="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-gray-200 border-t-[#01796F]" />
+          <p className="mt-4 text-sm text-gray-500">Loading attendance...</p>
+        </div>
       ) : (
-        <div className="mt-5 overflow-x-auto">
+        <>
+        <div className="mt-5 hidden overflow-hidden rounded-2xl border border-gray-100 lg:block">
+          <div className="overflow-x-auto">
           <table className="w-full min-w-[620px]">
-            <thead className="border-b border-gray-200 bg-gray-50">
+            <thead className="bg-gray-50 text-gray-700">
               <tr>
                 <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600">
                   Name / ID
@@ -233,7 +236,7 @@ export default function AttendanceMarkingPanel({ mode }: Props) {
                               [key]: event.target.value as AttendanceStatus,
                             }))
                           }
-                          className="rounded-lg border border-gray-200 px-3 py-2 text-sm"
+                          className="rounded-xl border border-gray-200 bg-white px-3 py-2.5 text-sm outline-none transition focus:border-[#01796f] focus:ring-2 focus:ring-[#01796f]/10"
                         >
                           {statuses.map((status) => (
                             <option key={status} value={status}>
@@ -290,7 +293,7 @@ export default function AttendanceMarkingPanel({ mode }: Props) {
                               [key]: event.target.value as AttendanceStatus,
                             }))
                           }
-                          className="rounded-lg border border-gray-200 px-3 py-2 text-sm"
+                          className="rounded-xl border border-gray-200 bg-white px-3 py-2.5 text-sm outline-none transition focus:border-[#01796f] focus:ring-2 focus:ring-[#01796f]/10"
                         >
                           {statuses.map((status) => (
                             <option key={status} value={status}>
@@ -336,6 +339,74 @@ export default function AttendanceMarkingPanel({ mode }: Props) {
             </tbody>
           </table>
         </div>
+        </div>
+
+        <div className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:hidden">
+          {(mode === "student"
+            ? students.map((person) => ({
+                id: person.id,
+                name: person.name,
+                identifier: `Student ID: ${person.id}`,
+                detail: `${person.className}-${person.section}`,
+              }))
+            : teachers.map((person) => ({
+                id: person.id,
+                name: person.name,
+                identifier: `Teacher ID: ${person.id}`,
+                detail: person.subject || "—",
+              }))
+          ).map((person) => {
+            const key = `${mode}-${person.id}`;
+            const existing = getExistingRecord(person.id);
+
+            return (
+              <article key={key} className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
+                <h3 className="font-semibold text-gray-900">{person.name}</h3>
+                <p className="mt-1 text-xs text-gray-500">{person.identifier}</p>
+                <div className="mt-4 grid grid-cols-2 items-end gap-3 border-t border-gray-100 pt-4">
+                  <div>
+                    <p className="mb-1.5 text-xs text-gray-400">Class / Subject</p>
+                    <p className="text-sm font-medium text-gray-700">{person.detail}</p>
+                  </div>
+                  <div>
+                    <label htmlFor={`status-${key}`} className="mb-1.5 block text-xs text-gray-400">Status</label>
+                    <select
+                      id={`status-${key}`}
+                      value={selectedStatuses[key] ?? "Present"}
+                      onChange={(event) =>
+                        setSelectedStatuses((previous) => ({
+                          ...previous,
+                          [key]: event.target.value as AttendanceStatus,
+                        }))
+                      }
+                      className="w-full rounded-xl border border-gray-200 bg-white px-3 py-2.5 text-sm outline-none transition focus:border-[#01796f] focus:ring-2 focus:ring-[#01796f]/10"
+                    >
+                      {statuses.map((status) => (
+                        <option key={status} value={status}>{status}</option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  disabled={savingId === key}
+                  onClick={() => void handleSave(person.id)}
+                  className="mt-4 w-full rounded-full bg-[#01796f] px-4 py-2.5 text-sm font-medium text-white transition hover:bg-[#015f58] disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  {savingId === key ? "Saving..." : existing ? "Update Attendance" : "Save Attendance"}
+                </button>
+              </article>
+            );
+          })}
+
+          {((mode === "student" && students.length === 0) ||
+            (mode === "teacher" && teachers.length === 0)) && (
+            <div className="col-span-full rounded-2xl border border-gray-100 bg-white p-10 text-center text-sm text-gray-500 shadow-sm">
+              {mode === "student" ? "No active students found." : "No active teachers found."}
+            </div>
+          )}
+        </div>
+        </>
       )}
     </section>
   );

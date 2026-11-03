@@ -6,10 +6,6 @@ import Link from "next/link";
 import {
   GraduationCap,
   Users,
-  CheckCircle2,
-  XCircle,
-  Clock3,
-  TrendingUp,
 } from "lucide-react";
 
 import AttendanceCalendar from "@/components/admin/attendance/AttendanceCalendar";
@@ -75,27 +71,18 @@ export default function AttendancePage() {
     {
       title: "Present",
       value: present,
-      description: "Students & teachers",
-      icon: CheckCircle2,
     },
     {
       title: "Absent",
       value: absent,
-      description: "Students & teachers",
-      icon: XCircle,
     },
     {
       title: "Late",
       value: late,
-      description: "Students & teachers",
-      icon: Clock3,
     },
     {
       title: "Attendance Rate",
       value: `${attendanceRate}%`,
-      ispercentage: true,
-      description: "Based on loaded records",
-      icon: TrendingUp,
     },
   ];
 
@@ -142,31 +129,14 @@ export default function AttendancePage() {
       {/* Stats */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {stats.map((stat) => {
-          const Icon = stat.icon;
-
           return (
             <div
               key={stat.title}
-              className="rounded-2xl border border-gray-200 bg-white p-5"
+              className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm"
             >
-              <div className="flex items-start justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-500">
-                    {stat.title}
-                  </p>
-
-                  <h2 className="mt-2 text-2xl font-bold text-gray-900">
-                    {loading ? "0" : stat.value}
-                  </h2>
-                </div>
-
-                <div className="rounded-xl bg-[#e6f4f2] p-2.5 text-[#01796f]">
-                  <Icon size={20} />
-                </div>
-              </div>
-
-              <p className="mt-3 text-sm text-gray-500">
-                {stat.description}
+              <p className="text-sm text-gray-500">{stat.title}</p>
+              <p className="mt-2 text-2xl font-bold text-gray-800">
+                {loading ? "0" : stat.value}
               </p>
             </div>
           );
@@ -233,9 +203,6 @@ export default function AttendancePage() {
           <h2 className="text-lg font-semibold text-gray-900">
             Recent Attendance
           </h2>
-          <p className="mt-1 text-sm text-gray-500">
-            Records retrieved from the backend.
-          </p>
         </div>
 
         {loading ? (

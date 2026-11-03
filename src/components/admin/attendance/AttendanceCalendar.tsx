@@ -87,7 +87,7 @@ export default function AttendanceCalendar({
   };
 
   return (
-    <div className="rounded-2xl border border-gray-200 bg-white p-5">
+    <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm sm:p-6">
       {/* Header */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-3">
@@ -107,7 +107,7 @@ export default function AttendanceCalendar({
             type="button"
             onClick={() => changeMonth(-1)}
             aria-label="Previous month"
-            className="rounded-lg border border-gray-200 p-2 hover:bg-gray-50"
+            className="rounded-full border border-gray-200 p-2 text-gray-600 transition hover:bg-gray-50"
           >
             <ChevronLeft size={18} />
           </button>
@@ -120,7 +120,7 @@ export default function AttendanceCalendar({
             type="button"
             onClick={() => changeMonth(1)}
             aria-label="Next month"
-            className="rounded-lg border border-gray-200 p-2 hover:bg-gray-50"
+            className="rounded-full border border-gray-200 p-2 text-gray-600 transition hover:bg-gray-50"
           >
             <ChevronRight size={18} />
           </button>
