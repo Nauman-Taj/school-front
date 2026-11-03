@@ -69,6 +69,17 @@ export default function AttendanceCalendar({
     const nextDate = new Date(year, month + amount, 1);
     setDate(nextDate);
 
+    const today = new Date();
+    if (
+      nextDate.getMonth() === today.getMonth() &&
+      nextDate.getFullYear() === today.getFullYear()
+    ) {
+      setSelectedDate(
+        formatDate(today.getDate(), today.getMonth(), today.getFullYear()),
+      );
+      return;
+    }
+
     // Preserve the selected day when possible; otherwise select day 1.
     const selectedParts = selectedDate.match(
       /^(\d{2}) ([A-Za-z]{3}) (\d{4})$/,
@@ -178,7 +189,7 @@ export default function AttendanceCalendar({
                 key={day}
                 onClick={() => setSelectedDate(dateString)}
                 aria-pressed={selected}
-                className={`relative min-h-[85px] border-r border-t border-gray-100 p-2 text-left transition ${
+                className={`relative min-h-[85px] border-r border-t border-gray-100 p-2 text-left ${
                   selected ? "bg-[#e6f4f2]" : "hover:bg-gray-50"
                 }`}
               >
