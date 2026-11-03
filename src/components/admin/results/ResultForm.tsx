@@ -106,22 +106,24 @@ export default function ResultForm({ result }: ResultFormProps) {
           <div><label className="mb-2 block text-sm font-medium text-gray-700">Total Marks</label><input readOnly value={selectedExam?.totalMarks ?? ''} placeholder="Selected from exam" className={`${inputClass} bg-gray-50`} /></div>
           <div><label htmlFor="obtainedMarks" className="mb-2 block text-sm font-medium text-gray-700">Obtained Marks</label><input id="obtainedMarks" type="number" min="0" max={selectedExam?.totalMarks} step="1" value={obtainedMarks} onChange={(event) => setObtainedMarks(event.target.value)} placeholder="Enter obtained marks" required className={inputClass} /></div>
         </div>}
-        <div className="mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
-          <button
-            type="button"
-            onClick={() => router.back()}
-            className="rounded-full border border-gray-200 px-5 py-2.5 text-sm font-medium text-gray-600 transition hover:border-gray-300 hover:bg-gray-50"
-          >
-            Cancel
-          </button>
-          <button
-            type="submit"
-            disabled={saving || loadingOptions || exams.length === 0}
-            className="inline-flex items-center justify-center gap-2 rounded-full bg-[#01796f] px-5 py-2.5 text-sm font-medium text-white transition hover:bg-[#015f58] disabled:cursor-not-allowed disabled:opacity-60"
-          >
-            {saving ? 'Saving...' : isEditMode ? 'Save Changes' : 'Add Result'}
-          </button>
-        </div>
+        {!loadingOptions && (
+          <div className="mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+            <button
+              type="button"
+              onClick={() => router.back()}
+              className="rounded-full border border-gray-200 px-5 py-2.5 text-sm font-medium text-gray-600 transition hover:border-gray-300 hover:bg-gray-50"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              disabled={saving || exams.length === 0}
+              className="inline-flex items-center justify-center gap-2 rounded-full bg-[#01796f] px-5 py-2.5 text-sm font-medium text-white transition hover:bg-[#015f58] disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              {saving ? 'Saving...' : isEditMode ? 'Save Changes' : 'Add Result'}
+            </button>
+          </div>
+        )}
       </form>
     </div>
   );
