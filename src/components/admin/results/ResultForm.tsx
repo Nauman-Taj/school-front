@@ -10,33 +10,52 @@ import type { Exam } from '@/types/exam';
 import type { Result } from '@/types/result';
 import type { Student } from '@/types/student';
 
-type ResultFormProps = { result?: Result };
+type ResultFormProps = {
+  result?: Result;
+  initialStudents?: Student[];
+  initialExams?: Exam[];
+  initialResults?: Result[];
+};
 
 const inputClass = 'w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-900 outline-none transition focus:border-[#01796f] focus:ring-2 focus:ring-[#01796f]/10';
 
-export default function ResultForm({ result }: ResultFormProps) {
+export default function ResultForm({
+  result,
+  initialStudents,
+  initialExams,
+  initialResults,
+}: ResultFormProps) {
   const router = useRouter();
   const isEditMode = Boolean(result);
-  const [students, setStudents] = useState<Student[]>([]);
-  const [exams, setExams] = useState<Exam[]>([]);
+  const [students, setStudents] = useState<Student[]>(initialStudents ?? []);
+  const [exams, setExams] = useState<Exam[]>(initialExams ?? []);
+  const [results, setResults] = useState<Result[]>(initialResults ?? []);
   const [studentId, setStudentId] = useState(result?.studentId.toString() ?? '');
   const [examId, setExamId] = useState(result?.examId ?? '');
   const [obtainedMarks, setObtainedMarks] = useState(result?.obtainedMarks.toString() ?? '');
-  const [loadingOptions, setLoadingOptions] = useState(true);
+  const [loadingOptions, setLoadingOptions] = useState(
+    !initialStudents || !initialExams || !initialResults,
+  );
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
 
   useEffect(() => {
     let cancelled = false;
     async function loadOptions() {
+      if (initialStudents && initialExams && initialResults) return;
       try {
         const token = getAuthToken();
         if (!token) throw new Error('Your session has expired. Please log in again.');
-        const [studentRows, examRows] = await Promise.all([
+        const [studentRows, examRows, resultRows] = await Promise.all([
           apiRequest<Student[]>('/students', { token }),
           apiRequest<Exam[]>('/exams', { token }),
+          apiRequest<Result[]>('/results', { token }),
         ]);
-        if (!cancelled) { setStudents(studentRows); setExams(examRows); }
+        if (!cancelled) {
+          setStudents(studentRows);
+          setExams(examRows);
+          setResults(resultRows);
+        }
       } catch (err) {
         if (!cancelled) setError(err instanceof Error ? err.message : 'Unable to load students and exams.');
       } finally {
@@ -45,10 +64,30 @@ export default function ResultForm({ result }: ResultFormProps) {
     }
     void loadOptions();
     return () => { cancelled = true; };
-  }, []);
+  }, [initialStudents, initialExams, initialResults]);
 
   const selectedExam = exams.find((exam) => exam.id === examId);
-  const eligibleStudents = useMemo(() => students.filter((student) => selectedExam && student.className === selectedExam.className && student.section === (selectedExam.sections?.[0]?.section ?? selectedExam.section)), [students, selectedExam]);
+  const eligibleStudents = useMemo(
+    () =>
+      students.filter((student) => {
+        if (
+          !selectedExam ||
+          student.className !== selectedExam.className ||
+          student.section !==
+            (selectedExam.sections?.[0]?.section ?? selectedExam.section)
+        ) {
+          return false;
+        }
+
+        return !results.some(
+          (existingResult) =>
+            existingResult.examId === selectedExam.id &&
+            existingResult.studentId === student.id &&
+            existingResult.id !== result?.id,
+        );
+      }),
+    [students, selectedExam, results, result?.id],
+  );
   const selectedStudent = eligibleStudents.find((student) => student.id === Number(studentId));
 
   const handleExamChange = (nextExamId: string) => {
@@ -97,15 +136,150 @@ export default function ResultForm({ result }: ResultFormProps) {
             {error}
           </div>
         )}
-        {loadingOptions ? <div className="py-8 text-center text-sm text-gray-500">Loading exam and student options...</div> : <div className="grid gap-5 sm:grid-cols-2">
-          <div><label htmlFor="examId" className="mb-2 block text-sm font-medium text-gray-700">Exam</label><select id="examId" value={examId} onChange={(event) => handleExamChange(event.target.value)} required className={inputClass}><option value="">Select exam</option>{exams.map((exam) => <option key={exam.id} value={exam.id}>{exam.name} — {exam.subject} ({exam.className}-{exam.sections?.[0]?.section ?? exam.section})</option>)}</select></div>
-          <div><label htmlFor="studentId" className="mb-2 block text-sm font-medium text-gray-700">Student</label><select id="studentId" value={studentId} onChange={(event) => setStudentId(event.target.value)} required disabled={!selectedExam} className={inputClass}><option value="">{selectedExam ? 'Select student' : 'Select an exam first'}</option>{eligibleStudents.map((student) => <option key={student.id} value={student.id}>{student.name} — Roll {student.rollNo}</option>)}</select></div>
-          <div><label className="mb-2 block text-sm font-medium text-gray-700">Class</label><input readOnly value={selectedExam?.className ?? ''} placeholder="Selected from exam" className={`${inputClass} bg-gray-50`} /></div>
-          <div><label className="mb-2 block text-sm font-medium text-gray-700">Section</label><input readOnly value={selectedExam?.sections?.[0]?.section ?? selectedExam?.section ?? ''} placeholder="Selected from exam" className={`${inputClass} bg-gray-50`} /></div>
-          <div><label className="mb-2 block text-sm font-medium text-gray-700">Subject</label><input readOnly value={selectedExam?.subject ?? ''} placeholder="Selected from exam" className={`${inputClass} bg-gray-50`} /></div>
-          <div><label className="mb-2 block text-sm font-medium text-gray-700">Total Marks</label><input readOnly value={selectedExam?.totalMarks ?? ''} placeholder="Selected from exam" className={`${inputClass} bg-gray-50`} /></div>
-          <div><label htmlFor="obtainedMarks" className="mb-2 block text-sm font-medium text-gray-700">Obtained Marks</label><input id="obtainedMarks" type="number" min="0" max={selectedExam?.totalMarks} step="1" value={obtainedMarks} onChange={(event) => setObtainedMarks(event.target.value)} placeholder="Enter obtained marks" required className={inputClass} /></div>
-        </div>}
+        {loadingOptions ? (
+          <div className="py-8 text-center text-sm text-gray-500">
+            Loading exam and student options...
+          </div>
+        ) : (
+          <div className="grid gap-5 sm:grid-cols-2">
+            <div>
+              <label
+                htmlFor="examId"
+                className="mb-2 block text-sm font-medium text-gray-700"
+              >
+                Exam
+              </label>
+              <select
+                id="examId"
+                value={examId}
+                onChange={(event) => handleExamChange(event.target.value)}
+                required
+                className={inputClass}
+              >
+                <option value="">Select exam</option>
+                {exams.map((exam) => (
+                  <option key={exam.id} value={exam.id}>
+                    {exam.name} — {exam.subject} ({exam.className}-
+                    {exam.sections?.[0]?.section ?? exam.section})
+                  </option>
+                ))}
+              </select>
+              {exams.length === 0 && (
+                <p className="mt-2 text-sm text-amber-700">
+                  No exams are available. Add an exam before recording results.
+                </p>
+              )}
+            </div>
+
+            <div>
+              <label
+                htmlFor="studentId"
+                className="mb-2 block text-sm font-medium text-gray-700"
+              >
+                Student
+              </label>
+              <select
+                id="studentId"
+                value={studentId}
+                onChange={(event) => setStudentId(event.target.value)}
+                required
+                disabled={!selectedExam || eligibleStudents.length === 0}
+                className={inputClass}
+              >
+                <option value="">
+                  {!selectedExam
+                    ? 'Select an exam first'
+                    : eligibleStudents.length === 0
+                      ? 'No students available'
+                      : 'Select student'}
+                </option>
+                {eligibleStudents.map((student) => (
+                  <option key={student.id} value={student.id}>
+                    {student.name} — Roll {student.rollNo}
+                  </option>
+                ))}
+              </select>
+              {selectedExam && eligibleStudents.length === 0 && (
+                <p className="mt-2 text-sm text-amber-700">
+                  All students in this exam's class and section already have
+                  a result.{' '}
+                  <Link
+                    href="/admin/exams/add"
+                    className="font-medium text-[#01796F] hover:underline underline-offset-2"
+                  >
+                    Add another exam
+                  </Link>{' '}
+                  to record more results.
+                </p>
+              )}
+            </div>
+
+            <div>
+              <label className="mb-2 block text-sm font-medium text-gray-700">
+                Class
+              </label>
+              <input
+                readOnly
+                value={selectedExam?.className ?? ''}
+                placeholder="Selected from exam"
+                className={`${inputClass} bg-gray-50`}
+              />
+            </div>
+            <div>
+              <label className="mb-2 block text-sm font-medium text-gray-700">
+                Section
+              </label>
+              <input
+                readOnly
+                value={selectedExam?.sections?.[0]?.section ?? selectedExam?.section ?? ''}
+                placeholder="Selected from exam"
+                className={`${inputClass} bg-gray-50`}
+              />
+            </div>
+            <div>
+              <label className="mb-2 block text-sm font-medium text-gray-700">
+                Subject
+              </label>
+              <input
+                readOnly
+                value={selectedExam?.subject ?? ''}
+                placeholder="Selected from exam"
+                className={`${inputClass} bg-gray-50`}
+              />
+            </div>
+            <div>
+              <label className="mb-2 block text-sm font-medium text-gray-700">
+                Total Marks
+              </label>
+              <input
+                readOnly
+                value={selectedExam?.totalMarks ?? ''}
+                placeholder="Selected from exam"
+                className={`${inputClass} bg-gray-50`}
+              />
+            </div>
+            <div>
+              <label
+                htmlFor="obtainedMarks"
+                className="mb-2 block text-sm font-medium text-gray-700"
+              >
+                Obtained Marks
+              </label>
+              <input
+                id="obtainedMarks"
+                type="number"
+                min="0"
+                max={selectedExam?.totalMarks}
+                step="1"
+                value={obtainedMarks}
+                onChange={(event) => setObtainedMarks(event.target.value)}
+                placeholder="Enter obtained marks"
+                required
+                className={inputClass}
+              />
+            </div>
+          </div>
+        )}
         {!loadingOptions && (
           <div className="mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
             <button
@@ -117,7 +291,7 @@ export default function ResultForm({ result }: ResultFormProps) {
             </button>
             <button
               type="submit"
-              disabled={saving || exams.length === 0}
+              disabled={saving || !selectedExam || !selectedStudent}
               className="inline-flex items-center justify-center gap-2 rounded-full bg-[#01796f] px-5 py-2.5 text-sm font-medium text-white transition hover:bg-[#015f58] disabled:cursor-not-allowed disabled:opacity-60"
             >
               {saving ? 'Saving...' : isEditMode ? 'Save Changes' : 'Add Result'}
