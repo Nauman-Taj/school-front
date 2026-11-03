@@ -1,7 +1,4 @@
-import { notFound } from "next/navigation";
-
-import { assignments } from "@/data/assignments";
-import AssignmentForm from "@/components/admin/assignments/AssignmentForm";
+import AssignmentLoader from "@/components/admin/assignments/AssignmentLoader";
 
 type EditAssignmentPageProps = {
   params: Promise<{
@@ -13,19 +10,5 @@ export default async function EditAssignmentPage({
   params,
 }: EditAssignmentPageProps) {
   const { id } = await params;
-
-  const assignment = assignments.find(
-    (assignment) => assignment.id === id
-  );
-
-  if (!assignment) {
-    notFound();
-  }
-
-  return (
-    <AssignmentForm
-      assignment={assignment}
-      isEdit
-    />
-  );
+  return <AssignmentLoader id={id} mode="edit" />;
 }

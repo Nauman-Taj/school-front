@@ -17,7 +17,7 @@ type AssignmentProfileProps = {
 
 const statusStyles = {
   Pending: "bg-yellow-50 text-yellow-700",
-  Submitted: "bg-green-50 text-green-700",
+  Submitted: "bg-[#e6f4f2] text-[#01796F]",
   Overdue: "bg-red-50 text-red-700",
 };
 
@@ -96,7 +96,7 @@ export default function AssignmentProfile({
             <div>
               <p className="text-xs text-gray-400">Class</p>
               <p className="mt-1 font-medium text-gray-800">
-                {assignment.className}
+                {assignment.className}-{assignment.section}
               </p>
             </div>
           </div>

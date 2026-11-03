@@ -1,7 +1,4 @@
-import { notFound } from "next/navigation";
-
-import { assignments } from "@/data/assignments";
-import AssignmentProfile from "@/components/admin/assignments/AssignmentProfile";
+import AssignmentLoader from "@/components/admin/assignments/AssignmentLoader";
 
 type AssignmentPageProps = {
   params: Promise<{
@@ -13,14 +10,5 @@ export default async function AssignmentPage({
   params,
 }: AssignmentPageProps) {
   const { id } = await params;
-
-  const assignment = assignments.find(
-    (assignment) => assignment.id === id
-  );
-
-  if (!assignment) {
-    notFound();
-  }
-
-  return <AssignmentProfile assignment={assignment} />;
+  return <AssignmentLoader id={id} mode="profile" />;
 }
