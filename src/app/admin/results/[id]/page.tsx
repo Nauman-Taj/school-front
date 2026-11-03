@@ -1,7 +1,4 @@
-import { notFound } from "next/navigation";
-
-import { results } from "@/data/results";
-import ResultProfile from "@/components/admin/results/ResultProfile";
+import ResultLoader from '@/components/admin/results/ResultLoader';
 
 type ResultDetailsPageProps = {
   params: Promise<{
@@ -9,16 +6,7 @@ type ResultDetailsPageProps = {
   }>;
 };
 
-export default async function ResultDetailsPage({
-  params,
-}: ResultDetailsPageProps) {
+export default async function ResultDetailsPage({ params }: ResultDetailsPageProps) {
   const { id } = await params;
-
-  const result = results.find((item) => item.id === id);
-
-  if (!result) {
-    notFound();
-  }
-
-  return <ResultProfile result={result} />;
+  return <ResultLoader id={id} mode="profile" />;
 }

@@ -3,187 +3,106 @@ import {
   ArrowLeft,
   Award,
   BookOpen,
+  ClipboardCheck,
   GraduationCap,
+  Pencil,
   UserRound,
 } from "lucide-react";
 
-import { results } from "@/data/results";
-import { students } from "@/data/students";
-import { exams } from "@/data/exams";
-import { Result } from "@/types/result";
+import type { Result } from "@/types/result";
 
 type ResultProfileProps = {
   result: Result;
 };
 
-export default function ResultProfile({
-  result,
-}: ResultProfileProps) {
-  const student = students.find(
-    (item) => item.id === result.studentId
-  );
-
-  const exam = exams.find(
-    (item) => item.id === result.examId
-  );
+export default function ResultProfile({ result }: ResultProfileProps) {
+  const details = [
+    { label: "Student", value: result.student, Icon: UserRound },
+    { label: "Roll Number", value: result.rollNo ?? "—", Icon: UserRound },
+    {
+      label: "Class",
+      value: `${result.className} · Section ${result.section}`,
+      Icon: GraduationCap,
+    },
+    { label: "Exam", value: result.exam ?? "—", Icon: ClipboardCheck },
+    { label: "Subject", value: result.subject, Icon: BookOpen },
+    { label: "Teacher", value: result.teacher, Icon: UserRound },
+    {
+      label: "Marks",
+      value: `${result.obtainedMarks} / ${result.totalMarks}`,
+      Icon: ClipboardCheck,
+    },
+    { label: "Percentage", value: `${result.percentage}%`, Icon: Award },
+    { label: "Grade", value: result.grade, Icon: Award },
+  ];
 
   return (
     <div className="space-y-5">
-      {/* Back */}
       <Link
         href="/admin/results"
-        className="inline-flex items-center gap-2 text-sm font-medium text-gray-500 transition hover:text-[#01796f]"
+        className="inline-flex items-center gap-2 text-sm font-medium text-gray-500 transition hover:text-[#01796F]"
       >
         <ArrowLeft size={17} />
         Back to Results
       </Link>
 
-      {/* Header */}
       <div className="rounded-2xl border border-gray-200 bg-white p-6">
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-4">
-            <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-[#e6f4f2] text-[#01796f]">
-              <UserRound size={26} />
+            <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-[#e6f4f2] text-[#01796F]">
+              <Award size={26} />
             </div>
-
             <div>
-              <h1 className="text-xl font-bold text-gray-900">
+              <h1 className="text-2xl font-bold text-gray-900">
                 {result.student}
               </h1>
-
               <p className="mt-1 text-sm text-gray-500">
-                {student?.rollNo ?? "—"} •{" "}
-                {result.className}-{result.section}
+                Result ID: {result.id}
               </p>
             </div>
           </div>
 
-          <span
-            className={`w-fit rounded-full px-3 py-1.5 text-sm font-medium ${
-              result.status === "Pass"
-                ? "bg-green-50 text-green-600"
-                : "bg-red-50 text-red-600"
-            }`}
-          >
-            {result.status}
-          </span>
-        </div>
-      </div>
-
-      {/* Result Summary */}
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <div className="rounded-2xl border border-gray-200 bg-white p-5">
-          <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#e6f4f2] text-[#01796f]">
-              <BookOpen size={20} />
-            </div>
-
-            <div>
-              <p className="text-xs text-gray-400">Exam</p>
-              <p className="mt-1 font-semibold text-gray-800">
-                {exam?.name ?? "—"}
-              </p>
-            </div>
-          </div>
-        </div>
-
-        <div className="rounded-2xl border border-gray-200 bg-white p-5">
-          <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#e6f4f2] text-[#01796f]">
-              <GraduationCap size={20} />
-            </div>
-
-            <div>
-              <p className="text-xs text-gray-400">Subject</p>
-              <p className="mt-1 font-semibold text-gray-800">
-                {result.subject}
-              </p>
-            </div>
-          </div>
-        </div>
-
-        <div className="rounded-2xl border border-gray-200 bg-white p-5">
-          <p className="text-xs text-gray-400">Marks</p>
-
-          <p className="mt-1 text-xl font-bold text-gray-900">
-            {result.obtainedMarks}
-            <span className="text-sm font-medium text-gray-400">
-              {" "}
-              / {result.totalMarks}
+          <div className="flex flex-wrap items-center gap-3">
+            <span
+              className={`rounded-full px-3 py-1.5 text-sm font-medium ${result.status === "Pass" ? "bg-[#e6f4f2] text-[#01796F]" : "bg-red-50 text-red-600"}`}
+            >
+              {result.status}
             </span>
-          </p>
-        </div>
-
-        <div className="rounded-2xl border border-gray-200 bg-white p-5">
-          <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#e6f4f2] text-[#01796f]">
-              <Award size={20} />
-            </div>
-
-            <div>
-              <p className="text-xs text-gray-400">Grade</p>
-              <p className="mt-1 text-xl font-bold text-gray-900">
-                {result.grade}
-              </p>
-            </div>
+            <Link
+              href={`/admin/results/${encodeURIComponent(result.id)}/edit`}
+              className="inline-flex items-center justify-center gap-2 rounded-full bg-[#01796F] px-4 py-2.5 text-sm font-medium text-white transition hover:bg-[#015f58]"
+            >
+              <Pencil size={17} />
+              Edit Result
+            </Link>
           </div>
         </div>
       </div>
 
-      {/* Details */}
       <div className="rounded-2xl border border-gray-200 bg-white p-6">
-        <h2 className="text-lg font-semibold text-gray-900">
+        <h2 className="mb-5 text-lg font-semibold text-gray-900">
           Result Details
         </h2>
-
-        <div className="mt-5 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          <div>
-            <p className="text-xs text-gray-400">Student</p>
-            <p className="mt-1 font-medium text-gray-800">
-              {result.student}
-            </p>
-          </div>
-
-          <div>
-            <p className="text-xs text-gray-400">Roll Number</p>
-            <p className="mt-1 font-medium text-gray-800">
-              {student?.rollNo ?? "—"}
-            </p>
-          </div>
-
-          <div>
-            <p className="text-xs text-gray-400">Class</p>
-            <p className="mt-1 font-medium text-gray-800">
-              {result.className}-{result.section}
-            </p>
-          </div>
-
-          <div>
-            <p className="text-xs text-gray-400">Exam</p>
-            <p className="mt-1 font-medium text-gray-800">
-              {exam?.name ?? "—"}
-            </p>
-          </div>
-
-          <div>
-            <p className="text-xs text-gray-400">Teacher</p>
-            <p className="mt-1 font-medium text-gray-800">
-              {result.teacher}
-            </p>
-          </div>
-
-          <div>
-            <p className="text-xs text-gray-400">Percentage</p>
-            <p className="mt-1 font-medium text-gray-800">
-              {result.percentage}%
-            </p>
-          </div>
-
-          <div>
-            <p className="text-xs text-gray-400">Status</p>
-            <p className="mt-1 font-medium text-gray-800">
-              {result.status}
-            </p>
+        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          {details.map(({ label, value, Icon }) => (
+            <div key={label} className="flex items-start gap-3">
+              <Icon size={20} className="mt-0.5 text-[#01796F]" />
+              <div>
+                <p className="text-xs text-gray-400">{label}</p>
+                <p className="mt-1 font-medium text-gray-800">{value}</p>
+              </div>
+            </div>
+          ))}
+          <div className="flex items-start gap-3">
+            <ClipboardCheck size={20} className="mt-0.5 text-[#01796F]" />
+            <div>
+              <p className="text-xs text-gray-400">Status</p>
+              <span
+                className={`mt-1 inline-flex rounded-full px-3 py-1 text-xs font-medium ${result.status === "Pass" ? "bg-[#e6f4f2] text-[#01796F]" : "bg-red-50 text-red-600"}`}
+              >
+                {result.status}
+              </span>
+            </div>
           </div>
         </div>
       </div>
