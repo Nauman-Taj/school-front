@@ -160,15 +160,6 @@ export default function FeesPage() {
           );
         })}
       </div>
-
-      {!loading && !error && (
-        <p className="text-sm text-gray-500">
-          {summary.invoiceCount}{" "}
-          {summary.invoiceCount === 1 ? "invoice" : "invoices"}{" "}
-          · Collection rate: {summary.collectionRate}%
-        </p>
-      )}
-
       <FeeTable />
     </div>
   );
