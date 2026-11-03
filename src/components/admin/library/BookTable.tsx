@@ -128,10 +128,6 @@ export default function BookTable({
         </div>
       )}
 
-      <p className="text-sm text-gray-500">
-        Showing {filteredBooks.length} of {books.length} books
-      </p>
-
       {/* Desktop Table */}
       <div className="hidden overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm lg:block">
         <div className="overflow-x-auto">
@@ -149,9 +145,8 @@ export default function BookTable({
                 ].map((heading) => (
                   <th
                     key={heading}
-                    className={`px-5 py-4 text-sm font-semibold text-gray-700 ${
-                      heading === "Action" ? "text-center" : ""
-                    }`}
+                    className={`px-5 py-4 text-sm font-semibold text-gray-700 ${heading === "Action" ? "text-center" : ""
+                      }`}
                   >
                     {heading}
                   </th>
@@ -205,6 +200,9 @@ export default function BookTable({
               ))}
             </tbody>
           </table>
+        </div>
+        <div className="border-t border-gray-100 px-5 py-4 text-sm text-gray-500">
+          Showing {filteredBooks.length} of {books.length} books
         </div>
       </div>
 

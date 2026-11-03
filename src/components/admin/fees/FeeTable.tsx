@@ -147,7 +147,7 @@ export default function FeeTable() {
 
     const confirmed = window.confirm(
       `Are you sure you want to delete invoice ${fee.invoiceNumber} for ${fee.student}?\n\n` +
-        "Invoices with payment history cannot be deleted.",
+      "Invoices with payment history cannot be deleted.",
     );
 
     if (!confirmed) return;
@@ -204,11 +204,10 @@ export default function FeeTable() {
         type="button"
         onClick={() => void handleDeleteFee(fee)}
         disabled={deleteInProgress}
-        className={`flex h-9 w-9 items-center justify-center rounded-lg transition ${
-          deleteInProgress
+        className={`flex h-9 w-9 items-center justify-center rounded-lg transition ${deleteInProgress
             ? "cursor-not-allowed text-gray-300"
             : "text-gray-500 hover:bg-red-50 hover:text-red-600"
-        }`}
+          }`}
         title={
           isDeleting
             ? `Deleting invoice ${fee.invoiceNumber}...`
@@ -299,10 +298,6 @@ export default function FeeTable() {
 
       {!loading && !error && (
         <>
-          <p className="text-sm text-gray-500">
-            Showing {filteredFees.length} of {feeList.length} fee records
-          </p>
-
           {/* Desktop Table */}
           <div className="hidden overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm lg:block">
             <div className="overflow-x-auto">
@@ -401,6 +396,9 @@ export default function FeeTable() {
                   ))}
                 </tbody>
               </table>
+            </div>
+            <div className="border-t border-gray-100 px-5 py-4 text-sm text-gray-500">
+              Showing {filteredFees.length} of {feeList.length} fee records
             </div>
           </div>
 
