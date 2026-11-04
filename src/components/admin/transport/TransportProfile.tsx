@@ -47,7 +47,7 @@ export default function TransportProfile({
             </div>
 
 
-            <div className="rounded-2xl border border-gray-200 bg-white p-5 sm:p-6">
+            <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm sm:p-6">
                 <div className="flex flex-col gap-4 border-b border-gray-100 pb-6 sm:flex-row sm:items-center">
                     <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-[#e6f4f2] text-[#01796F]">
                         <Bus size={27} />

@@ -1,7 +1,4 @@
-import { notFound } from "next/navigation";
-
-import { transport } from "@/data/transport";
-import TransportProfile from "@/components/admin/transport/TransportProfile";
+import TransportLoader from "@/components/admin/transport/TransportLoader";
 
 type TransportPageProps = {
   params: Promise<{
@@ -14,13 +11,5 @@ export default async function TransportDetailsPage({
 }: TransportPageProps) {
   const { id } = await params;
 
-  const vehicle = transport.find(
-    (vehicle) => vehicle.id === Number(id)
-  );
-
-  if (!vehicle) {
-    notFound();
-  }
-
-  return <TransportProfile vehicle={vehicle} />;
+  return <TransportLoader id={id} mode="profile" />;
 }

@@ -2,6 +2,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import { Plus } from "lucide-react";
 
 import CalendarView from "@/components/admin/calendar/CalendarView";
 import EventForm from "@/components/admin/calendar/EventForm";
@@ -168,8 +169,9 @@ export default function CalendarPage() {
             setShowForm(true);
           }}
           disabled={loading}
-          className="inline-flex w-full items-center justify-center rounded-full bg-[#01796f] px-5 py-2.5 text-sm font-medium text-white transition hover:bg-[#01665d] disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto"
+          className="inline-flex items-center justify-center gap-2 rounded-full bg-[#01796F] px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-[#015f58]"
         >
+          <Plus size={18} />
           Add Event
         </button>
       </div>
@@ -181,11 +183,10 @@ export default function CalendarPage() {
             <button
               key={item}
               onClick={() => setView(item)}
-              className={`rounded-full px-4 py-2 text-sm font-medium transition ${
-                view === item
+              className={`rounded-full px-4 py-2 text-sm font-medium transition ${view === item
                   ? "bg-[#01796f] text-white"
                   : "text-gray-600 hover:bg-gray-50"
-              }`}
+                }`}
             >
               {item}
             </button>

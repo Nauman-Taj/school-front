@@ -1,7 +1,4 @@
-import { notFound } from "next/navigation";
-
-import { transport } from "@/data/transport";
-import TransportForm from "@/components/admin/transport/TransportForm";
+import TransportLoader from "@/components/admin/transport/TransportLoader";
 
 type EditTransportPageProps = {
   params: Promise<{
@@ -14,18 +11,5 @@ export default async function EditTransportPage({
 }: EditTransportPageProps) {
   const { id } = await params;
 
-  const vehicle = transport.find(
-    (vehicle) => vehicle.id === Number(id)
-  );
-
-  if (!vehicle) {
-    notFound();
-  }
-
-  return (
-    <TransportForm
-      mode="edit"
-      vehicle={vehicle}
-    />
-  );
+  return <TransportLoader id={id} mode="edit" />;
 }
