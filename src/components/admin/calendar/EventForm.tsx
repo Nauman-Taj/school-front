@@ -88,7 +88,7 @@ export default function EventForm({
 
   return (
     <div className="fixed inset-0 z-[9999] flex items-start justify-center overflow-y-auto bg-black/40 px-4 pb-8 pt-20">
-      <div className="w-full max-w-lg rounded-2xl bg-white p-6 shadow-xl">
+      <div className="w-full max-w-lg rounded-2xl border border-gray-100 bg-white p-5 shadow-xl sm:p-6">
         <div className="flex items-center justify-between">
           <h2 className="text-lg font-semibold text-gray-900">
             {isEditing ? "Edit Calendar Event" : "Add Calendar Event"}
@@ -114,7 +114,7 @@ export default function EventForm({
             <div>
               <label
                 htmlFor="event-title"
-                className="mb-1.5 block text-sm font-medium text-gray-700"
+                className="mb-2 block text-sm font-medium text-gray-700"
               >
                 Event Title
               </label>
@@ -126,7 +126,7 @@ export default function EventForm({
                 maxLength={150}
                 required
                 placeholder="Enter event title"
-                className="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm outline-none transition focus:border-[#01796f] focus:ring-2 focus:ring-[#01796f]/10"
+                className="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm outline-none transition focus:border-[#01796f] focus:ring-2 focus:ring-[#01796f]/10"
               />
             </div>
 
@@ -134,7 +134,7 @@ export default function EventForm({
               <div>
                 <label
                   htmlFor="event-date"
-                  className="mb-1.5 block text-sm font-medium text-gray-700"
+                  className="mb-2 block text-sm font-medium text-gray-700"
                 >
                   Date
                 </label>
@@ -145,14 +145,14 @@ export default function EventForm({
                   value={date}
                   onChange={(inputEvent) => setDate(inputEvent.target.value)}
                   required
-                  className="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm outline-none focus:border-[#01796f] focus:ring-2 focus:ring-[#01796f]/10"
+                  className="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm outline-none transition focus:border-[#01796f] focus:ring-2 focus:ring-[#01796f]/10"
                 />
               </div>
 
               <div>
                 <label
                   htmlFor="event-type"
-                  className="mb-1.5 block text-sm font-medium text-gray-700"
+                  className="mb-2 block text-sm font-medium text-gray-700"
                 >
                   Type
                 </label>
@@ -163,7 +163,7 @@ export default function EventForm({
                   onChange={(inputEvent) =>
                     setType(inputEvent.target.value as CalendarEventType)
                   }
-                  className="w-full rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm outline-none focus:border-[#01796f] focus:ring-2 focus:ring-[#01796f]/10"
+                  className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm outline-none transition focus:border-[#01796f] focus:ring-2 focus:ring-[#01796f]/10"
                 >
                   <option value="Exam">Exam</option>
                   <option value="Holiday">Holiday</option>
@@ -178,7 +178,7 @@ export default function EventForm({
             <div>
               <label
                 htmlFor="event-description"
-                className="mb-1.5 block text-sm font-medium text-gray-700"
+                className="mb-2 block text-sm font-medium text-gray-700"
               >
                 Description
               </label>
@@ -192,7 +192,7 @@ export default function EventForm({
                 maxLength={1000}
                 rows={3}
                 placeholder="Enter event description"
-                className="w-full resize-none rounded-xl border border-gray-200 px-4 py-2.5 text-sm outline-none focus:border-[#01796f] focus:ring-2 focus:ring-[#01796f]/10"
+                className="w-full resize-none rounded-xl border border-gray-200 px-4 py-3 text-sm outline-none transition focus:border-[#01796f] focus:ring-2 focus:ring-[#01796f]/10"
               />
             </div>
           </div>
@@ -211,7 +211,7 @@ export default function EventForm({
               type="button"
               onClick={onClose}
               disabled={saving}
-              className="w-full rounded-full border border-gray-200 px-5 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 sm:w-auto"
+              className="w-full rounded-full border border-gray-200 px-5 py-3 text-sm font-medium text-gray-700 transition hover:bg-gray-50 disabled:opacity-50 sm:w-auto"
             >
               Cancel
             </button>
@@ -219,7 +219,7 @@ export default function EventForm({
             <button
               type="submit"
               disabled={!title.trim() || !date || saving}
-              className="w-full rounded-full bg-[#01796f] px-5 py-2.5 text-sm font-medium text-white transition hover:bg-[#01665d] disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto"
+              className="w-full rounded-full bg-[#01796F] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#015f58] disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto"
             >
               {saving
                 ? isEditing

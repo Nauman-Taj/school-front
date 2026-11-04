@@ -131,6 +131,7 @@ export default function CalendarView({
     const date = new Date(currentDate);
 
     if (view === "Month") {
+      date.setDate(1);
       date.setMonth(date.getMonth() - 1);
     }
 
@@ -149,6 +150,7 @@ export default function CalendarView({
     const date = new Date(currentDate);
 
     if (view === "Month") {
+      date.setDate(1);
       date.setMonth(date.getMonth() + 1);
     }
 
@@ -187,7 +189,7 @@ export default function CalendarView({
         : `${monthName} ${year}`;
 
   return (
-    <div className="rounded-2xl border border-gray-200 bg-white p-5">
+    <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm sm:p-6">
       <CalendarHeader
         title={currentTitle}
         previous={goPrevious}
@@ -198,6 +200,7 @@ export default function CalendarView({
       {view === "Month" && (
         <MonthView
           year={year}
+          month={month}
           monthName={monthName}
           firstDay={firstDay}
           days={days}
@@ -237,6 +240,7 @@ export default function CalendarView({
 
 function MonthView({
   year,
+  month,
   monthName,
   firstDay,
   days,
@@ -246,6 +250,7 @@ function MonthView({
   deletingId,
 }: {
   year: number;
+  month: number;
   monthName: string;
   firstDay: number;
   days: number[];
@@ -254,10 +259,12 @@ function MonthView({
   onDelete: (event: CalendarEvent) => void;
   deletingId: number | null;
 }) {
+  const today = new Date();
+
   return (
     <>
       {/* Desktop */}
-      <div className="mt-6 hidden md:block">
+      <div className="mt-6 hidden lg:block">
         <div className="grid grid-cols-7 border-b border-gray-200">
           {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map(
             (day) => (
@@ -281,13 +288,24 @@ function MonthView({
 
           {days.map((day) => {
             const dayEvents = getEvents(day);
+            const isToday =
+              year === today.getFullYear() &&
+              month === today.getMonth() &&
+              day === today.getDate();
 
             return (
               <div
                 key={day}
                 className="min-h-32 border-b border-r border-gray-100 p-2"
               >
-                <div className="flex h-7 w-7 items-center justify-center rounded-full text-sm font-medium text-gray-700">
+                <div
+                  aria-current={isToday ? "date" : undefined}
+                  className={`flex h-7 w-7 items-center justify-center rounded-full text-sm font-medium ${
+                    isToday
+                      ? "bg-[#01796f] text-white"
+                      : "text-gray-700"
+                  }`}
+                >
                   {day}
                 </div>
 
@@ -319,7 +337,7 @@ function MonthView({
       </div>
 
       {/* Mobile */}
-      <div className="mt-6 space-y-2 md:hidden">
+      <div className="mt-6 space-y-2 lg:hidden">
         {days.map((day) => {
           const dayEvents = getEvents(day);
 
@@ -407,9 +425,10 @@ function WeekView({
   });
 
   return (
-    <div className="mt-6 grid grid-cols-1 gap-2 sm:grid-cols-2 md:grid-cols-7">
+    <div className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-7">
       {weekDays.map((date) => {
         const dateString = formatDate(date);
+          const isToday = dateString === formatDate(new Date());
 
         const dayEvents = events.filter(
           (event) => event.date === dateString
@@ -426,7 +445,7 @@ function WeekView({
               })}
             </p>
 
-            <p className="mt-1 text-sm font-semibold text-gray-900">
+            <p className={`mt-1 flex h-7 w-7 items-center justify-center rounded-full text-sm font-semibold ${isToday ? "bg-[#01796f] text-white" : "text-gray-900"}`}>
               {date.getDate()}
             </p>
 

@@ -2,7 +2,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { Plus } from "lucide-react";
+import { Plus, RefreshCw } from "lucide-react";
 
 import CalendarView from "@/components/admin/calendar/CalendarView";
 import EventForm from "@/components/admin/calendar/EventForm";
@@ -148,6 +148,15 @@ export default function CalendarPage() {
     }
   };
 
+  const today = new Date();
+  const todayString = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
+  const currentMonthPrefix = todayString.slice(0, 7);
+  const stats = [
+    { title: "Total Events", value: events.length },
+    { title: "Upcoming Events", value: events.filter((event) => event.date >= todayString).length },
+    { title: "This Month", value: events.filter((event) => event.date.startsWith(currentMonthPrefix)).length },
+  ];
+
   return (
     <div className="space-y-5">
       {/* Header */}
@@ -162,18 +171,39 @@ export default function CalendarPage() {
           </p>
         </div>
 
-        <button
-          onClick={() => {
-            setActionError("");
-            setEditingEvent(null);
-            setShowForm(true);
-          }}
-          disabled={loading}
-          className="inline-flex items-center justify-center gap-2 rounded-full bg-[#01796F] px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-[#015f58]"
-        >
-          <Plus size={18} />
-          Add Event
-        </button>
+        <div className="flex flex-wrap items-center gap-3">
+          <button
+            type="button"
+            onClick={() => void loadEvents()}
+            disabled={loading}
+            className="inline-flex items-center justify-center gap-2 rounded-full border border-gray-200 bg-white px-5 py-2.5 text-sm font-medium text-gray-700 transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            <RefreshCw size={16} className={loading ? "animate-spin" : ""} />
+            Refresh
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              setActionError("");
+              setEditingEvent(null);
+              setShowForm(true);
+            }}
+            disabled={loading}
+            className="inline-flex items-center justify-center gap-2 rounded-full bg-[#01796F] px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-[#015f58]"
+          >
+            <Plus size={18} />
+            Add Event
+          </button>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+        {stats.map((stat) => (
+          <div key={stat.title} className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
+            <p className="text-sm text-gray-500">{stat.title}</p>
+            <p className="mt-2 text-2xl font-bold text-gray-800">{loading ? "0" : stat.value}</p>
+          </div>
+        ))}
       </div>
 
       {/* View Buttons */}
@@ -216,18 +246,21 @@ export default function CalendarPage() {
 
       {/* Loading and fetch error states */}
       {loading ? (
-        <div className="rounded-2xl border border-gray-200 bg-white py-12 text-center text-sm text-gray-500">
-          Loading calendar events...
+        <div className="rounded-2xl border border-gray-100 bg-white p-10 text-center shadow-sm">
+          <div className="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-gray-200 border-t-[#01796F]" />
+          <p className="mt-4 text-sm text-gray-500">Loading calendar events...</p>
         </div>
       ) : error ? (
-        <div className="rounded-2xl border border-red-200 bg-white p-5">
-          <p className="text-sm text-red-600">{error}</p>
+        <div role="alert" className="flex flex-col gap-3 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700 sm:flex-row sm:items-center sm:justify-between">
+          <p>{error}</p>
 
           <button
+            type="button"
             onClick={() => void loadEvents()}
-            className="mt-3 rounded-full bg-[#01796f] px-4 py-2 text-sm font-medium text-white transition hover:bg-[#015f58]"
+            className="inline-flex w-fit items-center gap-2 rounded-full border border-red-200 bg-white px-4 py-2 font-medium transition hover:bg-red-100"
           >
-            Try Again
+            <RefreshCw size={15} />
+            Try again
           </button>
         </div>
       ) : (
