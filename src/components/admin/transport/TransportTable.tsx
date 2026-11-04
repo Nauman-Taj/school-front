@@ -84,6 +84,13 @@ export default function TransportTable({
 
       {error && <div role="alert" className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{error}</div>}
 
+      {loading ? (
+        <div className="rounded-2xl border border-gray-100 bg-white p-10 text-center shadow-sm">
+          <div className="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-gray-200 border-t-[#01796F]" />
+          <p className="mt-4 text-sm text-gray-500">Loading transport vehicles...</p>
+        </div>
+      ) : (
+        <>
       <div className="hidden overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm lg:block">
         <div className="overflow-x-auto">
           <table className="w-full min-w-[900px] text-left text-sm">
@@ -146,6 +153,8 @@ export default function TransportTable({
         {filteredVehicles.length === 0 && <div className="col-span-full rounded-2xl border border-gray-100 bg-white p-10 text-center text-sm text-gray-500 shadow-sm">{search.trim() ? "No vehicles match your search." : "No vehicles were returned by the backend."}</div>}
       </div>
       <p className="text-sm text-gray-500 lg:hidden">Showing {filteredVehicles.length} of {vehicles.length} vehicles</p>
+        </>
+      )}
     </div>
   );
 }

@@ -128,6 +128,13 @@ export default function BookTable({
         </div>
       )}
 
+      {loading ? (
+        <div className="rounded-2xl border border-gray-100 bg-white p-10 text-center shadow-sm">
+          <div className="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-gray-200 border-t-[#01796F]" />
+          <p className="mt-4 text-sm text-gray-500">Loading books...</p>
+        </div>
+      ) : (
+        <>
       {/* Desktop Table */}
       <div className="hidden overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm lg:block">
         <div className="overflow-x-auto">
@@ -270,6 +277,8 @@ export default function BookTable({
         <div className="rounded-2xl border border-gray-100 bg-white px-6 py-12 text-center text-sm text-gray-500 shadow-sm">
           {search.trim() ? "No books match your search." : "No books were returned by the backend."}
         </div>
+      )}
+        </>
       )}
     </div>
   );
