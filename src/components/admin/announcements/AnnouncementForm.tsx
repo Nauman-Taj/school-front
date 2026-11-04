@@ -2,202 +2,59 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
 
-import { Announcement } from "@/types/announcement";
+import { apiRequest } from "@/lib/api";
+import { getAuthToken } from "@/lib/auth";
+import type { Announcement, AnnouncementAudience, AnnouncementStatus } from "@/types/announcement";
+import { toApiAnnouncementAudience, toApiAnnouncementStatus } from "@/lib/announcements";
 
-type AnnouncementFormProps = {
-  mode?: "add" | "edit";
-  announcement?: Announcement;
-};
+type Props = { mode?: "add" | "edit"; announcement?: Announcement };
+const audiences: AnnouncementAudience[] = ["All", "Students", "Teachers", "Parents", "Staff"];
+const statuses: AnnouncementStatus[] = ["Published", "Draft"];
 
-function formatDateForInput(date: string) {
-  return date;
-}
-// function formatDateForInput(date: string) {
-//   const [day, month, year] = date.split(" ");
+export default function AnnouncementForm({ mode = "add", announcement }: Props) {
+  const router = useRouter();
+  const [title, setTitle] = useState(announcement?.title ?? "");
+  const [description, setDescription] = useState(announcement?.description ?? "");
+  const [audience, setAudience] = useState<AnnouncementAudience | "">(announcement?.audience ?? "");
+  const [date, setDate] = useState(announcement?.date.slice(0, 10) ?? "");
+  const [status, setStatus] = useState<AnnouncementStatus>(announcement?.status ?? "Draft");
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState("");
 
-//   const months: Record<string, string> = {
-//     Jan: "01",
-//     Feb: "02",
-//     Mar: "03",
-//     Apr: "04",
-//     May: "05",
-//     Jun: "06",
-//     Jul: "07",
-//     Aug: "08",
-//     Sep: "09",
-//     Oct: "10",
-//     Nov: "11",
-//     Dec: "12",
-//   };
+  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault(); setError("");
+    const token = getAuthToken();
+    if (!token) { setError("Your session has expired. Please log in again."); return; }
+    if (!audience) { setError("Select an audience."); return; }
+    setSaving(true);
+    try {
+      await apiRequest(mode === "edit" && announcement ? `/announcements/${announcement.id}` : "/announcements", {
+        method: mode === "edit" ? "PATCH" : "POST", token,
+        body: JSON.stringify({ title: title.trim(), description: description.trim(), audience: toApiAnnouncementAudience(audience), date, status: toApiAnnouncementStatus(status) }),
+      });
+      router.push("/admin/announcements"); router.refresh();
+    } catch (err) { setError(err instanceof Error ? err.message : "Unable to save announcement."); }
+    finally { setSaving(false); }
+  }
 
-//   return `${year}-${months[month]}-${day.padStart(2, "0")}`;
-// }
-
-export default function AnnouncementForm({
-  mode = "add",
-  announcement,
-}: AnnouncementFormProps) {
-  const [formData, setFormData] = useState({
-  title: announcement?.title ?? "",
-  description: announcement?.description ?? "",
-  audience: announcement?.audience ?? "",
-  date: announcement?.date
-    ? formatDateForInput(announcement.date)
-    : "",
-  status: announcement?.status ?? "Draft",
-});
-
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
-  ) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-
-    window.location.href = "/admin/announcements";
-  };
-
-  return (
-    <div className="space-y-5">
-      <Link
-        href="/admin/announcements"
-        className="inline-flex items-center gap-2 text-sm font-medium text-gray-500 transition hover:text-[#01796F]"
-      >
-        <ArrowLeft size={17} />
-        Back to Announcements
-      </Link>
-
-      <div>
-        <h1 className="text-2xl font-bold text-gray-900">
-          {mode === "edit"
-            ? "Edit Announcement"
-            : "Add Announcement"}
-        </h1>
-
-        {/* <p className="mt-1 text-sm text-gray-500">
-          {mode === "edit"
-            ? "Update the announcement information."
-            : "Create a new school announcement."}
-        </p> */}
+  const inputClass = "w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-700 outline-none transition focus:border-[#01796f] focus:ring-2 focus:ring-[#01796f]/10";
+  const labelClass = "mb-2 block text-sm font-medium text-gray-700";
+  return <div className="space-y-5">
+    <Link href="/admin/announcements" className="inline-flex items-center gap-2 text-sm font-medium text-gray-500 transition hover:text-[#01796f]"><ArrowLeft size={17}/>Back to Announcements</Link>
+    <div><h1 className="text-2xl font-bold text-gray-900">{mode === "edit" ? "Edit Announcement" : "Add Announcement"}</h1></div>
+    <form onSubmit={handleSubmit} className="max-w-5xl rounded-2xl border border-gray-100 bg-white p-5 shadow-sm sm:p-6">
+      {error && <div role="alert" className="mb-5 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{error}</div>}
+      <div className="grid gap-5 md:grid-cols-2">
+        <div className="md:col-span-2"><label htmlFor="announcement-title" className={labelClass}>Title</label><input id="announcement-title" type="text" maxLength={160} value={title} onChange={(event) => setTitle(event.target.value)} placeholder="Enter announcement title" required className={inputClass}/></div>
+        <div className="md:col-span-2"><label htmlFor="announcement-description" className={labelClass}>Description</label><textarea id="announcement-description" value={description} onChange={(event) => setDescription(event.target.value)} placeholder="Enter announcement description" rows={4} required className={`${inputClass} resize-none`}/></div>
+        <div><label htmlFor="announcement-audience" className={labelClass}>Audience</label><select id="announcement-audience" value={audience} onChange={(event) => setAudience(event.target.value as AnnouncementAudience)} required className={inputClass}><option value="">Select audience</option>{audiences.map((item) => <option key={item} value={item}>{item}</option>)}</select></div>
+        <div><label htmlFor="announcement-date" className={labelClass}>Date</label><input id="announcement-date" type="date" value={date} onChange={(event) => setDate(event.target.value)} required className={inputClass}/></div>
+        <div><label htmlFor="announcement-status" className={labelClass}>Status</label><select id="announcement-status" value={status} onChange={(event) => setStatus(event.target.value as AnnouncementStatus)} className={inputClass}>{statuses.map((item) => <option key={item} value={item}>{item}</option>)}</select></div>
       </div>
-
-      <form
-        onSubmit={handleSubmit}
-        className="rounded-2xl max-w-5xl border border-gray-200 bg-white p-5 sm:p-6"
-      >
-        <div className="grid gap-5 md:grid-cols-2">
-          <div className="md:col-span-2">
-            <label className="mb-1.5 block text-sm font-medium text-gray-700">
-              Title
-            </label>
-
-            <input
-              type="text"
-              name="title"
-              value={formData.title}
-              onChange={handleChange}
-              placeholder="Enter announcement title"
-              className="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm outline-none transition focus:border-[#01796F] focus:ring-1 focus:ring-[#01796F]"
-              required
-            />
-          </div>
-
-          <div className="md:col-span-2">
-            <label className="mb-1.5 block text-sm font-medium text-gray-700">
-              Description
-            </label>
-
-            <textarea
-              name="description"
-              value={formData.description}
-              onChange={handleChange}
-              placeholder="Enter announcement description"
-              rows={4}
-              className="w-full resize-none rounded-xl border border-gray-200 px-4 py-2.5 text-sm outline-none transition focus:border-[#01796F] focus:ring-1 focus:ring-[#01796F]"
-              required
-            />
-          </div>
-
-          <div>
-            <label className="mb-1.5 block text-sm font-medium text-gray-700">
-              Audience
-            </label>
-
-            <select
-              name="audience"
-              value={formData.audience}
-              onChange={handleChange}
-              className="w-full rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm text-gray-700 outline-none transition focus:border-[#01796F] focus:ring-1 focus:ring-[#01796F]"
-              required
-            >
-              <option value="">Select audience</option>
-              <option value="All">All</option>
-              <option value="All Students">All Students</option>
-              <option value="Students">Students</option>
-              <option value="Teachers">Teachers</option>
-              <option value="Parents">Parents</option>
-              <option value="Staff">Staff</option>
-            </select>
-          </div>
-
-          <div>
-            <label className="mb-1.5 block text-sm font-medium text-gray-700">
-              Date
-            </label>
-
-            <input
-              type="date"
-              name="date"
-              value={formData.date}
-              onChange={handleChange}
-              className="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm outline-none transition focus:border-[#01796F] focus:ring-1 focus:ring-[#01796F]"
-              required
-            />
-          </div>
-
-          <div>
-            <label className="mb-1.5 block text-sm font-medium text-gray-700">
-              Status
-            </label>
-
-            <select
-              name="status"
-              value={formData.status}
-              onChange={handleChange}
-              className="w-full rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm text-gray-700 outline-none transition focus:border-[#01796F] focus:ring-1 focus:ring-[#01796F]"
-              required
-            >
-              <option value="Published">Published</option>
-              <option value="Draft">Draft</option>
-            </select>
-          </div>
-        </div>
-
-        <div className="mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
-          <Link
-            href="/admin/announcements"
-            className="inline-flex items-center justify-center rounded-full border border-gray-200 px-5 py-2.5 text-sm font-medium text-gray-600 transition hover:bg-gray-50"
-          >
-            Cancel
-          </Link>
-
-          <button
-            type="submit"
-            className="rounded-full bg-[#01796F] px-5 py-2.5 text-sm font-medium text-white transition hover:bg-[#015f58]"
-          >
-            {mode === "edit"
-              ? "Update Announcement"
-              : "Add Announcement"}
-          </button>
-        </div>
-      </form>
-    </div>
-  );
+      <div className="mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end"><Link href="/admin/announcements" className="inline-flex items-center justify-center rounded-full border border-gray-200 px-5 py-3 text-sm font-medium text-gray-600 transition hover:bg-gray-50">Cancel</Link><button type="submit" disabled={saving} className="rounded-full bg-[#01796f] px-5 py-3 text-sm font-medium text-white transition hover:bg-[#015f58] disabled:cursor-not-allowed disabled:opacity-60">{saving ? "Saving..." : mode === "edit" ? "Update Announcement" : "Add Announcement"}</button></div>
+    </form>
+  </div>;
 }

@@ -1,120 +1,15 @@
 "use client";
 
-import { useMemo } from "react";
-import {
-  Bell,
-  CalendarDays,
-  Users,
-  UserRound,
-} from "lucide-react";
-
-import { announcements } from "@/data/announcements";
+import { useEffect, useMemo, useState } from "react";
+import { fetchAnnouncements } from "@/lib/announcements";
+import type { Announcement } from "@/types/announcement";
 import ParentAnnouncementTable from "./ParentAnnouncementTable";
 
 export default function ParentAnnouncementsPage() {
-  const parentAnnouncements = useMemo(
-    () =>
-      announcements.filter(
-        (announcement) =>
-          announcement.status === "Published" &&
-          (announcement.audience === "All" ||
-            announcement.audience === "Parents")
-      ),
-    []
-  );
-
-  const stats = [
-    {
-      title: "Total",
-      value: parentAnnouncements.length,
-      icon: Bell,
-      iconClass: "bg-[#e6f4f2] text-[#01796F]",
-    },
-    {
-      title: "For Everyone",
-      value: parentAnnouncements.filter(
-        (announcement) => announcement.audience === "All"
-      ).length,
-      icon: Users,
-      iconClass: "bg-blue-50 text-blue-600",
-    },
-    {
-      title: "For Parents",
-      value: parentAnnouncements.filter(
-        (announcement) => announcement.audience === "Parents"
-      ).length,
-      icon: UserRound,
-      iconClass: "bg-yellow-50 text-yellow-600",
-    },
-    {
-      title: "Published",
-      value: parentAnnouncements.filter(
-        (announcement) => announcement.status === "Published"
-      ).length,
-      icon: CalendarDays,
-      iconClass: "bg-green-50 text-green-600",
-    },
-  ];
-
-  return (
-    <div className="space-y-5">
-      {/* Heading */}
-      <div>
-        <h1 className="text-2xl font-bold text-gray-900 sm:text-3xl">
-          Announcements
-        </h1>
-
-        <p className="mt-1 text-sm text-gray-500 sm:text-base">
-          View school announcements and important updates for parents.
-        </p>
-      </div>
-
-      {/* Stats */}
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {stats.map((stat) => {
-          const Icon = stat.icon;
-
-          return (
-            <div
-              key={stat.title}
-              className="rounded-2xl border border-gray-200 bg-white p-5"
-            >
-              <div className="flex items-center justify-between">
-                <p className="text-sm font-medium text-gray-500">
-                  {stat.title}
-                </p>
-
-                <div
-                  className={`flex h-10 w-10 items-center justify-center rounded-xl ${stat.iconClass}`}
-                >
-                  <Icon size={19} />
-                </div>
-              </div>
-
-              <h2 className="mt-3 text-2xl font-bold text-gray-900">
-                {stat.value}
-              </h2>
-            </div>
-          );
-        })}
-      </div>
-
-      {/* Announcement Records */}
-      <div>
-        <div className="mb-4">
-          <h2 className="text-lg font-semibold text-gray-800">
-            School Announcements
-          </h2>
-
-          <p className="mt-1 text-sm text-gray-500">
-            Latest published announcements available to parents.
-          </p>
-        </div>
-
-        <ParentAnnouncementTable
-          announcements={parentAnnouncements}
-        />
-      </div>
-    </div>
-  );
+  const [announcements, setAnnouncements] = useState<Announcement[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  useEffect(() => { let active = true; fetchAnnouncements().then((data) => { if (active) setAnnouncements(data); }).catch((err: unknown) => { if (active) setError(err instanceof Error ? err.message : "Unable to load announcements."); }).finally(() => { if (active) setLoading(false); }); return () => { active = false; }; }, []);
+  const stats = useMemo(() => [{ title: "Total", value: announcements.length }, { title: "For Everyone", value: announcements.filter((item) => item.audience === "All").length }, { title: "For Parents", value: announcements.filter((item) => item.audience === "Parents").length }, { title: "Published", value: announcements.filter((item) => item.status === "Published").length }], [announcements]);
+  return <div className="space-y-5"><div><h1 className="text-2xl font-bold text-gray-900 sm:text-3xl">Announcements</h1><p className="mt-1 text-sm text-gray-500 sm:text-base">View school announcements and important updates for parents.</p></div><div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">{stats.map((stat) => <div key={stat.title} className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm"><p className="text-sm font-medium text-gray-500">{stat.title}</p><p className="mt-2 text-2xl font-bold text-gray-900">{loading ? "—" : stat.value}</p></div>)}</div>{error && <div role="alert" className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{error}</div>}<div><div className="mb-4"><h2 className="text-lg font-semibold text-gray-800">School Announcements</h2><p className="mt-1 text-sm text-gray-500">Latest published announcements available to parents.</p></div>{loading ? <div className="rounded-2xl border border-gray-100 bg-white p-10 text-center shadow-sm"><div className="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-gray-200 border-t-[#01796F]"/><p className="mt-4 text-sm text-gray-500">Loading announcements...</p></div> : <ParentAnnouncementTable announcements={announcements}/>}</div></div>;
 }

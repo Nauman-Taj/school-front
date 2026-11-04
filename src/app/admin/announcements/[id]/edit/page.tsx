@@ -1,31 +1,6 @@
-import { notFound } from "next/navigation";
+import AnnouncementLoader from "@/components/admin/announcements/AnnouncementLoader";
 
-import { announcements } from "@/data/announcements";
-import AnnouncementForm from "@/components/admin/announcements/AnnouncementForm";
-
-type EditAnnouncementPageProps = {
-  params: Promise<{
-    id: string;
-  }>;
-};
-
-export default async function EditAnnouncementPage({
-  params,
-}: EditAnnouncementPageProps) {
+export default async function EditAnnouncementPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-
-  const announcement = announcements.find(
-    (item) => item.id === Number(id)
-  );
-
-  if (!announcement) {
-    notFound();
-  }
-
-  return (
-    <AnnouncementForm
-      mode="edit"
-      announcement={announcement}
-    />
-  );
+  return <AnnouncementLoader id={id} mode="edit"/>;
 }

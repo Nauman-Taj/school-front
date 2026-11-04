@@ -1,28 +1,6 @@
-import { notFound } from "next/navigation";
+import AnnouncementLoader from "@/components/admin/announcements/AnnouncementLoader";
 
-import { announcements } from "@/data/announcements";
-import AnnouncementProfile from "@/components/admin/announcements/AnnouncementProfile";
-
-type AnnouncementPageProps = {
-  params: Promise<{
-    id: string;
-  }>;
-};
-
-export default async function AnnouncementDetailsPage({
-  params,
-}: AnnouncementPageProps) {
+export default async function AnnouncementDetailsPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-
-  const announcement = announcements.find(
-    (item) => item.id === Number(id)
-  );
-
-  if (!announcement) {
-    notFound();
-  }
-
-  return (
-    <AnnouncementProfile announcement={announcement} />
-  );
+  return <AnnouncementLoader id={id} mode="profile"/>;
 }
