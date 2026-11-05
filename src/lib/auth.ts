@@ -38,6 +38,21 @@ export const getAuthToken = (): string | null => {
   );
 };
 
+export const updateAuthSession = (
+  updates: Partial<Pick<AuthSession, "name" | "email">>,
+): AuthSession | null => {
+  const session = getSession();
+  if (!session || typeof window === "undefined") return null;
+
+  const updatedSession = { ...session, ...updates };
+  const storage = sessionStorage.getItem(SESSION_KEY)
+    ? sessionStorage
+    : localStorage;
+  storage.setItem(SESSION_KEY, JSON.stringify(updatedSession));
+  window.dispatchEvent(new Event("auth-session-updated"));
+  return updatedSession;
+};
+
 export const saveAuthSession = (
   session: AuthSession,
   token: string,
