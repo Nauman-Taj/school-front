@@ -153,7 +153,7 @@ export default function AdminHeader({
 
             {searchOpen && (
               <div
-                className="absolute right-[-130px] top-[-10px] z-50 w-[calc(100vw-2rem)] max-w-72 translate-y-16 rounded-xl border border-gray-200 bg-white p-2 shadow-lg sm:right-0 sm:top-full sm:mt-2 sm:w-72 sm:translate-y-0"
+                className="absolute right-[-140px] top-[-10px] z-50 w-[calc(100vw-2rem)] max-w-72 translate-y-16 rounded-xl border border-gray-200 bg-white p-2 shadow-lg sm:right-0 sm:top-full sm:mt-2 sm:w-72 sm:translate-y-0"
               >
                 <div className="flex items-center gap-2 rounded-full border border-gray-200 px-3">
                   <Search
