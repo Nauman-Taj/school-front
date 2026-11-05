@@ -87,6 +87,16 @@ export default function StudentProfile({
               value={student.status}
               status
             />
+
+            <InfoRow
+              label="Admission Date"
+              value={student.admissionDate ?? "Unavailable"}
+            />
+
+            <InfoRow
+              label="Withdrawal Date"
+              value={student.withdrawalDate ?? "Unavailable"}
+            />
           </div>
         </div>
 

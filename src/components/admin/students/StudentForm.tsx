@@ -23,6 +23,8 @@ type ApiStudent = {
   parentName: string | null;
   phone: string | null;
   status: "ACTIVE" | "INACTIVE";
+  admissionDate: string | null;
+  withdrawalDate: string | null;
 };
 
 export default function StudentForm({ student }: StudentFormProps) {
@@ -48,6 +50,8 @@ export default function StudentForm({ student }: StudentFormProps) {
     parentId: existingParentId?.toString() ?? "",
     phone: student?.phone ?? "",
     status: student?.status ?? "Active",
+    admissionDate: student?.admissionDate?.slice(0, 10) ?? "",
+    withdrawalDate: student?.withdrawalDate?.slice(0, 10) ?? "",
   });
 
   const [loading, setLoading] = useState(false);
@@ -102,6 +106,11 @@ export default function StudentForm({ student }: StudentFormProps) {
         phone: formData.phone.trim() || null,
         status:
           formData.status === "Active" ? "ACTIVE" : "INACTIVE",
+        admissionDate: formData.admissionDate || undefined,
+        withdrawalDate:
+          isEditMode && formData.status === "Inactive"
+            ? formData.withdrawalDate || undefined
+            : undefined,
       };
 
       if (isEditMode && student) {
@@ -278,6 +287,29 @@ export default function StudentForm({ student }: StudentFormProps) {
 
         <div>
           <label
+            htmlFor="admissionDate"
+            className="mb-2 block text-sm font-medium text-gray-700"
+          >
+            Admission Date
+          </label>
+          <input
+            id="admissionDate"
+            name="admissionDate"
+            type="date"
+            value={formData.admissionDate}
+            onChange={handleChange}
+            required={!isEditMode}
+            className="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm text-gray-900 outline-none transition focus:border-[#01796f] focus:ring-2 focus:ring-[#01796f]/10"
+          />
+          {isEditMode && !formData.admissionDate && (
+            <p className="mt-1 text-xs text-gray-500">
+              Historical admission date is unavailable. You can leave this blank.
+            </p>
+          )}
+        </div>
+
+        <div>
+          <label
             htmlFor="phone"
             className="mb-2 block text-sm font-medium text-gray-700"
           >
@@ -314,6 +346,28 @@ export default function StudentForm({ student }: StudentFormProps) {
             <option value="Inactive">Inactive</option>
           </select>
         </div>
+
+        {isEditMode && formData.status === "Inactive" && (
+          <div>
+            <label
+              htmlFor="withdrawalDate"
+              className="mb-2 block text-sm font-medium text-gray-700"
+            >
+              Withdrawal Date
+            </label>
+            <input
+              id="withdrawalDate"
+              name="withdrawalDate"
+              type="date"
+              value={formData.withdrawalDate}
+              onChange={handleChange}
+              className="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm text-gray-900 outline-none transition focus:border-[#01796f] focus:ring-2 focus:ring-[#01796f]/10"
+            />
+            <p className="mt-1 text-xs text-gray-500">
+              Enter a known historical date, or leave blank to record today when changing status.
+            </p>
+          </div>
+        )}
       </div>
 
       <div className="mt-8 flex flex-col-reverse gap-3 border-t border-gray-100 pt-6 sm:flex-row sm:justify-end">

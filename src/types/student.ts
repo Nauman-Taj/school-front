@@ -8,4 +8,6 @@ export type Student = {
   parentName: string;
   phone: string;
   status: "Active" | "Inactive";
+  admissionDate?: string | null;
+  withdrawalDate?: string | null;
 };

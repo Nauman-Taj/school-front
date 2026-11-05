@@ -25,6 +25,8 @@ type ApiStudent = {
   parentName: string | null;
   phone: string | null;
   status: "ACTIVE" | "INACTIVE" | "Active" | "Inactive";
+  admissionDate: string | null;
+  withdrawalDate: string | null;
 };
 
 function mapApiStudent(data: ApiStudent): Student {
@@ -41,6 +43,8 @@ function mapApiStudent(data: ApiStudent): Student {
       data.status === "INACTIVE" || data.status === "Inactive"
         ? "Inactive"
         : "Active",
+    admissionDate: data.admissionDate?.slice(0, 10) ?? null,
+    withdrawalDate: data.withdrawalDate?.slice(0, 10) ?? null,
   };
 }
 
