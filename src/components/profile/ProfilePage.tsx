@@ -180,8 +180,12 @@ export default function ProfilePage() {
     <div className="space-y-5">
       <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
         <div>
-          <h1 className="text-2xl font-bold text-gray-800">My Profile</h1>
-          <p className="mt-1 text-sm text-gray-500">Manage your account information.</p>
+          <h1 className="text-2xl font-bold text-gray-900 sm:text-3xl">
+            My Profile
+          </h1>
+          <p className="mt-1 text-sm text-gray-500 sm:text-base">
+            Manage your account information.
+          </p>
         </div>
 
         {profile && profile.email && (
@@ -196,7 +200,7 @@ export default function ProfilePage() {
               setIsEditing(true);
             }}
             disabled={saving}
-            className="inline-flex items-center justify-center gap-2 rounded-full border border-gray-200 bg-white px-5 py-2.5 text-sm font-medium text-gray-700 transition hover:bg-gray-50 disabled:opacity-50"
+            className="inline-flex items-center justify-center gap-2 rounded-full border border-gray-200 bg-[#01796F] px-5 py-2.5 text-sm text-white font-semibold text-gray-700 transition hover:bg-[#015f58] disabled:opacity-50"
           >
             {isEditing ? "Cancel" : <><Pencil size={17} /> Edit Profile</>}
           </button>
