@@ -153,20 +153,7 @@ export default function AdminHeader({
 
             {searchOpen && (
               <div
-                className="
-                  absolute
-                  right-0
-                  top-full
-                  z-50
-                  mt-2
-                  w-[min(calc(100vw-2rem),20rem)]
-                  rounded-xl
-                  border
-                  border-gray-200
-                  bg-white
-                  p-2
-                  shadow-lg
-                "
+                className="absolute right-[-130px] top-[-10px] z-50 w-[calc(100vw-2rem)] max-w-72 translate-y-16 rounded-xl border border-gray-200 bg-white p-2 shadow-lg sm:right-0 sm:top-full sm:mt-2 sm:w-72 sm:translate-y-0"
               >
                 <div className="flex items-center gap-2 rounded-full border border-gray-200 px-3">
                   <Search
@@ -260,7 +247,7 @@ export default function AdminHeader({
             </button>
 
             {notificationOpen && (
-              <div className="absolute right-0 top-full z-50 mt-2 w-[min(calc(100vw-2rem),24rem)] overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-lg">
+              <div className="absolute right-[-120px] top-12 z-50 w-[calc(100vw-2rem)] max-w-sm overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-lg sm:right-0">
 
                 {/* Header */}
                 <div className="flex items-center justify-between border-b border-gray-200 px-4 py-3">
