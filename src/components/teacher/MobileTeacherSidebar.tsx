@@ -1,6 +1,6 @@
 "use client";
 
-import { navigationByRole } from "@/data/navigation";
+import { getNavigationItemClass, isNavigationItemActive, navigationByRole } from "@/data/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
@@ -35,7 +35,7 @@ export default function MobileTeacherSidebar({
         <div className="flex h-16 items-center justify-between border-b border-gray-200 ps-6">
 
           <Link
-            href="/"
+            href="/teacher"
             className="flex items-center gap-3"
           >
             <Image
@@ -48,7 +48,7 @@ export default function MobileTeacherSidebar({
           </Link>
 
           <Link
-            href="/"
+            href="/teacher"
             className="flex items-center gap-3"
           >
             <h1 className="pr-4 text-lg font-bold text-[#015f58]">
@@ -72,17 +72,15 @@ export default function MobileTeacherSidebar({
             {teacherNavigation.map((item) => {
               const Icon = item.icon;
 
-              const isActive =
-                item.href === "/teacher"
-                  ? pathname === "/teacher"
-                  : pathname.startsWith(item.href);
+              const isActive = isNavigationItemActive(pathname, item.href);
 
               return (
                 <Link
                   key={item.label}
                   href={item.href}
                   onClick={onClose}
-                  className={`flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition-colors text-gray-600 hover:bg-[#01796f]/10 hover:text-[#01796f]`}
+                  aria-current={isActive ? "page" : undefined}
+                  className={getNavigationItemClass(isActive)}
                 //  ${
                 //   isActive
                 //     ? "bg-[#01796f]/10 text-[#01796f]"

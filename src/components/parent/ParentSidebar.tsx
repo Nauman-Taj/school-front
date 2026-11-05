@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { navigationByRole } from "@/data/navigation";
+import { getNavigationItemClass, isNavigationItemActive, navigationByRole } from "@/data/navigation";
 import { usePathname } from "next/navigation";
 import Image from "next/image";
 
@@ -17,7 +17,7 @@ export default function ParentSidebar() {
       <div className="flex h-16 shrink-0 items-center border-b border-gray-200 px-6">
 
         <Link
-          href="/"
+          href="/parent"
           className="flex items-center gap-3"
         >
           <Image
@@ -30,7 +30,7 @@ export default function ParentSidebar() {
         </Link>
 
         <Link
-          href="/"
+          href="/parent"
           className="flex items-center gap-3"
         >
           <div className="pl-2 text-lg font-bold text-[#015f58]">
@@ -46,21 +46,14 @@ export default function ParentSidebar() {
 
           {parentNavigation.map((item) => {
             const Icon = item.icon;
-            const isActive =
-              item.href === "/parent"
-                ? pathname === "/parent"
-                : pathname.startsWith(item.href);
+            const isActive = isNavigationItemActive(pathname, item.href);
 
             return (
               <Link
                 key={item.label}
                 href={item.href}
-                className={`flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition-colors text-gray-600 hover:bg-[#01796f]/10 hover:text-[#01796f]`}
-              // ${
-              // isActive
-              //   ? "bg-[#01796f]/10 text-[#01796f]"
-              //   : "text-gray-600 hover:bg-[#01796f]/10 hover:text-[#01796f]"
-              // }`}
+                aria-current={isActive ? "page" : undefined}
+                className={getNavigationItemClass(isActive)}
               >
                 <Icon
                   size={19}

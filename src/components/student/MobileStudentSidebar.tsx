@@ -5,7 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 
-import { navigationByRole } from "@/data/navigation";
+import { getNavigationItemClass, isNavigationItemActive, navigationByRole } from "@/data/navigation";
 
 
 type MobileStudentSidebarProps = {
@@ -35,7 +35,7 @@ export default function MobileStudentSidebar({
         {/* Logo */}
         <div className="flex h-16 shrink-0 items-center justify-between border-b border-gray-200 px-6">
           <div className="flex items-center">
-            <Link href="/" onClick={onClose}>
+            <Link href="/student" onClick={onClose}>
               <Image
                 src="/images/school.jpg"
                 alt="School Logo"
@@ -45,7 +45,7 @@ export default function MobileStudentSidebar({
               />
             </Link>
 
-            <Link href="/" onClick={onClose}>
+            <Link href="/student" onClick={onClose}>
               <div className="pl-2 text-lg font-bold text-[#015f58]">
                 <p>Garrison School</p>
               </div>
@@ -68,22 +68,15 @@ export default function MobileStudentSidebar({
             {studentNavigation.map((item) => {
               const Icon = item.icon;
 
-              const isActive =
-                item.href === "/student"
-                  ? pathname === "/student"
-                  : pathname.startsWith(item.href);
+              const isActive = isNavigationItemActive(pathname, item.href);
 
               return (
                 <Link
                   key={item.label}
                   href={item.href}
                   onClick={onClose}
-                  className={`flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition-colors text-gray-600 hover:bg-[#01796f]/10 hover:text-[#01796f]`}
-                  // ${
-                  //   isActive
-                  //   ? "bg-[#01796f]/10 text-[#01796f]"
-                  //   : "text-gray-600 hover:bg-[#01796f]/10 hover:text-[#01796f]"
-                  // }`}
+                  aria-current={isActive ? "page" : undefined}
+                  className={getNavigationItemClass(isActive)}
                 >
                   <Icon size={19} strokeWidth={1.8} />
 

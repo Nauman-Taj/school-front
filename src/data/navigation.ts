@@ -25,6 +25,19 @@ export type NavigationItem = {
   icon: React.ElementType;
 };
 
+export function isNavigationItemActive(pathname: string, href: string) {
+  const isRoleHome = /^\/(admin|teacher|student|parent)$/.test(href);
+  return pathname === href || (!isRoleHome && pathname.startsWith(`${href}/`));
+}
+
+export function getNavigationItemClass(isActive: boolean) {
+  return `flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition-colors ${
+    isActive
+      ? "bg-[#e6f4f2] text-[#01796f]"
+      : "text-gray-600 hover:bg-[#01796f]/10 hover:text-[#01796f]"
+  }`;
+}
+
 export const navigationByRole: Record<UserRole, NavigationItem[]> = {
   Admin: [
     {

@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   Search,
+  RefreshCw,
   Menu,
   CheckCheck,
   User,
@@ -15,7 +16,7 @@ import {
 
 import { getSession, logout, AuthSession } from "@/lib/auth";
 import { navigationByRole } from "@/data/navigation";
-import { notifications as initialNotifications } from "@/data/notifications";
+import { useHeaderNotifications } from "@/components/layout/useHeaderNotifications";
 
 
 type ParentHeaderProps = {
@@ -37,10 +38,16 @@ export default function ParentHeader({
     useState(false);
   const [search, setSearch] = useState("");
 
-  const [parentNotifications, setparentNotifications] =
-    useState(initialNotifications);
-
   const parentNavigation = navigationByRole.Parent;
+  const {
+    notifications: filteredNotifications,
+    unreadCount,
+    loading: notificationsLoading,
+    error: notificationsError,
+    refresh: refreshNotifications,
+    markAsRead,
+    markAllAsRead,
+  } = useHeaderNotifications(session?.role, session?.id);
 
 
   useEffect(() => {
@@ -79,18 +86,6 @@ export default function ParentHeader({
     };
   }, []);
 
-  const filteredNotifications =
-    parentNotifications.filter(
-      (notification) =>
-        notification.role === "Parent" &&
-        notification.userId === session?.id
-    );
-
-  const unreadCount =
-    filteredNotifications.filter(
-      (notification) => !notification.read
-    ).length;
-
   const navigation =
     session?.role === "Parent"
       ? parentNavigation.map((item) => ({
@@ -114,33 +109,6 @@ export default function ParentHeader({
     setSearchOpen(false);
   };
 
-  const markAsRead = (id: number) => {
-    setparentNotifications((current) =>
-      current.map((notification) =>
-        notification.id === id
-          ? {
-            ...notification,
-            read: true,
-          }
-          : notification
-      )
-    );
-  };
-
-  const markAllAsRead = () => {
-    setparentNotifications((current) =>
-      current.map((notification) =>
-        notification.role === "Parent" &&
-          notification.userId === session?.id
-          ? {
-            ...notification,
-            read: true,
-          }
-          : notification
-      )
-    );
-  };
-
   return (
     <header className="sticky top-0 z-30 h-16 border-b border-gray-200 bg-white">
       <div className="flex h-full items-center justify-between px-4 sm:px-6 lg:px-8">
@@ -158,7 +126,7 @@ export default function ParentHeader({
 
           <div className="hidden sm:block">
             <Link
-              href="/"
+              href="/parent"
               className="text-xl font-bold text-[#015f58]"
             >
               Garrison School
@@ -179,6 +147,7 @@ export default function ParentHeader({
               onClick={() => setSearchOpen(true)}
               className="rounded-lg p-2.5 text-gray-600 transition hover:bg-gray-100 hover:text-[#01796f]"
               aria-label="Search"
+              aria-expanded={searchOpen}
             >
               <Search
                 size={20}
@@ -190,12 +159,7 @@ export default function ParentHeader({
               <div
                 className="
                   absolute
-                  right-[-130px]
-                  top-[-10px]
-                  z-50
-                  w-[calc(100vw-2rem)]
-                  max-w-72
-                  translate-y-16
+                  right-0 top-full z-50 mt-2 w-[min(calc(100vw-2rem),18rem)]
                   rounded-xl
                   border
                   border-gray-200
@@ -279,6 +243,7 @@ export default function ParentHeader({
               }
               className="relative rounded-lg p-2.5 text-gray-600 transition hover:bg-gray-100 hover:text-[#01796f]"
               aria-label="Notifications"
+              aria-expanded={notificationOpen}
             >
               <Bell
                 size={20}
@@ -297,7 +262,7 @@ export default function ParentHeader({
 
             {/* Notification Dropdown */}
             {notificationOpen && (
-              <div className="absolute right-[-120px] top-12 z-50 w-[calc(100vw-2rem)] max-w-sm overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-lg sm:right-0">
+              <div className="absolute right-0 top-full z-50 mt-2 w-[min(calc(100vw-2rem),24rem)] overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-lg">
 
                 {/* Header */}
                 <div className="flex items-center justify-between border-b border-gray-200 px-4 py-3">
@@ -321,19 +286,34 @@ export default function ParentHeader({
                       Mark all read
                     </button>
                   )}
+                  <button
+                    type="button"
+                    onClick={() => void refreshNotifications()}
+                    disabled={notificationsLoading}
+                    aria-label="Refresh notifications"
+                    title="Refresh notifications"
+                    className="rounded-full p-2 text-gray-500 transition hover:bg-gray-100 hover:text-[#01796f] disabled:cursor-not-allowed disabled:opacity-50"
+                  >
+                    <RefreshCw size={15} className={notificationsLoading ? "animate-spin" : ""} />
+                  </button>
                 </div>
 
                 {/* Notifications */}
                 <div className="max-h-96 overflow-y-auto">
-                  {filteredNotifications.length > 0 ? (
+                  {notificationsLoading ? (
+                    <p className="px-4 py-8 text-center text-sm text-gray-500">Loading notifications...</p>
+                  ) : notificationsError && filteredNotifications.length === 0 ? (
+                    <div className="px-4 py-8 text-center">
+                      <p className="text-sm text-gray-600">{notificationsError}</p>
+                      <button type="button" onClick={() => void refreshNotifications()} className="mt-3 rounded-full border border-gray-200 px-4 py-2 text-xs font-medium text-gray-700 hover:bg-gray-50">Try again</button>
+                    </div>
+                  ) : filteredNotifications.length > 0 ? (
                     filteredNotifications.map(
                       (notification) => (
                         <button
                           key={notification.id}
                           type="button"
-                          onClick={() =>
-                            markAsRead(notification.id)
-                          }
+                          onClick={() => { markAsRead(notification.id); setNotificationOpen(false); router.push(notification.href); }}
                           className={`w-full border-b border-gray-100 px-4 py-3 text-left transition hover:bg-gray-50 ${!notification.read
                             ? "bg-[#e6f4f2]/40"
                             : "bg-white"
@@ -397,25 +377,11 @@ export default function ParentHeader({
             )}
           </div>
 
-          {/* User */}
-          <div className="ml-2 flex items-center gap-3 border-l border-gray-200 pl-4">
-            <div className="hidden text-right sm:block">
-              <p className="text-sm font-semibold text-gray-900">
-                {session?.name || "Parent"}
-              </p>
-
-              <p className="text-xs text-gray-500">
-                {session?.role || "Parent"}
-              </p>
-            </div>
-
-            <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#01796f]/10 text-[#01796f]">
-              <User
-                size={19}
-                strokeWidth={1.8}
-              />
-            </div>
-          </div>
+          {/* User profile */}
+          <Link href="/parent/profile" aria-label="Open parent profile" className="ml-2 flex items-center gap-3 border-l border-gray-200 pl-4 transition hover:opacity-80">
+            <div className="hidden text-right sm:block"><p className="text-sm font-semibold text-gray-900">{session?.name || "Parent"}</p><p className="text-xs text-gray-500">{session?.role || "Parent"}</p></div>
+            <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#01796f]/10 text-[#01796f]"><User size={19} strokeWidth={1.8} /></div>
+          </Link>
 
           {/* Logout */}
           <button
