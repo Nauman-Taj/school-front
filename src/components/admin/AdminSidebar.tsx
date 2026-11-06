@@ -15,13 +15,17 @@ export default function AdminSidebar() {
       {/* Logo */}
       <div className="flex h-16 shrink-0 items-center border-b border-gray-200 px-6">
         <Link href="/admin" className="flex items-center gap-3">
-          <img
-            src={school.logo}
-            alt=""
-            width={55}
-            height={55}
-            className="object-contain"
-          />
+          {school.logo ? (
+            <img
+              src={school.logo}
+              alt=""
+              width={55}
+              height={55}
+              className="object-contain"
+            />
+          ) : (
+            <span className="block h-[55px] w-[55px]" />
+          )}
         </Link>
 
         <Link href="/admin" className="min-w-0 flex-1">

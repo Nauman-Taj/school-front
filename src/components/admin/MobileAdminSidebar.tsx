@@ -35,11 +35,15 @@ export default function MobileAdminSidebar({
         {/* Header */}
         <div className="flex h-16 items-center justify-between border-b border-gray-200 ps-6">
           <Link href="/admin" className="flex items-center gap-3">
-            <img
-              src={school.logo}
-              alt=""
-              className="h-11 w-11 rounded-lg object-contain"
-            />
+            {school.logo ? (
+              <img
+                src={school.logo}
+                alt=""
+                className="h-11 w-11 rounded-lg object-contain"
+              />
+            ) : (
+              <span className="block h-11 w-11" />
+            )}
           </Link>
 
           <Link href="/admin" className="min-w-0 flex-1">

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   Building2,
   MapPin,
@@ -12,10 +12,13 @@ import {
   Upload,
 } from "lucide-react";
 
-import { schoolSettings } from "@/data/settings";
 import { apiRequest } from "@/lib/api";
 import { getAuthToken } from "@/lib/auth";
-import { notifySchoolSettingsUpdated } from "@/lib/schoolSettings";
+import {
+  notifySchoolSettingsUpdated,
+  useSchoolSetting,
+  useSchoolSettingError,
+} from "@/lib/schoolSettings";
 
 type SchoolSettingResponse = {
   id: number;
@@ -30,64 +33,41 @@ type SchoolSettingResponse = {
 };
 
 export default function SchoolSettings() {
-  const [schoolName, setSchoolName] = useState("");
-  const [loaded, setLoaded] = useState(false);
+  const school = useSchoolSetting();
+  const loadError = useSchoolSettingError();
+  const edited = useRef(false);
+  const [schoolName, setSchoolName] = useState(school.schoolName);
+  const [loaded, setLoaded] = useState(Boolean(school.schoolName || school.email));
 
   const [showConfirm, setShowConfirm] = useState(false);
   const [saving, setSaving] = useState(false);
   const [feedback, setFeedback] = useState<string | null>(null);
-  const [logo, setLogo] = useState(schoolSettings.logo);
-  const [address, setAddress] = useState(schoolSettings.address);
-  const [phone, setPhone] = useState(schoolSettings.phone);
-  const [email, setEmail] = useState(schoolSettings.email);
-  const [website, setWebsite] = useState(schoolSettings.website);
-  const [academicYear, setAcademicYear] = useState(
-    schoolSettings.academicYear
-  );
-  const [principalName, setPrincipalName] = useState(
-    schoolSettings.principalName
-  );
+  const [logo, setLogo] = useState(school.logo);
+  const [address, setAddress] = useState(school.address);
+  const [phone, setPhone] = useState(school.phone);
+  const [email, setEmail] = useState(school.email);
+  const [website, setWebsite] = useState(school.website);
+  const [academicYear, setAcademicYear] = useState(school.academicYear);
+  const [principalName, setPrincipalName] = useState(school.principalName);
 
   useEffect(() => {
-    let active = true;
+    if (edited.current) return;
+    if (!school.schoolName && !school.email && !school.address) return;
 
-    const loadSchoolSetting = async () => {
-      const token = getAuthToken();
-      if (!token) {
-        if (active) setFeedback("Your session has expired. Please log in again.");
-        return;
-      }
+    setLoaded(true);
+    setSchoolName(school.schoolName);
+    setLogo(school.logo);
+    setAddress(school.address);
+    setPhone(school.phone);
+    setEmail(school.email);
+    setWebsite(school.website);
+    setAcademicYear(school.academicYear);
+    setPrincipalName(school.principalName);
+  }, [school]);
 
-      try {
-        const data = await apiRequest<SchoolSettingResponse>("/school-settings", {
-          token,
-        });
-        if (!active) return;
-        setLoaded(true);
-        setSchoolName(data.schoolName);
-        setLogo(data.logo);
-        setAddress(data.address);
-        setPhone(data.phone);
-        setEmail(data.email);
-        setWebsite(data.website);
-        setAcademicYear(data.academicYear);
-        setPrincipalName(data.principalName);
-      } catch (error) {
-        if (active) {
-          setFeedback(
-            error instanceof Error
-              ? error.message
-              : "Unable to load school settings.",
-          );
-        }
-      }
-    };
-
-    void loadSchoolSetting();
-    return () => {
-      active = false;
-    };
-  }, []);
+  useEffect(() => {
+    if (loadError) setFeedback(loadError);
+  }, [loadError]);
 
   const handleLogoChange = (
     event: React.ChangeEvent<HTMLInputElement>
@@ -95,9 +75,17 @@ export default function SchoolSettings() {
     const file = event.target.files?.[0];
 
     if (file) {
+      edited.current = true;
       setLogo(URL.createObjectURL(file));
     }
   };
+
+  const editText =
+    (update: (value: string) => void) =>
+    (event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+      edited.current = true;
+      update(event.target.value);
+    };
 
   const saveSchoolSetting = async () => {
     const token = getAuthToken();
@@ -192,7 +180,7 @@ export default function SchoolSettings() {
             <input
               type="text"
               value={schoolName}
-              onChange={(e) => setSchoolName(e.target.value)}
+              onChange={editText(setSchoolName)}
               className="w-full rounded-xl border border-gray-200 px-10 py-3 text-sm outline-none transition focus:border-[#01796f] focus:ring-2 focus:ring-[#01796f]/10"
             />
           </div>
@@ -213,7 +201,7 @@ export default function SchoolSettings() {
             <input
               type="text"
               value={address}
-              onChange={(e) => setAddress(e.target.value)}
+              onChange={editText(setAddress)}
               className="w-full rounded-xl border border-gray-200 px-10 py-3 text-sm outline-none transition focus:border-[#01796f] focus:ring-2 focus:ring-[#01796f]/10"
             />
           </div>
@@ -234,7 +222,7 @@ export default function SchoolSettings() {
             <input
               type="text"
               value={phone}
-              onChange={(e) => setPhone(e.target.value)}
+              onChange={editText(setPhone)}
               className="w-full rounded-xl border border-gray-200 px-10 py-3 text-sm outline-none transition focus:border-[#01796f] focus:ring-2 focus:ring-[#01796f]/10"
             />
           </div>
@@ -255,7 +243,7 @@ export default function SchoolSettings() {
             <input
               type="email"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={editText(setEmail)}
               className="w-full rounded-xl border border-gray-200 px-10 py-3 text-sm outline-none transition focus:border-[#01796f] focus:ring-2 focus:ring-[#01796f]/10"
             />
           </div>
@@ -276,7 +264,7 @@ export default function SchoolSettings() {
             <input
               type="text"
               value={website}
-              onChange={(e) => setWebsite(e.target.value)}
+              onChange={editText(setWebsite)}
               className="w-full rounded-xl border border-gray-200 px-10 py-3 text-sm outline-none transition focus:border-[#01796f] focus:ring-2 focus:ring-[#01796f]/10"
             />
           </div>
@@ -296,9 +284,15 @@ export default function SchoolSettings() {
 
             <select
               value={academicYear}
-              onChange={(e) => setAcademicYear(e.target.value)}
+              onChange={editText(setAcademicYear)}
+              disabled={!loaded}
               className="w-full appearance-none rounded-xl border border-gray-200 bg-white px-10 py-3 text-sm outline-none transition focus:border-[#01796f] focus:ring-2 focus:ring-[#01796f]/10"
             >
+              {academicYear === "" && <option value=""></option>}
+              {academicYear !== "" &&
+                !["2026-2027", "2025-2026", "2024-2025"].includes(academicYear) && (
+                  <option value={academicYear}>{academicYear}</option>
+                )}
               <option>2026-2027</option>
               <option>2025-2026</option>
               <option>2024-2025</option>
@@ -321,7 +315,7 @@ export default function SchoolSettings() {
             <input
               type="text"
               value={principalName}
-              onChange={(e) => setPrincipalName(e.target.value)}
+              onChange={editText(setPrincipalName)}
               className="w-full rounded-xl border border-gray-200 px-10 py-3 text-sm outline-none transition focus:border-[#01796f] focus:ring-2 focus:ring-[#01796f]/10"
             />
           </div>
@@ -334,11 +328,15 @@ export default function SchoolSettings() {
           </label>
 
           <div className="flex items-center gap-4">
-            <img
-              src={logo}
-              alt="School logo"
-              className="h-12 w-12 rounded-xl border border-gray-200 object-cover"
-            />
+            {logo ? (
+              <img
+                src={logo}
+                alt="School logo"
+                className="h-12 w-12 rounded-xl border border-gray-200 object-cover"
+              />
+            ) : (
+              <div className="h-12 w-12 rounded-xl border border-gray-200 bg-gray-50" />
+            )}
 
             <label className="inline-flex cursor-pointer items-center gap-2 rounded-xl border border-gray-200 px-4 py-3 text-sm font-medium text-gray-700 transition hover:bg-gray-50">
               <Upload size={17} />
