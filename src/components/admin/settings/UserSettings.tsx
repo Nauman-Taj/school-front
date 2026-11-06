@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { KeyRound, ShieldCheck, UserCheck } from "lucide-react";
 
 import { apiRequest } from "@/lib/api";
@@ -8,6 +8,7 @@ import { getAuthToken } from "@/lib/auth";
 import {
   notifySchoolSettingsUpdated,
   useSchoolSetting,
+  useSchoolSettingError,
 } from "@/lib/schoolSettings";
 
 type Account = {
@@ -35,45 +36,77 @@ const statusLabels: Record<string, string> = {
   INACTIVE: "Inactive",
 };
 
+const passwordPolicy = "Minimum 8 characters";
+const ACCOUNT_KEY = "garrison-signed-in-account";
+const ACCOUNT_CHANGED = "garrison-account-changed";
+
 const selectClassName =
-  "w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm outline-none transition focus:border-[#01796f] focus:ring-2 focus:ring-[#01796f]/10";
+  "w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm outline-none transition focus:border-[#01796f] focus:ring-2 focus:ring-[#01796f]/10 disabled:opacity-60";
 
-export default function UserSettings() {
-  const school = useSchoolSetting();
-  const [role, setRole] = useState("Admin");
-  const [permission, setPermission] = useState("Full Access");
-  const [status, setStatus] = useState("Active");
-  const [showConfirm, setShowConfirm] = useState(false);
-  const [saving, setSaving] = useState(false);
-  const [message, setMessage] = useState<string | null>(null);
+const blankAccount = { role: "", status: "" };
+let currentAccount = blankAccount;
+let accountRestored = false;
 
-  useEffect(() => {
-    if (school.permission && permissions.includes(school.permission)) {
-      setPermission(school.permission);
-    }
-  }, [school.permission]);
+function restoreAccount() {
+  if (accountRestored || typeof window === "undefined") return;
+  accountRestored = true;
+
+  try {
+    const saved = sessionStorage.getItem(ACCOUNT_KEY);
+    if (!saved) return;
+    currentAccount = JSON.parse(saved) as { role: string; status: string };
+  } catch {
+    currentAccount = blankAccount;
+  }
+}
+
+function rememberAccount(account: { role: string; status: string }) {
+  currentAccount = account;
+  accountRestored = true;
+
+  try {
+    sessionStorage.setItem(ACCOUNT_KEY, JSON.stringify(account));
+  } catch {
+    // The account still stays in memory for this page.
+  }
+
+  window.dispatchEvent(new Event(ACCOUNT_CHANGED));
+}
+
+function subscribeToAccount(onStoreChange: () => void) {
+  window.addEventListener(ACCOUNT_CHANGED, onStoreChange);
+  return () => window.removeEventListener(ACCOUNT_CHANGED, onStoreChange);
+}
+
+function getAccount() {
+  restoreAccount();
+  return currentAccount;
+}
+
+function useSignedInAccount() {
+  const account = useSyncExternalStore(
+    subscribeToAccount,
+    getAccount,
+    () => blankAccount,
+  );
 
   useEffect(() => {
     let active = true;
 
     const loadAccount = async () => {
       const token = getAuthToken();
-      if (!token) {
-        if (active) setMessage("Your session has expired. Please log in again.");
-        return;
-      }
+      if (!token) return;
 
       try {
-        const account = await apiRequest<Account>("/auth/me", { token });
+        const data = await apiRequest<Account>("/auth/me", { token });
         if (!active) return;
-        setRole(roleLabels[account.role] ?? account.role);
-        setStatus(statusLabels[account.status] ?? account.status ?? "Active");
-      } catch (error) {
-        if (active) {
-          setMessage(
-            error instanceof Error ? error.message : "Unable to load account settings.",
-          );
-        }
+        rememberAccount({
+          role: roleLabels[data.role] ?? data.role,
+          status: statusLabels[data.status] ?? data.status,
+        });
+      } catch {
+        if (!active || currentAccount.role) return;
+        rememberAccount(blankAccount);
       }
     };
 
@@ -82,6 +115,54 @@ export default function UserSettings() {
       active = false;
     };
   }, []);
+
+  return account;
+}
+
+function withCurrent(options: string[], current: string) {
+  if (current && !options.includes(current)) return [current, ...options];
+  return options;
+}
+
+export default function UserSettings() {
+  const school = useSchoolSetting();
+  const loadError = useSchoolSettingError();
+  const account = useSignedInAccount();
+  const edited = useRef(false);
+  const [role, setRole] = useState(account.role);
+  const [permission, setPermission] = useState(school.permission ?? "");
+  const [status, setStatus] = useState(account.status);
+  const [loaded, setLoaded] = useState(Boolean(school.permission || school.email));
+  const [showConfirm, setShowConfirm] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [message, setMessage] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (edited.current) return;
+    if (!school.schoolName && !school.email && !school.permission) return;
+
+    setLoaded(true);
+    setPermission(school.permission ?? "");
+  }, [school]);
+
+  useEffect(() => {
+    if (edited.current) return;
+    if (!account.role && !account.status) return;
+
+    setRole(account.role);
+    setStatus(account.status);
+  }, [account]);
+
+  useEffect(() => {
+    if (loadError) setMessage(loadError);
+  }, [loadError]);
+
+  const editValue =
+    (update: (value: string) => void) =>
+    (event: React.ChangeEvent<HTMLSelectElement>) => {
+      edited.current = true;
+      update(event.target.value);
+    };
 
   const saveUserSettings = async () => {
     const token = getAuthToken();
@@ -99,6 +180,7 @@ export default function UserSettings() {
         token,
         body: JSON.stringify({ permission }),
       });
+      edited.current = false;
       notifySchoolSettingsUpdated();
       setShowConfirm(false);
       setMessage("User settings were saved.");
@@ -110,6 +192,11 @@ export default function UserSettings() {
     }
   };
 
+  const accountReady = Boolean(role && status);
+  const permissionOptions = withCurrent(permissions, permission);
+  const roleOptions = withCurrent(Object.values(roleLabels), role);
+  const statusOptions = withCurrent(Object.values(statusLabels), status);
+
   return (
     <section className="max-w-5xl rounded-2xl border border-gray-200 bg-white p-5 sm:p-6">
       <div className="mb-6 flex items-center gap-3">
@@ -119,8 +206,6 @@ export default function UserSettings() {
         <h2 className="text-lg font-semibold text-gray-900">User Settings</h2>
       </div>
 
-      {message && <p className="mb-4 text-sm text-gray-600">{message}</p>}
-
       <div className="grid gap-5 md:grid-cols-2">
         <div>
           <label className="mb-2 block text-sm font-medium text-gray-700" htmlFor="settings-role">
@@ -129,10 +214,12 @@ export default function UserSettings() {
           <select
             id="settings-role"
             value={role}
-            onChange={(event) => setRole(event.target.value)}
+            onChange={editValue(setRole)}
+            disabled={!accountReady}
             className={selectClassName}
           >
-            {Object.values(roleLabels).map((item) => (
+            {role === "" && <option value=""></option>}
+            {roleOptions.map((item) => (
               <option key={item}>{item}</option>
             ))}
           </select>
@@ -145,10 +232,12 @@ export default function UserSettings() {
           <select
             id="settings-permissions"
             value={permission}
-            onChange={(event) => setPermission(event.target.value)}
+            onChange={editValue(setPermission)}
+            disabled={!loaded}
             className={selectClassName}
           >
-            {permissions.map((item) => (
+            {permission === "" && <option value=""></option>}
+            {permissionOptions.map((item) => (
               <option key={item}>{item}</option>
             ))}
           </select>
@@ -159,8 +248,15 @@ export default function UserSettings() {
             <KeyRound size={16} />
             Password Policy
           </label>
-          <select id="settings-password-policy" className={selectClassName} defaultValue="Minimum 8 characters">
-            <option>Minimum 8 characters</option>
+          <select
+            id="settings-password-policy"
+            value={accountReady ? passwordPolicy : ""}
+            onChange={() => undefined}
+            disabled={!accountReady}
+            className={selectClassName}
+          >
+            {!accountReady && <option value=""></option>}
+            {accountReady && <option>{passwordPolicy}</option>}
           </select>
         </div>
 
@@ -172,10 +268,12 @@ export default function UserSettings() {
           <select
             id="settings-account-status"
             value={status}
-            onChange={(event) => setStatus(event.target.value)}
+            onChange={editValue(setStatus)}
+            disabled={!accountReady}
             className={selectClassName}
           >
-            {Object.values(statusLabels).map((item) => (
+            {status === "" && <option value=""></option>}
+            {statusOptions.map((item) => (
               <option key={item}>{item}</option>
             ))}
           </select>
@@ -186,12 +284,13 @@ export default function UserSettings() {
         <button
           type="button"
           onClick={() => setShowConfirm(true)}
-          disabled={saving}
+          disabled={saving || !loaded || !accountReady}
           className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-[#01796f] px-5 py-3 text-sm font-medium text-white transition hover:bg-[#01665d] disabled:opacity-60 sm:w-auto"
         >
           {saving ? "Saving..." : "Save Changes"}
         </button>
       </div>
+      {message && <p className="mt-4 text-sm text-gray-600">{message}</p>}
 
       {showConfirm && (
         <div className="fixed inset-0 z-50 flex items-start justify-center bg-black/40 px-4 pt-10">

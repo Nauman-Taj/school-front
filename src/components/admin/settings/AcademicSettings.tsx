@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   Award,
   BookOpen,
@@ -15,6 +15,7 @@ import { getAuthToken } from "@/lib/auth";
 import {
   notifySchoolSettingsUpdated,
   useSchoolSetting,
+  useSchoolSettingError,
 } from "@/lib/schoolSettings";
 
 type ClassRecord = { name: string; section: string };
@@ -22,25 +23,58 @@ type SubjectRecord = { name: string };
 type ExamRecord = { name: string };
 
 const selectClassName =
-  "w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm outline-none transition focus:border-[#01796f] focus:ring-2 focus:ring-[#01796f]/10";
+  "w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm outline-none transition focus:border-[#01796f] focus:ring-2 focus:ring-[#01796f]/10 disabled:opacity-60";
+
+const yearOptions = ["2026-2027", "2025-2026", "2024-2025"];
 
 function unique(values: string[]) {
   return [...new Set(values.filter(Boolean))];
 }
 
+function withCurrent(options: string[], current: string) {
+  if (current && !options.includes(current)) return [current, ...options];
+  return options;
+}
+
 export default function AcademicSettings() {
   const school = useSchoolSetting();
+  const loadError = useSchoolSettingError();
+  const edited = useRef(false);
   const [classes, setClasses] = useState<string[]>([]);
   const [sections, setSections] = useState<string[]>([]);
   const [subjects, setSubjects] = useState<string[]>([]);
   const [terms, setTerms] = useState<string[]>([]);
-  const [selectedClass, setSelectedClass] = useState("");
-  const [selectedSection, setSelectedSection] = useState("");
-  const [selectedSubject, setSelectedSubject] = useState("");
-  const [selectedTerm, setSelectedTerm] = useState("");
+  const [selectedClass, setSelectedClass] = useState(school.selectedClass ?? "");
+  const [selectedSection, setSelectedSection] = useState(school.selectedSection ?? "");
+  const [selectedSubject, setSelectedSubject] = useState(school.selectedSubject ?? "");
+  const [gradingSystem, setGradingSystem] = useState(school.gradingSystem ?? "");
+  const [academicYear, setAcademicYear] = useState(school.academicYear);
+  const [selectedTerm, setSelectedTerm] = useState(school.term ?? "");
+  const [loaded, setLoaded] = useState(
+    Boolean(school.selectedClass || school.academicYear || school.email),
+  );
   const [showConfirm, setShowConfirm] = useState(false);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (edited.current) return;
+    if (!school.schoolName && !school.email && !school.selectedClass && !school.academicYear) {
+      return;
+    }
+
+    setLoaded(true);
+    setSelectedClass(school.selectedClass ?? "");
+    setSelectedSection(school.selectedSection ?? "");
+    setSelectedSubject(school.selectedSubject ?? "");
+    setGradingSystem(school.gradingSystem ?? "");
+    setAcademicYear(school.academicYear);
+    setSelectedTerm(school.term ?? "");
+  }, [school]);
+
+  useEffect(() => {
+    if (loadError) setMessage(loadError);
+  }, [loadError]);
 
   useEffect(() => {
     let active = true;
@@ -60,44 +94,23 @@ export default function AcademicSettings() {
         ]);
         if (!active) return;
 
-        const classNames = unique(classRecords.map((item) => item.name)).sort(
-          (left, right) => {
+        setClasses(
+          unique(classRecords.map((item) => item.name)).sort((left, right) => {
             const leftNumber = Number(left.match(/\d+/)?.[0] ?? 0);
             const rightNumber = Number(right.match(/\d+/)?.[0] ?? 0);
             return rightNumber - leftNumber;
-          },
-        );
-        const sectionNames = unique(classRecords.map((item) => item.section));
-        const subjectNames = unique(subjectRecords.map((item) => item.name));
-        const termNames = unique(
-          examRecords.map((item) => {
-            const match = item.name.match(/mid-term|final-term|final/i);
-            if (!match) return "";
-            return match[0].toLowerCase() === "mid-term" ? "Mid-Term" : match[0];
           }),
         );
-
-        setClasses(classNames);
-        setSections(sectionNames);
-        setSubjects(subjectNames);
-        setTerms(termNames);
-        setSelectedClass(
-          school.selectedClass && classNames.includes(school.selectedClass)
-            ? school.selectedClass
-            : classNames[0] ?? "",
-        );
-        setSelectedSection(
-          school.selectedSection && sectionNames.includes(school.selectedSection)
-            ? school.selectedSection
-            : sectionNames[0] ?? "",
-        );
-        setSelectedSubject(
-          school.selectedSubject && subjectNames.includes(school.selectedSubject)
-            ? school.selectedSubject
-            : subjectNames[0] ?? "",
-        );
-        setSelectedTerm(
-          school.term && termNames.includes(school.term) ? school.term : termNames[0] ?? "",
+        setSections(unique(classRecords.map((item) => item.section)));
+        setSubjects(unique(subjectRecords.map((item) => item.name)));
+        setTerms(
+          unique(
+            examRecords.map((item) => {
+              const match = item.name.match(/mid-term|final-term|final/i);
+              if (!match) return "";
+              return match[0].toLowerCase() === "mid-term" ? "Mid-Term" : match[0];
+            }),
+          ),
         );
       } catch (error) {
         if (active) {
@@ -114,7 +127,14 @@ export default function AcademicSettings() {
     return () => {
       active = false;
     };
-  }, [school.selectedClass, school.selectedSection, school.selectedSubject, school.term]);
+  }, []);
+
+  const editValue =
+    (update: (value: string) => void) =>
+    (event: React.ChangeEvent<HTMLSelectElement>) => {
+      edited.current = true;
+      update(event.target.value);
+    };
 
   const saveAcademicSettings = async () => {
     const token = getAuthToken();
@@ -134,11 +154,12 @@ export default function AcademicSettings() {
           selectedClass,
           selectedSection,
           selectedSubject,
-          gradingSystem: "Percentage and letter grades",
-          academicYear: school.academicYear,
+          gradingSystem,
+          academicYear,
           term: selectedTerm,
         }),
       });
+      edited.current = false;
       notifySchoolSettingsUpdated();
       setShowConfirm(false);
       setMessage("Academic settings were saved.");
@@ -152,6 +173,18 @@ export default function AcademicSettings() {
     }
   };
 
+  const classOptions = withCurrent(classes, selectedClass);
+  const sectionOptions = withCurrent(sections, selectedSection);
+  const subjectOptions = withCurrent(subjects, selectedSubject);
+  const termOptions = withCurrent(terms, selectedTerm);
+  const gradingOptions = withCurrent(
+    gradingSystem === "Percentage and letter grades" || gradingSystem === ""
+      ? ["Percentage and letter grades"]
+      : ["Percentage and letter grades"],
+    gradingSystem,
+  );
+  const academicYearOptions = withCurrent(yearOptions, academicYear);
+
   return (
     <section className="max-w-5xl rounded-2xl border border-gray-200 bg-white p-5 sm:p-6">
       <div className="mb-6 flex items-center gap-3">
@@ -160,8 +193,6 @@ export default function AcademicSettings() {
         </div>
         <h2 className="text-lg font-semibold text-gray-900">Academic Settings</h2>
       </div>
-
-      {message && <p className="mb-4 text-sm text-gray-600">{message}</p>}
 
       <div className="grid gap-5 md:grid-cols-2">
         <div>
@@ -172,10 +203,12 @@ export default function AcademicSettings() {
           <select
             id="settings-classes"
             value={selectedClass}
-            onChange={(event) => setSelectedClass(event.target.value)}
+            onChange={editValue(setSelectedClass)}
+            disabled={!loaded}
             className={selectClassName}
           >
-            {classes.map((item) => (
+            {selectedClass === "" && <option value=""></option>}
+            {classOptions.map((item) => (
               <option key={item}>{item}</option>
             ))}
           </select>
@@ -189,10 +222,12 @@ export default function AcademicSettings() {
           <select
             id="settings-sections"
             value={selectedSection}
-            onChange={(event) => setSelectedSection(event.target.value)}
+            onChange={editValue(setSelectedSection)}
+            disabled={!loaded}
             className={selectClassName}
           >
-            {sections.map((item) => (
+            {selectedSection === "" && <option value=""></option>}
+            {sectionOptions.map((item) => (
               <option key={item}>{item}</option>
             ))}
           </select>
@@ -206,10 +241,12 @@ export default function AcademicSettings() {
           <select
             id="settings-subjects"
             value={selectedSubject}
-            onChange={(event) => setSelectedSubject(event.target.value)}
+            onChange={editValue(setSelectedSubject)}
+            disabled={!loaded}
             className={selectClassName}
           >
-            {subjects.map((item) => (
+            {selectedSubject === "" && <option value=""></option>}
+            {subjectOptions.map((item) => (
               <option key={item}>{item}</option>
             ))}
           </select>
@@ -220,8 +257,17 @@ export default function AcademicSettings() {
             <Award size={16} />
             Grading System
           </label>
-          <select id="settings-grading" className={selectClassName} defaultValue="Percentage and letter grades">
-            <option>Percentage and letter grades</option>
+          <select
+            id="settings-grading"
+            value={gradingSystem}
+            onChange={editValue(setGradingSystem)}
+            disabled={!loaded}
+            className={selectClassName}
+          >
+            {gradingSystem === "" && <option value=""></option>}
+            {gradingOptions.filter(Boolean).map((item) => (
+              <option key={item}>{item}</option>
+            ))}
           </select>
         </div>
 
@@ -230,8 +276,17 @@ export default function AcademicSettings() {
             <CalendarDays size={16} />
             Academic Year
           </label>
-          <select id="settings-academic-year" className={selectClassName} value={school.academicYear} onChange={() => undefined}>
-            <option>{school.academicYear}</option>
+          <select
+            id="settings-academic-year"
+            value={academicYear}
+            onChange={editValue(setAcademicYear)}
+            disabled={!loaded}
+            className={selectClassName}
+          >
+            {academicYear === "" && <option value=""></option>}
+            {academicYearOptions.map((item) => (
+              <option key={item}>{item}</option>
+            ))}
           </select>
         </div>
 
@@ -243,10 +298,12 @@ export default function AcademicSettings() {
           <select
             id="settings-term"
             value={selectedTerm}
-            onChange={(event) => setSelectedTerm(event.target.value)}
+            onChange={editValue(setSelectedTerm)}
+            disabled={!loaded}
             className={selectClassName}
           >
-            {terms.map((item) => (
+            {selectedTerm === "" && <option value=""></option>}
+            {termOptions.map((item) => (
               <option key={item}>{item}</option>
             ))}
           </select>
@@ -257,12 +314,13 @@ export default function AcademicSettings() {
         <button
           type="button"
           onClick={() => setShowConfirm(true)}
-          disabled={saving}
+          disabled={saving || !loaded}
           className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-[#01796f] px-5 py-3 text-sm font-medium text-white transition hover:bg-[#01665d] disabled:opacity-60 sm:w-auto"
         >
           {saving ? "Saving..." : "Save Changes"}
         </button>
       </div>
+      {message && <p className="mt-4 text-sm text-gray-600">{message}</p>}
 
       {showConfirm && (
         <div className="fixed inset-0 z-50 flex items-start justify-center bg-black/40 px-4 pt-10">
