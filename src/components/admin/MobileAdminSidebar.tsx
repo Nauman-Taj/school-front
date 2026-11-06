@@ -39,7 +39,9 @@ export default function MobileAdminSidebar({
               <img
                 src={school.logo}
                 alt=""
-                className="h-11 w-11 rounded-lg object-contain"
+                width={55}
+                height={55}
+                className="object-contain"
               />
             ) : (
               <span className="block h-11 w-11" />
