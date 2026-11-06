@@ -48,7 +48,7 @@ export default function MobileAdminSidebar({
             )}
           </Link>
 
-          <Link href="/admin" className="min-w-0 flex-1">
+          <Link href="/admin" className="min-w-0 gap-3 flex-1">
             <h1 className="truncate pr-4 text-lg font-bold text-[#015f58]" title={school.schoolName}>
               {school.schoolName}
             </h1>
