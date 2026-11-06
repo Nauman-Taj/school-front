@@ -1,8 +1,4 @@
-import {
-  SchoolSettings,
-  UserSettings,
-  AcademicSettings,
-} from "@/types/settings";
+import { SchoolSettings } from "@/types/settings";
 
 export const schoolSettings: SchoolSettings = {
   schoolName: "Garrison Grammar School",
@@ -13,20 +9,4 @@ export const schoolSettings: SchoolSettings = {
   website: "https://www.garrisonschool.edu.pk",
   academicYear: "2026-2027",
   principalName: "Mr. Shafiq Ur Rehman",
-};
-
-export const userSettings: UserSettings = {
-  role: "Administrator",
-  permission: "Full Access",
-  passwordPolicy: "Strong Password",
-  accountStatus: "Active",
-};
-
-export const academicSettings: AcademicSettings = {
-  classes: "Primary",
-  sections: "A",
-  subjects: "Core Subjects",
-  gradingSystem: "Percentage",
-  academicYear: "2026-2027",
-  term: "Term 1",
 };

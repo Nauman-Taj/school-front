@@ -8,19 +8,3 @@ export type SchoolSettings = {
   academicYear: string;
   principalName: string;
 };
-
-export type UserSettings = {
-  role: string;
-  permission: string;
-  passwordPolicy: string;
-  accountStatus: string;
-};
-
-export type AcademicSettings = {
-  classes: string;
-  sections: string;
-  subjects: string;
-  gradingSystem: string;
-  academicYear: string;
-  term: string;
-};

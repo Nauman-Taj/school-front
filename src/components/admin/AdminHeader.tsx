@@ -15,6 +15,7 @@ import {
 import { useRouter } from "next/navigation";
 
 import { getSession, logout, AuthSession } from "@/lib/auth";
+import { useSchoolSetting } from "@/lib/schoolSettings";
 import { navigationByRole } from "@/data/navigation";
 import { useHeaderNotifications } from "@/components/layout/useHeaderNotifications";
 
@@ -26,6 +27,7 @@ export default function AdminHeader({
   onMenuClick,
 }: AdminHeaderProps) {
   const router = useRouter();
+  const school = useSchoolSetting();
 
   const searchRef = useRef<HTMLDivElement>(null);
   const notificationRef = useRef<HTMLDivElement>(null);
@@ -125,7 +127,7 @@ export default function AdminHeader({
               href="/admin"
               className="text-xl font-bold text-[#015f58]"
             >
-              Garrison School
+              {school.schoolName}
             </Link>
           </div>
         </div>

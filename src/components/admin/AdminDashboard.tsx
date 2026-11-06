@@ -230,12 +230,12 @@ export default function AdminDashboard() {
         ))}
       </div>
 
-      <div className="grid gap-6 xl:grid-cols-2">
+      <div className="grid min-w-0 gap-5 xl:grid-cols-2 [&>*]:min-w-0">
         <EnrollmentChart students={data.students} />
         <AttendanceChart records={data.attendance} />
       </div>
 
-      <div className="grid gap-6 xl:grid-cols-2">
+      <div className="grid min-w-0 gap-5 xl:grid-cols-2 [&>*]:min-w-0">
         <FeeChart />
         <UpcomingEvents />
       </div>

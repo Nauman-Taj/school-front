@@ -73,8 +73,8 @@ export default function AttendanceChart({
     });
 
   return (
-    <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
-      <div className="mb-6">
+    <div className="min-w-0 overflow-hidden rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
+      <div className="mb-4">
         <h2 className="text-lg font-semibold text-gray-900">
           Attendance Overview
         </h2>
@@ -84,9 +84,12 @@ export default function AttendanceChart({
         </p>
       </div>
 
-      <div className="h-72">
+      <div className="h-56 sm:h-72">
         <ResponsiveContainer width="100%" height="100%">
-          <LineChart data={attendanceChartData}>
+          <LineChart
+            data={attendanceChartData}
+            margin={{ top: 8, right: 8, left: 0, bottom: 8 }}
+          >
             <CartesianGrid
               strokeDasharray="3 3"
               vertical={false}
@@ -96,6 +99,8 @@ export default function AttendanceChart({
               dataKey="date"
               axisLine={false}
               tickLine={false}
+              tick={{ fontSize: 11 }}
+              minTickGap={24}
             />
 
             <YAxis

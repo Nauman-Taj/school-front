@@ -74,7 +74,7 @@ export default function UpcomingEvents() {
     .slice(0, 4);
 
   return (
-    <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
+    <div className="min-w-0 overflow-hidden rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
       <div className="mb-4 flex items-center gap-3">
         <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#e6f4f2]">
           <CalendarDays className="h-5 w-5 text-[#01796F]" />
@@ -109,7 +109,7 @@ export default function UpcomingEvents() {
             return (
               <div
                 key={event.id}
-                className="flex items-center gap-3 rounded-xl border border-gray-100 px-3 py-2.5"
+                className="flex min-w-0 items-center gap-3 rounded-xl border border-gray-100 px-3 py-2.5"
               >
                 <div className="flex h-10 w-10 shrink-0 flex-col items-center justify-center rounded-lg bg-[#e6f4f2]">
                   <span className="text-[10px] font-medium uppercase text-[#01796F]">

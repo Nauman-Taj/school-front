@@ -42,8 +42,8 @@ export default function EnrollmentChart({
     );
 
   return (
-    <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
-      <div className="mb-6">
+    <div className="min-w-0 overflow-hidden rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
+      <div className="mb-4">
         <h2 className="text-lg font-semibold text-gray-900">
           Student Enrollment
         </h2>
@@ -53,7 +53,7 @@ export default function EnrollmentChart({
         </p>
       </div>
 
-      <div className="h-72">
+      <div className="h-56 sm:h-72">
         {enrollmentData.length === 0 ? (
           <div className="flex h-full items-center justify-center text-sm text-gray-500">
             No student enrollment data available.
@@ -73,8 +73,10 @@ export default function EnrollmentChart({
                 dataKey="className"
                 axisLine={false}
                 tickLine={false}
-                tick={{ fontSize: 12 }}
+                tick={{ fontSize: 11 }}
                 interval={0}
+                minTickGap={0}
+                tickMargin={8}
               />
 
               <YAxis

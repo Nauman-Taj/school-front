@@ -1,12 +1,13 @@
 "use client";
 
 import { getNavigationItemClass, isNavigationItemActive, navigationByRole } from "@/data/navigation";
+import { useSchoolSetting } from "@/lib/schoolSettings";
 import Link from "next/link";
-import Image from "next/image";
 import { usePathname } from "next/navigation";
 
 export default function AdminSidebar() {
   const pathname = usePathname();
+  const school = useSchoolSetting();
   const adminNavigation = navigationByRole.Admin;
 
   return (
@@ -14,18 +15,20 @@ export default function AdminSidebar() {
       {/* Logo */}
       <div className="flex h-16 shrink-0 items-center border-b border-gray-200 px-6">
         <Link href="/admin" className="flex items-center gap-3">
-          <Image
-            src="/images/school.jpg"
-            alt="School Logo"
+          <img
+            src={school.logo}
+            alt=""
             width={55}
             height={55}
             className="object-contain"
           />
         </Link>
 
-        <Link href="/admin" className="flex items-center gap-3">
-          <div className="pl-2 text-lg font-bold text-[#015f58]">
-            <p>Garrison School</p>
+        <Link href="/admin" className="min-w-0 flex-1">
+          <div className="pl-2 text-[#015f58]">
+            <p className="truncate text-lg font-bold" title={school.schoolName}>
+              {school.schoolName}
+            </p>
           </div>
         </Link>
       </div>

@@ -88,7 +88,7 @@ export default function FeeChart() {
   ];
 
   return (
-    <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
+    <div className="min-w-0 overflow-hidden rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
       <div className="mb-4">
         <h2 className="text-lg font-semibold text-gray-900">
           Fee Collection
@@ -122,7 +122,7 @@ export default function FeeChart() {
         </div>
       ) : (
         <>
-          <div className="relative mx-auto h-56 w-56">
+          <div className="relative mx-auto h-56 w-full max-w-56">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
                 <Pie
@@ -177,7 +177,7 @@ export default function FeeChart() {
             </p>
           </div>
 
-          <div className="mt-4 flex items-center justify-center gap-6 text-sm">
+          <div className="mt-4 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm">
             <div className="flex items-center gap-2">
               <span className="h-2.5 w-2.5 rounded-full bg-[#01796F]" />
               <span className="text-gray-600">Collected</span>

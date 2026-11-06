@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Building2,
   MapPin,
@@ -13,13 +13,29 @@ import {
 } from "lucide-react";
 
 import { schoolSettings } from "@/data/settings";
+import { apiRequest } from "@/lib/api";
+import { getAuthToken } from "@/lib/auth";
+import { notifySchoolSettingsUpdated } from "@/lib/schoolSettings";
+
+type SchoolSettingResponse = {
+  id: number;
+  schoolName: string;
+  logo: string;
+  address: string;
+  phone: string;
+  email: string;
+  website: string;
+  academicYear: string;
+  principalName: string;
+};
 
 export default function SchoolSettings() {
-  const [schoolName, setSchoolName] = useState(
-    schoolSettings.schoolName
-  );
+  const [schoolName, setSchoolName] = useState("");
+  const [loaded, setLoaded] = useState(false);
 
   const [showConfirm, setShowConfirm] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [feedback, setFeedback] = useState<string | null>(null);
   const [logo, setLogo] = useState(schoolSettings.logo);
   const [address, setAddress] = useState(schoolSettings.address);
   const [phone, setPhone] = useState(schoolSettings.phone);
@@ -32,6 +48,47 @@ export default function SchoolSettings() {
     schoolSettings.principalName
   );
 
+  useEffect(() => {
+    let active = true;
+
+    const loadSchoolSetting = async () => {
+      const token = getAuthToken();
+      if (!token) {
+        if (active) setFeedback("Your session has expired. Please log in again.");
+        return;
+      }
+
+      try {
+        const data = await apiRequest<SchoolSettingResponse>("/school-settings", {
+          token,
+        });
+        if (!active) return;
+        setLoaded(true);
+        setSchoolName(data.schoolName);
+        setLogo(data.logo);
+        setAddress(data.address);
+        setPhone(data.phone);
+        setEmail(data.email);
+        setWebsite(data.website);
+        setAcademicYear(data.academicYear);
+        setPrincipalName(data.principalName);
+      } catch (error) {
+        if (active) {
+          setFeedback(
+            error instanceof Error
+              ? error.message
+              : "Unable to load school settings.",
+          );
+        }
+      }
+    };
+
+    void loadSchoolSetting();
+    return () => {
+      active = false;
+    };
+  }, []);
+
   const handleLogoChange = (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
@@ -39,6 +96,61 @@ export default function SchoolSettings() {
 
     if (file) {
       setLogo(URL.createObjectURL(file));
+    }
+  };
+
+  const saveSchoolSetting = async () => {
+    const token = getAuthToken();
+    if (!token) {
+      setFeedback("Your session has expired. Please log in again.");
+      setShowConfirm(false);
+      return;
+    }
+
+    const body: Partial<SchoolSettingResponse> = {
+      schoolName: schoolName.trim(),
+      address: address.trim(),
+      phone: phone.trim(),
+      email: email.trim(),
+      website: website.trim(),
+      academicYear,
+      principalName: principalName.trim(),
+    };
+    const logoIsPreview = logo.startsWith("blob:");
+    if (!logoIsPreview) body.logo = logo;
+
+    setSaving(true);
+    setFeedback(null);
+    try {
+      const updated = await apiRequest<SchoolSettingResponse>("/school-settings", {
+        method: "PATCH",
+        token,
+        body: JSON.stringify(body),
+      });
+      setSchoolName(updated.schoolName);
+      setLogo(logoIsPreview ? logo : updated.logo);
+      setAddress(updated.address);
+      setPhone(updated.phone);
+      setEmail(updated.email);
+      setWebsite(updated.website);
+      setAcademicYear(updated.academicYear);
+      setPrincipalName(updated.principalName);
+      setShowConfirm(false);
+      notifySchoolSettingsUpdated();
+      setFeedback(
+        logoIsPreview
+          ? "School settings were saved. The selected logo is only a preview on this page."
+          : "School settings were saved.",
+      );
+    } catch (error) {
+      setShowConfirm(false);
+      setFeedback(
+        error instanceof Error
+          ? error.message
+          : "Unable to save school settings.",
+      );
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -248,10 +360,15 @@ export default function SchoolSettings() {
         <button
           type="button"
           onClick={() => setShowConfirm(true)}
-          className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-[#01796f] px-5 py-3 text-sm font-medium text-white transition hover:bg-[#01665d] sm:w-auto"        >
-          Save Changes
+          disabled={saving || !loaded}
+          className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-[#01796f] px-5 py-3 text-sm font-medium text-white transition hover:bg-[#01665d] disabled:opacity-60 sm:w-auto"
+        >
+          {saving ? "Saving..." : "Save Changes"}
         </button>
       </div>
+      {feedback && (
+        <p className="mt-4 text-sm text-gray-600">{feedback}</p>
+      )}
       {showConfirm && (
         <div className="fixed inset-0 z-50 flex items-start justify-center pt-10 bg-black/40 px-4">
           <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl">
@@ -274,12 +391,13 @@ export default function SchoolSettings() {
 
               <button
                 type="button"
+                disabled={saving}
                 onClick={() => {
-                  setShowConfirm(false);
+                  void saveSchoolSetting();
                 }}
-                className="rounded-full bg-[#01796f] px-4 py-2.5 text-sm font-medium text-white transition hover:bg-[#01665d]"
+                className="rounded-full bg-[#01796f] px-4 py-2.5 text-sm font-medium text-white transition hover:bg-[#01665d] disabled:opacity-60"
               >
-                Save Changes
+                {saving ? "Saving..." : "Save Changes"}
               </button>
             </div>
           </div>

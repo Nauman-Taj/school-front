@@ -1,8 +1,8 @@
 "use client";
 
 import { getNavigationItemClass, isNavigationItemActive, navigationByRole } from "@/data/navigation";
+import { useSchoolSetting } from "@/lib/schoolSettings";
 import Link from "next/link";
-import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { X } from "lucide-react";
 
@@ -16,6 +16,7 @@ export default function MobileAdminSidebar({
   onClose,
 }: MobileAdminSidebarProps) {
   const pathname = usePathname();
+  const school = useSchoolSetting();
   const adminNavigation = navigationByRole.Admin;
 
   return (
@@ -34,18 +35,16 @@ export default function MobileAdminSidebar({
         {/* Header */}
         <div className="flex h-16 items-center justify-between border-b border-gray-200 ps-6">
           <Link href="/admin" className="flex items-center gap-3">
-            <Image
-              src="/images/school.jpg"
-              alt="School Logo"
-              width={55}
-              height={55}
-              className="object-contain"
+            <img
+              src={school.logo}
+              alt=""
+              className="h-11 w-11 rounded-lg object-contain"
             />
           </Link>
 
-          <Link href="/admin" className="flex items-center gap-3">
-            <h1 className="pr-4 text-lg font-bold text-[#015f58]">
-              Garrison School
+          <Link href="/admin" className="min-w-0 flex-1">
+            <h1 className="truncate pr-4 text-base font-bold text-[#015f58]" title={school.schoolName}>
+              {school.schoolName}
             </h1>
           </Link>
 
