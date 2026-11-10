@@ -31,11 +31,10 @@ export function isNavigationItemActive(pathname: string, href: string) {
 }
 
 export function getNavigationItemClass(isActive: boolean) {
-  return `flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition-colors ${
-    isActive
+  return `flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition-colors ${isActive
       ? "bg-[#e6f4f2] text-[#01796f]"
       : "text-gray-600 hover:bg-[#01796f]/10 hover:text-[#01796f]"
-  }`;
+    }`;
 }
 
 export const navigationByRole: Record<UserRole, NavigationItem[]> = {
@@ -260,6 +259,11 @@ export const navigationByRole: Record<UserRole, NavigationItem[]> = {
       icon: CalendarCheck,
     },
     {
+      label: "Exams",
+      href: "/parent/exams",
+      icon: GraduationCap,
+    },
+    {
       label: "Results",
       href: "/parent/results",
       icon: FileText,
@@ -278,11 +282,6 @@ export const navigationByRole: Record<UserRole, NavigationItem[]> = {
       label: "Timetable",
       href: "/parent/timetable",
       icon: CalendarDays,
-    },
-    {
-      label: "Exams",
-      href: "/parent/exams",
-      icon: GraduationCap,
     },
     {
       label: "Announcements",

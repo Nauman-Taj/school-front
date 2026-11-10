@@ -74,19 +74,19 @@ export default function ParentFeesPage() {
       title: "Paid",
       value: formatAmount(paid),
       icon: CheckCircle2,
-      iconClass: "bg-green-50 text-green-600",
+      iconClass: "bg-[#e6f4f2] text-[#01796f]",
     },
     {
       title: "Pending",
       value: formatAmount(pending),
       icon: Clock3,
-      iconClass: "bg-yellow-50 text-yellow-600",
+      iconClass: "bg-[#e6f4f2] text-[#01796f]",
     },
     {
       title: "Overdue",
       value: formatAmount(overdue),
       icon: AlertCircle,
-      iconClass: "bg-red-50 text-red-600",
+      iconClass: "bg-[#e6f4f2] text-[#01796f]",
     },
   ];
 
@@ -113,7 +113,7 @@ export default function ParentFeesPage() {
         </h1>
 
         <p className="mt-1 text-sm text-gray-500 sm:text-base">
-          View your child's fee details and payment status.
+          View your child&apos;s fee details and payment status.
         </p>
       </div>
 

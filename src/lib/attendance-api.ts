@@ -156,6 +156,21 @@ export async function fetchAttendance(date?: string) {
   return data.map(mapApiAttendance);
 }
 
+/**
+ * Loads attendance for one of the signed-in parent's children.
+ *
+ * The backend verifies the ParentStudent link before returning rows, so an
+ * unlinked studentId fails with 404 instead of leaking another child's data.
+ */
+export async function fetchChildAttendance(studentId: number) {
+  const data = await apiRequest<ApiAttendance[]>(
+    `/parents/me/children/${studentId}/attendance`,
+    { token: getToken() },
+  );
+
+  return data.map(mapApiAttendance);
+}
+
 export async function fetchStudents() {
   return apiRequest<ApiStudent[]>("/students", {
     token: getToken(),

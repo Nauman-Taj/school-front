@@ -69,19 +69,19 @@ export default function ParentResultsPage() {
             title: "Highest",
             value: `${highest}%`,
             icon: Award,
-            iconClass: "bg-yellow-50 text-yellow-600",
+            iconClass: "bg-[#e6f4f2] text-[#01796f]",
         },
         {
             title: "Subjects",
             value: results.length,
             icon: BookOpen,
-            iconClass: "bg-blue-50 text-blue-600",
+            iconClass: "bg-[#e6f4f2] text-[#01796f]",
         },
         {
             title: "Passed",
             value: `${passed}/${results.length}`,
             icon: GraduationCap,
-            iconClass: "bg-green-50 text-green-600",
+            iconClass: "bg-[#e6f4f2] text-[#01796f]",
         },
     ];
 
@@ -112,7 +112,7 @@ export default function ParentResultsPage() {
                 </h1>
 
                 <p className="mt-1 text-sm text-gray-500 sm:text-base">
-                    View your child's examination results and academic
+                    View your child&apos;s examination results and academic
                     performance.
                 </p>
             </div>

@@ -1,4 +1,3 @@
-
 export type ParentChild = {
   id: number;
   name: string;
@@ -6,6 +5,11 @@ export type ParentChild = {
   section: string;
   rollNo: string;
   status: string;
+  email?: string | null;
+  phone?: string | null;
+  parentName?: string | null;
+  admissionDate?: string | null;
+  withdrawalDate?: string | null;
 };
 
 export type Parent = {

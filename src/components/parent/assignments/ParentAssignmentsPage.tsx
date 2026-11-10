@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import {
     ClipboardList,
     CheckCircle2,
@@ -34,17 +34,13 @@ export default function ParentAssignmentsPage() {
         (child) => child.id === selectedChild
     );
 
-    const assignments = useMemo(() => {
-        if (!selectedStudent) {
-            return [];
-        }
-
-        return sharedAssignments.filter(
-            (assignment) =>
-                assignment.className === selectedStudent.className &&
-                assignment.section === selectedStudent.section
-        );
-    }, [selectedStudent]);
+    const assignments = selectedStudent
+        ? sharedAssignments.filter(
+              (assignment) =>
+                  assignment.className === selectedStudent.className &&
+                  assignment.section === selectedStudent.section
+          )
+        : [];
 
     const pending = assignments.filter(
         (assignment) => assignment.status === "Pending"
@@ -69,19 +65,19 @@ export default function ParentAssignmentsPage() {
             title: "Pending",
             value: pending,
             icon: Clock3,
-            iconClass: "bg-yellow-50 text-yellow-600",
+            iconClass: "bg-[#e6f4f2] text-[#01796f]",
         },
         {
             title: "Submitted",
             value: submitted,
             icon: CheckCircle2,
-            iconClass: "bg-green-50 text-green-600",
+            iconClass: "bg-[#e6f4f2] text-[#01796f]",
         },
         {
             title: "Overdue",
             value: overdue,
             icon: AlertCircle,
-            iconClass: "bg-red-50 text-red-600",
+            iconClass: "bg-[#e6f4f2] text-[#01796f]",
         },
     ];
 
@@ -108,7 +104,7 @@ export default function ParentAssignmentsPage() {
                 </h1>
 
                 <p className="mt-1 text-sm text-gray-500 sm:text-base">
-                    View your child's assignments and submission status.
+                    View your child&apos;s assignments and submission status.
                 </p>
             </div>
 

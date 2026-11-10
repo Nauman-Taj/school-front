@@ -9,37 +9,65 @@ import {
     UserRound,
 } from "lucide-react";
 
-import { students } from "@/data/students";
-import { getCurrentParentChildren } from "@/lib/parent";
+import { useParentProfile } from "@/lib/useParentProfile";
 
 export default function ChildProfilePage() {
-    const parentChildren = getCurrentParentChildren();
+    const { children, loading, error } = useParentProfile();
 
-    const children = useMemo(() => {
-        return parentChildren
-            .map((relation) =>
-                students.find((student) => student.id === relation.studentId)
-            )
-            .filter(Boolean);
-    }, [parentChildren]);
-
-    const [selectedChildId, setSelectedChildId] = useState<number>(
-        children[0]?.id ?? 0
+    const [selectedChildId, setSelectedChildId] = useState<number | null>(
+        null
     );
 
-    const selectedChild = students.find(
-        (student) => student.id === selectedChildId
+    const selectedChild = useMemo(
+        () =>
+            children.find((child) => child.id === selectedChildId) ??
+            children[0],
+        [children, selectedChildId]
     );
+
+    const header = (
+        <div>
+            <h1 className="text-2xl font-bold text-gray-900 sm:text-3xl" >Child Profile</h1>
+            <p className="mt-1 text-sm text-gray-500 sm:text-base">
+                View your child&apos;s academic and personal information.
+            </p>
+        </div>
+    );
+
+    if (loading) {
+        return (
+            <div className="space-y-5">
+                {header}
+
+                <div className="rounded-2xl border border-gray-100 bg-white p-10 text-center shadow-sm">
+                    <div className="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-gray-200 border-t-[#01796F]" />
+                    <p className="mt-4 text-sm text-gray-500">
+                        Loading child profile...
+                    </p>
+                </div>
+            </div>
+        );
+    }
+
+    if (error) {
+        return (
+            <div className="space-y-5">
+                {header}
+
+                <div
+                    role="alert"
+                    className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
+                >
+                    {error}
+                </div>
+            </div>
+        );
+    }
 
     if (!selectedChild) {
         return (
             <div className="space-y-5">
-                <div>
-                    <h1 className="text-2xl font-bold text-gray-900 sm:text-3xl" >Child Profile</h1>
-                    <p className="mt-1 text-sm text-gray-500 sm:text-base">
-                        View your child's academic and personal information.
-                    </p>
-                </div>
+                {header}
 
                 <div className="rounded-2xl border border-gray-200 bg-white p-8 text-center">
                     <UserRound className="mx-auto h-12 w-12 text-gray-300" />
@@ -56,12 +84,7 @@ export default function ChildProfilePage() {
     return (
         <div className="space-y-5">
             {/* Header */}
-            <div>
-                <h1 className="text-2xl font-bold text-gray-900 sm:text-3xl" >Child Profile</h1>
-                <p className="mt-1 text-sm text-gray-500 sm:text-base">
-                    View your child's academic and personal information.
-                </p>
-            </div>
+            {header}
 
             {/* Child Selector + Profile Header */}
             <div className="grid grid-cols-1 gap-5 lg:grid-cols-[minmax(0,1fr)_240px]">
@@ -108,13 +131,13 @@ export default function ChildProfilePage() {
 
                     <select
                         id="child"
-                        value={selectedChildId}
+                        value={selectedChild.id}
                         onChange={(e) => setSelectedChildId(Number(e.target.value))}
                         className="w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-700 outline-none transition focus:border-[#01796F] focus:ring-2 focus:ring-[#01796F]/10"
                     >
                         {children.map((child) => (
-                            <option key={child!.id} value={child!.id}>
-                                {child!.name}
+                            <option key={child.id} value={child.id}>
+                                {child.name}
                             </option>
                         ))}
                     </select>
@@ -142,19 +165,19 @@ export default function ChildProfilePage() {
                     <InfoItem
                         icon={<Mail className="h-5 w-5" />}
                         label="Email"
-                        value={selectedChild.email}
+                        value={selectedChild.email ?? "—"}
                     />
 
                     <InfoItem
                         icon={<Phone className="h-5 w-5" />}
                         label="Phone"
-                        value={selectedChild.phone}
+                        value={selectedChild.phone ?? "—"}
                     />
 
                     <InfoItem
                         icon={<UserRound className="h-5 w-5" />}
                         label="Parent Name"
-                        value={selectedChild.parentName}
+                        value={selectedChild.parentName ?? "—"}
                     />
                 </div>
             </div>
