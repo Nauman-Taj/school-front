@@ -4,7 +4,11 @@ export type Fee = {
   student: string;
   className: string;
   section: string;
-  feeType: "Tuition Fee" | "Admission Fee" | "Exam Fee";
+  /**
+   * The backend accepts a free-form fee type, so the three known values keep
+   * their autocomplete while any other value from the API stays valid.
+   */
+  feeType: "Tuition Fee" | "Admission Fee" | "Exam Fee" | (string & {});
   amount: number;
   paidAmount: number;
   remainingAmount: number;
