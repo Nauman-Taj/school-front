@@ -237,10 +237,33 @@ export default function ParentDashboard() {
 
     /* ---------------- Fees ---------------- */
 
-    const pendingFees = childFees.reduce(
+    // The outstanding balance is split by due date, the same way the Fees
+    // module and the Admin fee summary do it.
+    const today = new Date().toISOString().slice(0, 10);
+
+    const outstandingFees = childFees.filter(
+        (fee) => fee.remainingAmount > 0
+    );
+
+    const outstandingTotal = outstandingFees.reduce(
         (total, fee) => total + fee.remainingAmount,
         0
     );
+
+    const overdueFees = outstandingFees
+        .filter((fee) => fee.dueDate < today)
+        .reduce((total, fee) => total + fee.remainingAmount, 0);
+
+    const dueFees = outstandingFees
+        .filter((fee) => fee.dueDate >= today)
+        .reduce((total, fee) => total + fee.remainingAmount, 0);
+
+    const feeReminder =
+        overdueFees > 0 && dueFees > 0
+            ? `Rs. ${overdueFees.toLocaleString()} is overdue and Rs. ${dueFees.toLocaleString()} is due.`
+            : overdueFees > 0
+              ? `Rs. ${overdueFees.toLocaleString()} is overdue.`
+              : `Rs. ${dueFees.toLocaleString()} is currently pending.`;
 
     /* ---------------- Exams ---------------- */
 
@@ -288,8 +311,8 @@ export default function ParentDashboard() {
             icon: ClipboardList,
         },
         {
-            title: "Pending Fees",
-            value: show(`Rs. ${pendingFees.toLocaleString()}`),
+            title: "Outstanding Fees",
+            value: show(`Rs. ${outstandingTotal.toLocaleString()}`),
             icon: Wallet,
         },
         {
@@ -362,7 +385,7 @@ export default function ParentDashboard() {
                         onChange={(e) =>
                             setSelectedChildId(Number(e.target.value))
                         }
-                        className="w-full rounded-lg border border-gray-200 bg-white px-4 py-2.5 text-sm text-gray-700 outline-none transition focus:border-[#01796F] focus:ring-2 focus:ring-[#01796F]/20"
+                        className="w-full rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm text-gray-700 outline-none transition focus:border-[#01796F] focus:ring-2 focus:ring-[#01796F]/20"
                     >
                         {children.map((child) => (
                             <option key={child.id} value={child.id}>
@@ -602,7 +625,7 @@ export default function ParentDashboard() {
                     </div>
 
                     {/* Fees */}
-                    {pendingFees > 0 && (
+                    {outstandingTotal > 0 && (
                         <div className="p-5">
                             <div className="flex gap-3">
                                 <div className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#e6f4f2] text-[#01796F]">
@@ -615,11 +638,7 @@ export default function ParentDashboard() {
                                     </p>
 
                                     <p className="mt-1 text-sm text-gray-500">
-                                        Rs.{" "}
-                                        <span className="font-medium text-gray-700">
-                                            {pendingFees.toLocaleString()}
-                                        </span>{" "}
-                                        is currently pending.
+                                        {feeReminder}
                                     </p>
                                 </div>
                             </div>
@@ -675,7 +694,7 @@ export default function ParentDashboard() {
                     )}
 
                     {/* No extra activity */}
-                    {pendingFees === 0 &&
+                    {outstandingTotal === 0 &&
                         pendingAssignments === 0 &&
                         upcomingExams === 0 && (
                             <div className="p-5 text-center">

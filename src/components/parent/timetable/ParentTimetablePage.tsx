@@ -1,56 +1,138 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { CalendarDays } from "lucide-react";
 
-import { timetable } from "@/data/timetable";
-import { students } from "@/data/students";
-import { getCurrentParentChildren } from "@/lib/parent";
+import { fetchChildTimetable } from "@/lib/timetable-api";
+import { useParentProfile } from "@/lib/useParentProfile";
+import type { TimetableEntry } from "@/types/timetable";
 
-import ParentTimetableTable from "./ParentTimetableTable";
+import TimetableGrid from "@/components/timetable/TimetableGrid";
 
 export default function ParentTimetablePage() {
-  const parentChildren = getCurrentParentChildren();
+  const {
+    children,
+    loading: profileLoading,
+    error: profileError,
+  } = useParentProfile();
 
-  const children = parentChildren
-    .map((relation) =>
-      students.find((student) => student.id === relation.studentId)
-    )
-    .filter(
-      (student): student is (typeof students)[number] =>
-        Boolean(student)
-    );
+  const [selectedChildId, setSelectedChildId] = useState<number | null>(null);
 
-  const [selectedChild, setSelectedChild] = useState(
-    children[0]?.id ?? 0
-  );
-
-  const selectedStudent = children.find(
-    (child) => child.id === selectedChild
-  );
-
-  const results = useMemo(
+  const selectedStudent = useMemo(
     () =>
-      selectedStudent
-        ? timetable.filter(
-            (item) =>
-              item.className === selectedStudent.className &&
-              item.section === selectedStudent.section
-          )
-        : [],
-    [selectedStudent]
+      children.find((child) => child.id === selectedChildId) ??
+      children[0],
+    [children, selectedChildId]
   );
+
+  const selectedStudentId = selectedStudent?.id ?? null;
+
+  const [timetableState, setTimetableState] = useState<{
+    studentId: number | null;
+    entries: TimetableEntry[];
+    error: string;
+  }>({
+    studentId: null,
+    entries: [],
+    error: "",
+  });
+
+  useEffect(() => {
+    if (selectedStudentId === null) return;
+
+    let active = true;
+
+    fetchChildTimetable(selectedStudentId)
+      .then((data) => {
+        if (!active) return;
+        setTimetableState({
+          studentId: selectedStudentId,
+          entries: data,
+          error: "",
+        });
+      })
+      .catch((err: unknown) => {
+        if (!active) return;
+        setTimetableState({
+          studentId: selectedStudentId,
+          entries: [],
+          error:
+            err instanceof Error
+              ? err.message
+              : "Unable to load the timetable.",
+        });
+      });
+
+    return () => {
+      active = false;
+    };
+  }, [selectedStudentId]);
+
+  // A stored entry belongs to the previously selected child until the new
+  // request resolves, so treat that mismatch as loading.
+  const timetableLoading =
+    selectedStudentId !== null &&
+    timetableState.studentId !== selectedStudentId;
+
+  const entries = timetableLoading ? [] : timetableState.entries;
+  const timetableError = timetableLoading ? "" : timetableState.error;
+
+  const header = (
+    <div>
+      <h1 className="text-2xl font-bold text-gray-900 sm:text-3xl">
+        Timetable
+      </h1>
+
+      <p className="mt-1 text-sm text-gray-500 sm:text-base">
+        View your child&apos;s weekly class timetable.
+      </p>
+    </div>
+  );
+
+  if (profileLoading) {
+    return (
+      <div className="space-y-5">
+        {header}
+
+        <div className="rounded-2xl border border-gray-100 bg-white p-10 text-center shadow-sm">
+          <div className="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-gray-200 border-t-[#01796F]" />
+          <p className="mt-4 text-sm text-gray-500">
+            Loading timetable...
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  if (profileError) {
+    return (
+      <div className="space-y-5">
+        {header}
+
+        <div
+          role="alert"
+          className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
+        >
+          {profileError}
+        </div>
+      </div>
+    );
+  }
 
   if (!selectedStudent) {
     return (
-      <div className="rounded-2xl border border-gray-200 bg-white p-8 text-center">
-        <h2 className="text-lg font-semibold text-gray-800">
-          Child data not found
-        </h2>
+      <div className="space-y-5">
+        {header}
 
-        <p className="mt-2 text-sm text-gray-500">
-          No timetable information is available.
-        </p>
+        <div className="rounded-2xl border border-gray-200 bg-white p-8 text-center">
+          <h2 className="text-lg font-semibold text-gray-800">
+            Child data not found
+          </h2>
+
+          <p className="mt-2 text-sm text-gray-500">
+            No timetable information is available.
+          </p>
+        </div>
       </div>
     );
   }
@@ -58,15 +140,7 @@ export default function ParentTimetablePage() {
   return (
     <div className="space-y-5">
       {/* Heading */}
-      <div>
-        <h1 className="text-2xl font-bold text-gray-900 sm:text-3xl">
-          Timetable
-        </h1>
-
-        <p className="mt-1 text-sm text-gray-500 sm:text-base">
-          View your child&apos;s weekly class timetable.
-        </p>
-      </div>
+      {header}
 
       {/* Child Information + Selector */}
       <div className="grid gap-4 lg:grid-cols-[1fr_280px]">
@@ -97,11 +171,11 @@ export default function ParentTimetablePage() {
 
           <select
             id="child"
-            value={selectedChild}
+            value={selectedStudent.id}
             onChange={(e) =>
-              setSelectedChild(Number(e.target.value))
+              setSelectedChildId(Number(e.target.value))
             }
-            className="w-full rounded-lg border border-gray-200 bg-white px-4 py-2.5 text-sm text-gray-700 outline-none transition focus:border-[#01796F] focus:ring-2 focus:ring-[#01796F]/20"
+            className="w-full rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm text-gray-700 outline-none transition focus:border-[#01796F] focus:ring-2 focus:ring-[#01796F]/20"
           >
             {children.map((child) => (
               <option key={child.id} value={child.id}>
@@ -129,8 +203,25 @@ export default function ParentTimetablePage() {
         </div>
       </div>
 
-      {/* Timetable */}
-      <ParentTimetableTable timetable={results} />
+      {timetableError && (
+        <div
+          role="alert"
+          className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
+        >
+          {timetableError}
+        </div>
+      )}
+
+      {timetableLoading ? (
+        <div className="rounded-2xl border border-gray-100 bg-white p-10 text-center shadow-sm">
+          <div className="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-gray-200 border-t-[#01796F]" />
+          <p className="mt-4 text-sm text-gray-500">
+            Loading the weekly timetable...
+          </p>
+        </div>
+      ) : (
+        <TimetableGrid entries={entries} />
+      )}
     </div>
   );
 }

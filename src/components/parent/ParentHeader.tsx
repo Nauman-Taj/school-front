@@ -169,7 +169,7 @@ export default function ParentHeader({
                 "
               >
                 {/* Search Input */}
-                <div className="flex items-center gap-2 rounded-full border border-gray-200 px-3">
+                <div className="flex items-center gap-2 rounded-xl border border-gray-200 px-3">
                   <Search
                     size={17}
                     className="shrink-0 text-gray-400"

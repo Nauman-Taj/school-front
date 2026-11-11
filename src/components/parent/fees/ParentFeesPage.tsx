@@ -224,7 +224,7 @@ export default function ParentFeesPage() {
             onChange={(e) =>
               setSelectedChildId(Number(e.target.value))
             }
-            className="w-full rounded-lg border border-gray-200 bg-white px-4 py-2.5 text-sm text-gray-700 outline-none transition focus:border-[#01796F] focus:ring-2 focus:ring-[#01796F]/20"
+            className="w-full rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm text-gray-700 outline-none transition focus:border-[#01796F] focus:ring-2 focus:ring-[#01796F]/20"
           >
             {children.map((child) => (
               <option key={child.id} value={child.id}>
