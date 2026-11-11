@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
     Bell,
     CalendarDays,
@@ -10,33 +10,173 @@ import {
     Wallet,
 } from "lucide-react";
 
-import { getCurrentParent, getCurrentParentChildren } from "@/lib/parent";
+import { fetchChildAttendance } from "@/lib/attendance-api";
+import { fetchChildAssignments } from "@/lib/assignments-api";
+import { fetchChildExams } from "@/lib/exams-api";
+import { fetchChildFees } from "@/lib/fees-api";
+import {
+    fetchChildClassPosition,
+    fetchChildResults,
+} from "@/lib/results-api";
+import { useParentProfile } from "@/lib/useParentProfile";
+import type { AttendanceRecord } from "@/types/attendance";
+import type { Assignment } from "@/types/assignment";
+import type { Exam } from "@/types/exam";
+import type { Fee } from "@/types/fee";
+import type { Result } from "@/types/result";
 
-import { students } from "@/data/students";
-import { attendance } from "@/data/attendance";
-import { assignments } from "@/data/assignments";
-import { fees } from "@/data/fees";
-import { exams } from "@/data/exams";
-import { results } from "@/data/results";
+type DashboardData = {
+    attendance: AttendanceRecord[];
+    exams: Exam[];
+    results: Result[];
+    assignments: Assignment[];
+    fees: Fee[];
+    position: number | null;
+    totalStudents: number;
+};
+
+const emptyData: DashboardData = {
+    attendance: [],
+    exams: [],
+    results: [],
+    assignments: [],
+    fees: [],
+    position: null,
+    totalStudents: 0,
+};
 
 export default function ParentDashboard() {
-    const parent = getCurrentParent();
-    const parentChildren = getCurrentParentChildren();
+    const {
+        profile,
+        children,
+        loading: profileLoading,
+        error: profileError,
+    } = useParentProfile();
 
-    const children = parentChildren
-        .map((relation) =>
-            students.find((student) => student.id === relation.studentId)
-        )
-        .filter(
-            (student): student is (typeof students)[number] =>
-                Boolean(student)
-        );
-
-    const [selectedChild, setSelectedChild] = useState(
-        children[0]?.name ?? ""
+    const [selectedChildId, setSelectedChildId] = useState<number | null>(
+        null
     );
 
-    if (!parent) {
+    const selectedStudent = useMemo(
+        () =>
+            children.find((child) => child.id === selectedChildId) ??
+            children[0],
+        [children, selectedChildId]
+    );
+
+    const selectedStudentId = selectedStudent?.id ?? null;
+
+    const [dataState, setDataState] = useState<{
+        studentId: number | null;
+        data: DashboardData;
+        error: string;
+    }>({
+        studentId: null,
+        data: emptyData,
+        error: "",
+    });
+
+    useEffect(() => {
+        if (selectedStudentId === null) return;
+
+        let active = true;
+
+        // Every request is settled on its own so one failing section cannot
+        // blank the whole dashboard.
+        const load = async () => {
+            const [attendance, exams, results, assignments, fees, position] =
+                await Promise.allSettled([
+                    fetchChildAttendance(selectedStudentId),
+                    fetchChildExams(selectedStudentId),
+                    fetchChildResults(selectedStudentId),
+                    fetchChildAssignments(selectedStudentId),
+                    fetchChildFees(selectedStudentId),
+                    fetchChildClassPosition(selectedStudentId),
+                ]);
+
+            if (!active) return;
+
+            const failures: string[] = [];
+
+            const read = <T,>(
+                result: PromiseSettledResult<T>,
+                label: string,
+                fallback: T
+            ): T => {
+                if (result.status === "fulfilled") return result.value;
+
+                failures.push(label);
+
+                return fallback;
+            };
+
+            const classPosition =
+                position.status === "fulfilled" ? position.value : null;
+
+            if (!classPosition) failures.push("Class position");
+
+            setDataState({
+                studentId: selectedStudentId,
+                data: {
+                    attendance: read(attendance, "Attendance", []),
+                    exams: read(exams, "Exams", []),
+                    results: read(results, "Results", []),
+                    assignments: read(assignments, "Assignments", []),
+                    fees: read(fees, "Fees", []),
+                    position: classPosition?.position ?? null,
+                    totalStudents: classPosition?.totalStudents ?? 0,
+                },
+                error: failures.length
+                    ? `Could not load: ${failures.join(", ")}.`
+                    : "",
+            });
+        };
+
+        load();
+
+        return () => {
+            active = false;
+        };
+    }, [selectedStudentId]);
+
+    // A stored value belongs to the previously selected child until the new
+    // requests resolve, so treat that mismatch as loading.
+    const dashboardLoading =
+        selectedStudentId !== null &&
+        dataState.studentId !== selectedStudentId;
+
+    const {
+        attendance: childAttendance,
+        exams: childExams,
+        results: childResults,
+        assignments: childAssignments,
+        fees: childFees,
+    } = dataState.data;
+
+    const dataError = dashboardLoading ? "" : dataState.error;
+
+    if (profileLoading) {
+        return (
+            <div className="flex min-h-[400px] items-center justify-center">
+                <div className="text-center">
+                    <div className="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-gray-200 border-t-[#01796F]" />
+                    <p className="mt-4 text-sm text-gray-500">
+                        Loading dashboard...
+                    </p>
+                </div>
+            </div>
+        );
+    }
+
+    if (profileError) {
+        return (
+            <div className="flex min-h-[400px] items-center justify-center">
+                <p className="text-gray-500">{profileError}</p>
+            </div>
+        );
+    }
+
+    if (!profile) {
         return (
             <div className="flex min-h-[400px] items-center justify-center">
                 <p className="text-gray-500">
@@ -45,10 +185,6 @@ export default function ParentDashboard() {
             </div>
         );
     }
-
-    const selectedStudent =
-        children.find((child) => child.name === selectedChild) ??
-        children[0];
 
     if (!selectedStudent) {
         return (
@@ -66,26 +202,24 @@ export default function ParentDashboard() {
 
     /* ---------------- Attendance ---------------- */
 
-    const childAttendance = attendance.filter(
-        (record) =>
-            record.role === "Student" &&
-            record.studentId === selectedStudent.id
-    );
-
     const present = childAttendance.filter(
-        (record) => record.status === "Present"
+        (record) =>
+            record.role === "Student" && record.status === "Present"
     ).length;
 
     const absent = childAttendance.filter(
-        (record) => record.status === "Absent"
+        (record) =>
+            record.role === "Student" && record.status === "Absent"
     ).length;
 
     const late = childAttendance.filter(
-        (record) => record.status === "Late"
+        (record) =>
+            record.role === "Student" && record.status === "Late"
     ).length;
 
     const leave = childAttendance.filter(
-        (record) => record.status === "Leave"
+        (record) =>
+            record.role === "Student" && record.status === "Leave"
     ).length;
 
     const attendancePercentage =
@@ -97,21 +231,11 @@ export default function ParentDashboard() {
 
     /* ---------------- Assignments ---------------- */
 
-    const childAssignments = assignments.filter(
-        (assignment) =>
-            assignment.className === selectedStudent.className &&
-            assignment.section === selectedStudent.section
-    );
-
     const pendingAssignments = childAssignments.filter(
         (assignment) => assignment.status === "Pending"
     ).length;
 
     /* ---------------- Fees ---------------- */
-
-    const childFees = fees.filter(
-        (fee) => fee.studentId === selectedStudent.id
-    );
 
     const pendingFees = childFees.reduce(
         (total, fee) => total + fee.remainingAmount,
@@ -120,25 +244,11 @@ export default function ParentDashboard() {
 
     /* ---------------- Exams ---------------- */
 
-    const today = new Date().toISOString().split("T")[0];
-
-    const childExams = exams.filter(
-        (exam) =>
-            exam.className === selectedStudent.className &&
-            exam.section === selectedStudent.section
-    );
-
     const upcomingExams = childExams.filter(
-        (exam) =>
-            exam.examDate >= today &&
-            exam.status !== "Completed"
+        (exam) => exam.status === "Upcoming"
     ).length;
 
     /* ---------------- Results ---------------- */
-
-    const childResults = results.filter(
-        (result) => result.studentId === selectedStudent.id
-    );
 
     const average =
         childResults.length > 0
@@ -159,63 +269,32 @@ export default function ParentDashboard() {
               ).grade
             : "-";
 
-    const classResults = results.filter(
-        (result) =>
-            result.className === selectedStudent.className &&
-            result.section === selectedStudent.section
-    );
+    const position = dataState.data.position;
 
-    const studentAverages = classResults
-        .reduce<
-            {
-                studentId: number;
-                percentage: number;
-            }[]
-        >((studentsList, result) => {
-            const existing = studentsList.find(
-                (student) => student.studentId === result.studentId
-            );
-
-            if (existing) {
-                existing.percentage =
-                    (existing.percentage + result.percentage) / 2;
-            } else {
-                studentsList.push({
-                    studentId: result.studentId,
-                    percentage: result.percentage,
-                });
-            }
-
-            return studentsList;
-        }, [])
-        .sort((a, b) => b.percentage - a.percentage);
-
-    const position =
-        studentAverages.findIndex(
-            (student) => student.studentId === selectedStudent.id
-        ) + 1;
+    const show = (value: string | number) =>
+        dashboardLoading ? "-" : value;
 
     /* ---------------- Dashboard Stats ---------------- */
 
     const stats = [
         {
             title: "Attendance",
-            value: `${attendancePercentage}%`,
+            value: show(`${attendancePercentage}%`),
             icon: CalendarDays,
         },
         {
             title: "Pending Assignments",
-            value: pendingAssignments,
+            value: show(pendingAssignments),
             icon: ClipboardList,
         },
         {
             title: "Pending Fees",
-            value: `Rs. ${pendingFees.toLocaleString()}`,
+            value: show(`Rs. ${pendingFees.toLocaleString()}`),
             icon: Wallet,
         },
         {
             title: "Upcoming Exams",
-            value: upcomingExams,
+            value: show(upcomingExams),
             icon: GraduationCap,
         },
     ];
@@ -229,10 +308,19 @@ export default function ParentDashboard() {
                 </h1>
 
                 <p className="mt-1 text-sm text-gray-500 sm:text-base">
-                    Monitor your child's academic progress and school
+                    Monitor your child&apos;s academic progress and school
                     activities.
                 </p>
             </div>
+
+            {dataError && (
+                <div
+                    role="alert"
+                    className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
+                >
+                    {dataError}
+                </div>
+            )}
 
             {/* Parent + Child Selection */}
             <div className="grid gap-5 lg:grid-cols-[1fr_300px]">
@@ -249,11 +337,11 @@ export default function ParentDashboard() {
                             </p>
 
                             <h2 className="mt-1 font-semibold text-gray-800">
-                                {parent.name}
+                                {profile.name}
                             </h2>
 
                             <p className="mt-1 text-sm text-gray-500">
-                                {parent.email}
+                                {profile.email}
                             </p>
                         </div>
                     </div>
@@ -270,12 +358,14 @@ export default function ParentDashboard() {
 
                     <select
                         id="child"
-                        value={selectedChild}
-                        onChange={(e) => setSelectedChild(e.target.value)}
+                        value={selectedStudent.id}
+                        onChange={(e) =>
+                            setSelectedChildId(Number(e.target.value))
+                        }
                         className="w-full rounded-lg border border-gray-200 bg-white px-4 py-2.5 text-sm text-gray-700 outline-none transition focus:border-[#01796F] focus:ring-2 focus:ring-[#01796F]/20"
                     >
                         {children.map((child) => (
-                            <option key={child.id} value={child.name}>
+                            <option key={child.id} value={child.id}>
                                 {child.name}
                             </option>
                         ))}
@@ -367,7 +457,7 @@ export default function ParentDashboard() {
                         </div>
 
                         <div className="rounded-lg bg-[#e6f4f2] px-3 py-1.5 text-sm font-semibold text-[#01796F]">
-                            {attendancePercentage}%
+                            {show(`${attendancePercentage}%`)}
                         </div>
                     </div>
 
@@ -379,7 +469,7 @@ export default function ParentDashboard() {
                                 </p>
 
                                 <p className="mt-1 text-xl font-bold text-gray-800">
-                                    {present}
+                                    {show(present)}
                                 </p>
                             </div>
 
@@ -389,7 +479,7 @@ export default function ParentDashboard() {
                                 </p>
 
                                 <p className="mt-1 text-xl font-bold text-gray-800">
-                                    {absent}
+                                    {show(absent)}
                                 </p>
                             </div>
 
@@ -399,7 +489,7 @@ export default function ParentDashboard() {
                                 </p>
 
                                 <p className="mt-1 text-xl font-bold text-gray-800">
-                                    {late}
+                                    {show(late)}
                                 </p>
                             </div>
 
@@ -409,7 +499,7 @@ export default function ParentDashboard() {
                                 </p>
 
                                 <p className="mt-1 text-xl font-bold text-gray-800">
-                                    {leave}
+                                    {show(leave)}
                                 </p>
                             </div>
                         </div>
@@ -436,7 +526,7 @@ export default function ParentDashboard() {
                                 </p>
 
                                 <p className="mt-1 text-xl font-bold text-gray-800">
-                                    {average}%
+                                    {show(`${average}%`)}
                                 </p>
                             </div>
 
@@ -446,7 +536,7 @@ export default function ParentDashboard() {
                                 </p>
 
                                 <p className="mt-1 text-xl font-bold text-gray-800">
-                                    {grade}
+                                    {show(grade)}
                                 </p>
                             </div>
 
@@ -456,7 +546,11 @@ export default function ParentDashboard() {
                                 </p>
 
                                 <p className="mt-1 text-xl font-bold text-gray-800">
-                                    #{position || "-"}
+                                    {show(
+                                        position
+                                            ? `#${position}`
+                                            : "-"
+                                    )}
                                 </p>
                             </div>
                         </div>
@@ -499,7 +593,7 @@ export default function ParentDashboard() {
                                     {selectedStudent.name} currently has an
                                     attendance rate of{" "}
                                     <span className="font-medium text-gray-700">
-                                        {attendancePercentage}%
+                                        {show(`${attendancePercentage}%`)}
                                     </span>
                                     .
                                 </p>

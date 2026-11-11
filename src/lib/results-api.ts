@@ -39,6 +39,11 @@ export function mapApiResult(item: ApiResult): Result {
   };
 }
 
+export type ApiClassPosition = {
+  position: number | null;
+  totalStudents: number;
+};
+
 /**
  * Loads the results for one of the signed-in parent's children.
  *
@@ -52,4 +57,17 @@ export async function fetchChildResults(studentId: number) {
   );
 
   return data.map(mapApiResult);
+}
+
+/**
+ * Loads the child's position in the class ranking.
+ *
+ * Only the position and the number of ranked students are returned; no other
+ * student's results are exposed to a parent.
+ */
+export async function fetchChildClassPosition(studentId: number) {
+  return apiRequest<ApiClassPosition>(
+    `/parents/me/children/${studentId}/class-position`,
+    { token: getToken() }
+  );
 }
