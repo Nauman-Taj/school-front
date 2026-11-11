@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
     ClipboardList,
     CheckCircle2,
@@ -8,39 +8,83 @@ import {
     AlertCircle,
 } from "lucide-react";
 
-import { assignments as sharedAssignments } from "@/data/assignments";
-import { students } from "@/data/students";
-import { getCurrentParentChildren } from "@/lib/parent";
+import { fetchChildAssignments } from "@/lib/assignments-api";
+import { useParentProfile } from "@/lib/useParentProfile";
+import type { Assignment } from "@/types/assignment";
 
 import ParentAssignmentTable from "./ParentAssignmentTable";
 
 export default function ParentAssignmentsPage() {
-    const parentChildren = getCurrentParentChildren();
+    const {
+        children,
+        loading: profileLoading,
+        error: profileError,
+    } = useParentProfile();
 
-    const children = parentChildren
-        .map((relation) =>
-            students.find((student) => student.id === relation.studentId)
-        )
-        .filter(
-            (student): student is (typeof students)[number] =>
-                Boolean(student)
-        );
-
-    const [selectedChild, setSelectedChild] = useState(
-        children[0]?.id ?? 0
+    const [selectedChildId, setSelectedChildId] = useState<number | null>(
+        null
     );
 
-    const selectedStudent = children.find(
-        (child) => child.id === selectedChild
+    const selectedStudent = useMemo(
+        () =>
+            children.find((child) => child.id === selectedChildId) ??
+            children[0],
+        [children, selectedChildId]
     );
 
-    const assignments = selectedStudent
-        ? sharedAssignments.filter(
-              (assignment) =>
-                  assignment.className === selectedStudent.className &&
-                  assignment.section === selectedStudent.section
-          )
-        : [];
+    const selectedStudentId = selectedStudent?.id ?? null;
+
+    const [assignmentState, setAssignmentState] = useState<{
+        studentId: number | null;
+        assignments: Assignment[];
+        error: string;
+    }>({
+        studentId: null,
+        assignments: [],
+        error: "",
+    });
+
+    useEffect(() => {
+        if (selectedStudentId === null) return;
+
+        let active = true;
+
+        fetchChildAssignments(selectedStudentId)
+            .then((data) => {
+                if (!active) return;
+                setAssignmentState({
+                    studentId: selectedStudentId,
+                    assignments: data,
+                    error: "",
+                });
+            })
+            .catch((err: unknown) => {
+                if (!active) return;
+                setAssignmentState({
+                    studentId: selectedStudentId,
+                    assignments: [],
+                    error:
+                        err instanceof Error
+                            ? err.message
+                            : "Unable to load assignments.",
+                });
+            });
+
+        return () => {
+            active = false;
+        };
+    }, [selectedStudentId]);
+
+    // A stored assignment belongs to the previously selected child until the
+    // new request resolves, so treat that mismatch as loading.
+    const assignmentsLoading =
+        selectedStudentId !== null &&
+        assignmentState.studentId !== selectedStudentId;
+
+    const assignments = assignmentsLoading ? [] : assignmentState.assignments;
+    const assignmentsError = assignmentsLoading
+        ? ""
+        : assignmentState.error;
 
     const pending = assignments.filter(
         (assignment) => assignment.status === "Pending"
@@ -81,16 +125,62 @@ export default function ParentAssignmentsPage() {
         },
     ];
 
+    const header = (
+        <div>
+            <h1 className="text-2xl font-bold text-gray-900 sm:text-3xl">
+                Assignments
+            </h1>
+
+            <p className="mt-1 text-sm text-gray-500 sm:text-base">
+                View your child&apos;s assignments and submission status.
+            </p>
+        </div>
+    );
+
+    if (profileLoading) {
+        return (
+            <div className="space-y-5">
+                {header}
+
+                <div className="rounded-2xl border border-gray-100 bg-white p-10 text-center shadow-sm">
+                    <div className="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-gray-200 border-t-[#01796F]" />
+                    <p className="mt-4 text-sm text-gray-500">
+                        Loading assignments...
+                    </p>
+                </div>
+            </div>
+        );
+    }
+
+    if (profileError) {
+        return (
+            <div className="space-y-5">
+                {header}
+
+                <div
+                    role="alert"
+                    className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
+                >
+                    {profileError}
+                </div>
+            </div>
+        );
+    }
+
     if (!selectedStudent) {
         return (
-            <div className="rounded-2xl border border-gray-200 bg-white p-8 text-center">
-                <h2 className="text-lg font-semibold text-gray-800">
-                    Child data not found
-                </h2>
+            <div className="space-y-5">
+                {header}
 
-                <p className="mt-2 text-sm text-gray-500">
-                    No assignments information is available.
-                </p>
+                <div className="rounded-2xl border border-gray-200 bg-white p-8 text-center">
+                    <h2 className="text-lg font-semibold text-gray-800">
+                        Child data not found
+                    </h2>
+
+                    <p className="mt-2 text-sm text-gray-500">
+                        No assignments information is available.
+                    </p>
+                </div>
             </div>
         );
     }
@@ -98,15 +188,7 @@ export default function ParentAssignmentsPage() {
     return (
         <div className="space-y-5">
             {/* Heading */}
-            <div>
-                <h1 className="text-2xl font-bold text-gray-900 sm:text-3xl">
-                    Assignments
-                </h1>
-
-                <p className="mt-1 text-sm text-gray-500 sm:text-base">
-                    View your child&apos;s assignments and submission status.
-                </p>
-            </div>
+            {header}
 
             {/* Child Information + Selector */}
             <div className="grid gap-4 lg:grid-cols-[1fr_280px]">
@@ -137,9 +219,9 @@ export default function ParentAssignmentsPage() {
 
                     <select
                         id="child"
-                        value={selectedChild}
+                        value={selectedStudent.id}
                         onChange={(e) =>
-                            setSelectedChild(Number(e.target.value))
+                            setSelectedChildId(Number(e.target.value))
                         }
                         className="w-full rounded-lg border border-gray-200 bg-white px-4 py-2.5 text-sm text-gray-700 outline-none transition focus:border-[#01796F] focus:ring-2 focus:ring-[#01796F]/20"
                     >
@@ -175,7 +257,7 @@ export default function ParentAssignmentsPage() {
                             </div>
 
                             <h2 className="mt-3 text-2xl font-bold text-gray-900">
-                                {stat.value}
+                                {assignmentsLoading ? "-" : stat.value}
                             </h2>
                         </div>
                     );
@@ -192,9 +274,32 @@ export default function ParentAssignmentsPage() {
                     <p className="mt-1 text-sm text-gray-500">
                         Assignments for {selectedStudent.name}.
                     </p>
+
+                    <p className="mt-1 text-xs text-gray-400">
+                        Assignment status is tracked for the whole class, not
+                        per student.
+                    </p>
                 </div>
 
-                <ParentAssignmentTable assignments={assignments} />
+                {assignmentsError && (
+                    <div
+                        role="alert"
+                        className="mb-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
+                    >
+                        {assignmentsError}
+                    </div>
+                )}
+
+                {assignmentsLoading ? (
+                    <div className="rounded-2xl border border-gray-100 bg-white p-10 text-center shadow-sm">
+                        <div className="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-gray-200 border-t-[#01796F]" />
+                        <p className="mt-4 text-sm text-gray-500">
+                            Loading assignment records...
+                        </p>
+                    </div>
+                ) : (
+                    <ParentAssignmentTable assignments={assignments} />
+                )}
             </div>
         </div>
     );
