@@ -56,7 +56,7 @@ export default function ChildProfilePage() {
 
                 <div
                     role="alert"
-                    className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
+                    className="rounded-2xl border border-red-200 bg-red-50 p-4 text-sm text-red-700"
                 >
                     {error}
                 </div>
@@ -89,7 +89,7 @@ export default function ChildProfilePage() {
             {/* Child Selector + Profile Header */}
             <div className="grid grid-cols-1 gap-5 lg:grid-cols-[minmax(0,1fr)_240px]">
                 {/* Profile Header Card */}
-                <div className="rounded-2xl border border-gray-200 bg-white p-5 sm:p-6">
+                <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
                     <div className="flex items-center gap-4">
                         <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-[#e6f4f2] text-[#01796F] sm:h-20 sm:w-20">
                             <UserRound className="h-8 w-8 sm:h-10 sm:w-10" />
@@ -145,7 +145,7 @@ export default function ChildProfilePage() {
             </div>
 
             {/* Personal Information */}
-            <div className="rounded-2xl border border-gray-200 bg-white">
+            <div className="rounded-2xl border border-gray-100 bg-white shadow-sm">
                 <div className="border-b border-gray-200 px-5 py-4">
                     <h2 className="font-semibold text-gray-900">
                         Personal Information
@@ -183,7 +183,7 @@ export default function ChildProfilePage() {
             </div>
 
             {/* Academic Information */}
-            <div className="rounded-2xl border border-gray-200 bg-white">
+            <div className="rounded-2xl border border-gray-100 bg-white shadow-sm">
                 <div className="border-b border-gray-200 px-5 py-4">
                     <h2 className="font-semibold text-gray-900">
                         Academic Information
@@ -232,7 +232,7 @@ type InfoItemProps = {
 function InfoItem({ icon, label, value }: InfoItemProps) {
     return (
         <div className="flex items-start gap-3 rounded-xl bg-[#f6f8f8] p-4">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-[#e6f4f2] text-[#01796F]">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#e6f4f2] text-[#01796f]">
                 {icon}
             </div>
 

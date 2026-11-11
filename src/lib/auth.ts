@@ -13,6 +13,9 @@ export type AuthSession = {
 const SESSION_KEY = "auth-session";
 const TOKEN_KEY = "auth-token";
 
+let cachedRaw: string | null | undefined;
+let cachedSession: AuthSession | null = null;
+
 export const getSession = (): AuthSession | null => {
   if (typeof window === "undefined") return null;
 
@@ -20,13 +23,19 @@ export const getSession = (): AuthSession | null => {
     sessionStorage.getItem(SESSION_KEY) ??
     localStorage.getItem(SESSION_KEY);
 
-  if (!value) return null;
+  // The same stored value has to return the same object, so the session can
+  // be used as a useSyncExternalStore snapshot without re-rendering in a loop.
+  if (value === cachedRaw) return cachedSession;
+
+  cachedRaw = value;
 
   try {
-    return JSON.parse(value) as AuthSession;
+    cachedSession = value ? (JSON.parse(value) as AuthSession) : null;
   } catch {
-    return null;
+    cachedSession = null;
   }
+
+  return cachedSession;
 };
 
 export const getAuthToken = (): string | null => {

@@ -14,7 +14,8 @@ import {
   LogOut,
 } from "lucide-react";
 
-import { getSession, logout, AuthSession } from "@/lib/auth";
+import { logout } from "@/lib/auth";
+import { useAuthSession } from "@/lib/useAuthSession";
 import { navigationByRole } from "@/data/navigation";
 import { useHeaderNotifications } from "@/components/layout/useHeaderNotifications";
 
@@ -31,8 +32,7 @@ export default function ParentHeader({
   const notificationRef = useRef<HTMLDivElement>(null);
 
 
-  const [session, setSession] =
-    useState<AuthSession | null>(null);
+  const session = useAuthSession();
   const [searchOpen, setSearchOpen] = useState(false);
   const [notificationOpen, setNotificationOpen] =
     useState(false);
@@ -49,10 +49,6 @@ export default function ParentHeader({
     markAllAsRead,
   } = useHeaderNotifications(session?.role, session?.id);
 
-
-  useEffect(() => {
-    setSession(getSession());
-  }, []);
 
   // Close search when clicking outside
   useEffect(() => {
@@ -368,7 +364,7 @@ export default function ParentHeader({
                       </p>
 
                       <p className="mt-1 text-xs text-gray-400">
-                        You're all caught up.
+                        You&apos;re all caught up.
                       </p>
                     </div>
                   )}

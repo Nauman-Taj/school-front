@@ -189,7 +189,7 @@ export default function ParentDashboard() {
     if (!selectedStudent) {
         return (
             <div className="rounded-2xl border border-gray-200 bg-white p-8 text-center">
-                <h2 className="text-lg font-semibold text-gray-800">
+                <h2 className="text-lg font-semibold text-gray-900">
                     Child data not found
                 </h2>
 
@@ -295,7 +295,7 @@ export default function ParentDashboard() {
     const position = dataState.data.position;
 
     const show = (value: string | number) =>
-        dashboardLoading ? "-" : value;
+        dashboardLoading ? "0" : value;
 
     /* ---------------- Dashboard Stats ---------------- */
 
@@ -339,7 +339,7 @@ export default function ParentDashboard() {
             {dataError && (
                 <div
                     role="alert"
-                    className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
+                    className="rounded-2xl border border-red-200 bg-red-50 p-4 text-sm text-red-700"
                 >
                     {dataError}
                 </div>
@@ -348,7 +348,7 @@ export default function ParentDashboard() {
             {/* Parent + Child Selection */}
             <div className="grid gap-5 lg:grid-cols-[1fr_300px]">
                 {/* Parent Information */}
-                <div className="rounded-2xl border border-gray-200 bg-white p-5">
+                <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
                     <div className="flex items-center gap-4">
                         <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[#e6f4f2] text-[#01796F]">
                             <UserRound size={23} />
@@ -359,7 +359,7 @@ export default function ParentDashboard() {
                                 Parent
                             </p>
 
-                            <h2 className="mt-1 font-semibold text-gray-800">
+                            <h2 className="mt-1 font-semibold text-gray-900">
                                 {profile.name}
                             </h2>
 
@@ -371,7 +371,7 @@ export default function ParentDashboard() {
                 </div>
 
                 {/* Child Selector */}
-                <div className="rounded-2xl border border-gray-200 bg-white p-5">
+                <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
                     <label
                         htmlFor="child"
                         className="mb-2 block text-sm font-medium text-gray-700"
@@ -397,14 +397,14 @@ export default function ParentDashboard() {
             </div>
 
             {/* Selected Child */}
-            <div className="rounded-2xl border border-gray-200 bg-white p-5">
+            <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
                 <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                     <div>
                         <p className="text-xs font-medium uppercase tracking-wide text-gray-400">
                             Selected Child
                         </p>
 
-                        <h2 className="mt-1 text-xl font-bold text-gray-800">
+                        <h2 className="mt-1 text-xl font-bold text-gray-900">
                             {selectedStudent.name}
                         </h2>
 
@@ -416,7 +416,7 @@ export default function ParentDashboard() {
                         </p>
                     </div>
 
-                    <span className="w-fit rounded-full bg-[#e6f4f2] px-3 py-1.5 text-sm font-medium text-[#01796F]">
+                    <span className="w-fit rounded-full bg-[#e6f4f2] px-3 py-1.5 text-sm font-medium text-[#01796f]">
                         Active Student
                     </span>
                 </div>
@@ -425,7 +425,7 @@ export default function ParentDashboard() {
             {/* Statistics */}
             <div>
                 <div className="mb-3">
-                    <h2 className="text-lg font-semibold text-gray-800">
+                    <h2 className="text-lg font-semibold text-gray-900">
                         Overview
                     </h2>
 
@@ -441,15 +441,15 @@ export default function ParentDashboard() {
                         return (
                             <div
                                 key={stat.title}
-                                className="rounded-2xl border border-gray-200 bg-white p-5"
+                                className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm"
                             >
                                 <div className="flex items-center justify-between">
                                     <div>
-                                        <p className="text-sm font-medium text-gray-500">
+                                        <p className="text-sm text-gray-500">
                                             {stat.title}
                                         </p>
 
-                                        <h3 className="mt-2 text-2xl font-bold text-gray-800">
+                                        <h3 className="mt-2 text-2xl font-bold text-gray-900">
                                             {stat.value}
                                         </h3>
                                     </div>
@@ -467,10 +467,10 @@ export default function ParentDashboard() {
             {/* Attendance + Academic Performance */}
             <div className="grid gap-5 lg:grid-cols-2">
                 {/* Attendance */}
-                <div className="rounded-2xl border border-gray-200 bg-white p-5">
+                <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
                     <div className="flex items-center justify-between">
                         <div>
-                            <h2 className="text-lg font-semibold text-gray-800">
+                            <h2 className="text-lg font-semibold text-gray-900">
                                 Attendance
                             </h2>
 
@@ -479,7 +479,7 @@ export default function ParentDashboard() {
                             </p>
                         </div>
 
-                        <div className="rounded-lg bg-[#e6f4f2] px-3 py-1.5 text-sm font-semibold text-[#01796F]">
+                        <div className="rounded-full bg-[#e6f4f2] px-3 py-1 text-xs font-medium text-[#01796f]">
                             {show(`${attendancePercentage}%`)}
                         </div>
                     </div>
@@ -491,7 +491,7 @@ export default function ParentDashboard() {
                                     Present
                                 </p>
 
-                                <p className="mt-1 text-xl font-bold text-gray-800">
+                                <p className="mt-1 text-xl font-bold text-gray-900">
                                     {show(present)}
                                 </p>
                             </div>
@@ -501,7 +501,7 @@ export default function ParentDashboard() {
                                     Absent
                                 </p>
 
-                                <p className="mt-1 text-xl font-bold text-gray-800">
+                                <p className="mt-1 text-xl font-bold text-gray-900">
                                     {show(absent)}
                                 </p>
                             </div>
@@ -511,7 +511,7 @@ export default function ParentDashboard() {
                                     Late
                                 </p>
 
-                                <p className="mt-1 text-xl font-bold text-gray-800">
+                                <p className="mt-1 text-xl font-bold text-gray-900">
                                     {show(late)}
                                 </p>
                             </div>
@@ -521,7 +521,7 @@ export default function ParentDashboard() {
                                     Leave
                                 </p>
 
-                                <p className="mt-1 text-xl font-bold text-gray-800">
+                                <p className="mt-1 text-xl font-bold text-gray-900">
                                     {show(leave)}
                                 </p>
                             </div>
@@ -530,9 +530,9 @@ export default function ParentDashboard() {
                 </div>
 
                 {/* Academic Performance */}
-                <div className="rounded-2xl border border-gray-200 bg-white p-5">
+                <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
                     <div>
-                        <h2 className="text-lg font-semibold text-gray-800">
+                        <h2 className="text-lg font-semibold text-gray-900">
                             Academic Performance
                         </h2>
 
@@ -548,7 +548,7 @@ export default function ParentDashboard() {
                                     Average
                                 </p>
 
-                                <p className="mt-1 text-xl font-bold text-gray-800">
+                                <p className="mt-1 text-xl font-bold text-gray-900">
                                     {show(`${average}%`)}
                                 </p>
                             </div>
@@ -558,7 +558,7 @@ export default function ParentDashboard() {
                                     Grade
                                 </p>
 
-                                <p className="mt-1 text-xl font-bold text-gray-800">
+                                <p className="mt-1 text-xl font-bold text-gray-900">
                                     {show(grade)}
                                 </p>
                             </div>
@@ -568,7 +568,7 @@ export default function ParentDashboard() {
                                     Position
                                 </p>
 
-                                <p className="mt-1 text-xl font-bold text-gray-800">
+                                <p className="mt-1 text-xl font-bold text-gray-900">
                                     {show(
                                         position
                                             ? `#${position}`
@@ -582,10 +582,10 @@ export default function ParentDashboard() {
             </div>
 
             {/* Recent Activity */}
-            <div className="rounded-2xl border border-gray-200 bg-white">
+            <div className="rounded-2xl border border-gray-100 bg-white shadow-sm">
                 <div className="flex items-center justify-between border-b border-gray-100 p-5">
                     <div>
-                        <h2 className="text-lg font-semibold text-gray-800">
+                        <h2 className="text-lg font-semibold text-gray-900">
                             Recent Activity
                         </h2>
 
@@ -603,7 +603,7 @@ export default function ParentDashboard() {
                     {/* Attendance */}
                     <div className="p-5">
                         <div className="flex gap-3">
-                            <div className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#e6f4f2] text-[#01796F]">
+                            <div className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#e6f4f2] text-[#01796f]">
                                 <CalendarDays size={18} />
                             </div>
 
@@ -628,7 +628,7 @@ export default function ParentDashboard() {
                     {outstandingTotal > 0 && (
                         <div className="p-5">
                             <div className="flex gap-3">
-                                <div className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#e6f4f2] text-[#01796F]">
+                                <div className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#e6f4f2] text-[#01796f]">
                                     <Wallet size={18} />
                                 </div>
 
@@ -649,7 +649,7 @@ export default function ParentDashboard() {
                     {pendingAssignments > 0 && (
                         <div className="p-5">
                             <div className="flex gap-3">
-                                <div className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#e6f4f2] text-[#01796F]">
+                                <div className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#e6f4f2] text-[#01796f]">
                                     <ClipboardList size={18} />
                                 </div>
 
@@ -674,7 +674,7 @@ export default function ParentDashboard() {
                     {upcomingExams > 0 && (
                         <div className="p-5">
                             <div className="flex gap-3">
-                                <div className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#e6f4f2] text-[#01796F]">
+                                <div className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#e6f4f2] text-[#01796f]">
                                     <GraduationCap size={18} />
                                 </div>
 

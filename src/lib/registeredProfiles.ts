@@ -91,19 +91,6 @@ function writeProfiles<T extends ProfileRecord>(
   localStorage.setItem(key, JSON.stringify(profiles));
 }
 
-function matchesSession(
-  profile: ProfileRecord,
-  session: AuthSession
-): boolean {
-  const profileEmail = profile.email?.trim().toLowerCase();
-  const sessionEmail = session.email.trim().toLowerCase();
-
-  return (
-    (!!profileEmail && profileEmail === sessionEmail) ||
-    (profile.id !== undefined && String(profile.id) === String(session.id))
-  );
-}
-
 /**
  * Find a registered profile for the current logged-in account.
  * Email is preferred so an account ID cannot accidentally select

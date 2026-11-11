@@ -111,7 +111,7 @@ export default function ParentTimetablePage() {
 
         <div
           role="alert"
-          className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
+          className="rounded-2xl border border-red-200 bg-red-50 p-4 text-sm text-red-700"
         >
           {profileError}
         </div>
@@ -125,7 +125,7 @@ export default function ParentTimetablePage() {
         {header}
 
         <div className="rounded-2xl border border-gray-200 bg-white p-8 text-center">
-          <h2 className="text-lg font-semibold text-gray-800">
+          <h2 className="text-lg font-semibold text-gray-900">
             Child data not found
           </h2>
 
@@ -144,12 +144,12 @@ export default function ParentTimetablePage() {
 
       {/* Child Information + Selector */}
       <div className="grid gap-4 lg:grid-cols-[1fr_280px]">
-        <div className="rounded-2xl border border-gray-200 bg-white p-5">
-          <p className="text-sm font-medium text-gray-500">
+        <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
+          <p className="text-sm text-gray-500">
             Selected Child
           </p>
 
-          <h2 className="mt-2 text-xl font-bold text-gray-800">
+          <h2 className="mt-2 text-xl font-bold text-gray-900">
             {selectedStudent.name}
           </h2>
 
@@ -161,7 +161,7 @@ export default function ParentTimetablePage() {
           </p>
         </div>
 
-        <div className="rounded-2xl border border-gray-200 bg-white p-5">
+        <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
           <label
             htmlFor="child"
             className="mb-2 block text-sm font-medium text-gray-700"
@@ -206,7 +206,7 @@ export default function ParentTimetablePage() {
       {timetableError && (
         <div
           role="alert"
-          className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
+          className="rounded-2xl border border-red-200 bg-red-50 p-4 text-sm text-red-700"
         >
           {timetableError}
         </div>

@@ -180,3 +180,61 @@ export async function fetchParentProfile(): Promise<Parent> {
 
   return mapParentProfile(profile);
 }
+
+export type UpdateParentProfileInput = {
+  name?: string;
+  email?: string;
+  phone?: string;
+  address?: string;
+  occupation?: string;
+};
+
+/**
+ * Updates the signed-in parent's own profile.
+ *
+ * The backend only accepts the contact fields a parent owns, so the id, the
+ * linked account, the status and the child links cannot be changed here.
+ */
+export async function updateParentProfile(
+  input: UpdateParentProfileInput,
+): Promise<Parent> {
+  const token = getAuthToken();
+
+  if (!token) {
+    throw new Error("Your session has expired. Please log in again.");
+  }
+
+  const profile = await apiRequest<ApiParentProfile>("/parents/me", {
+    method: "PATCH",
+    token,
+    body: JSON.stringify(input),
+  });
+
+  return mapParentProfile(profile);
+}
+
+/**
+ * Changes the password of the signed-in account.
+ *
+ * The password belongs to the login account, so it goes through
+ * `PATCH /auth/me` with the current password for verification.
+ */
+export async function changeParentPassword(
+  currentPassword: string,
+  newPassword: string,
+) {
+  const token = getAuthToken();
+
+  if (!token) {
+    throw new Error("Your session has expired. Please log in again.");
+  }
+
+  return apiRequest<{ id: number; name: string; email: string }>(
+    "/auth/me",
+    {
+      method: "PATCH",
+      token,
+      body: JSON.stringify({ currentPassword, newPassword }),
+    },
+  );
+}

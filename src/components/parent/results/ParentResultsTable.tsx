@@ -30,99 +30,110 @@ export default function ParentResultsTable({
     return (
         <div className="space-y-5">
             {/* Search */}
-            <div className="relative">
-                <Search
-                    size={17}
-                    className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
-                />
+            <div className="rounded-2xl border border-gray-100 bg-white p-4 shadow-sm">
+                <div className="relative">
+                    <Search
+                        size={17}
+                        className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
+                    />
 
-                <input
-                    type="text"
-                    placeholder="Search results"
-                    value={search}
-                    onChange={(e) => setSearch(e.target.value)}
-                    className="w-full rounded-xl border border-gray-200 bg-white py-3 pl-11 pr-4 text-sm text-gray-900 outline-none transition placeholder:text-gray-400 focus:border-[#01796F] focus:ring-2 focus:ring-[#01796F]/10"
-                />
+                    <input
+                        type="text"
+                        placeholder="Search results"
+                        value={search}
+                        onChange={(e) => setSearch(e.target.value)}
+                        className="w-full rounded-full border border-gray-200 bg-gray-50 py-3 pl-11 pr-4 text-sm outline-none transition placeholder:text-gray-400 focus:border-[#01796F] focus:bg-white focus:ring-2 focus:ring-[#01796F]/10"
+                    />
+                </div>
             </div>
 
             {/* Desktop */}
-            <div className="hidden overflow-x-auto rounded-2xl border border-gray-200 bg-white md:block">
-                <table className="w-full text-sm">
-                    <thead className="bg-gray-50">
-                        <tr className="border-b border-gray-200 text-left text-gray-500">
-                            <th className="px-6 py-4 font-semibold text-gray-600">
-                                Subject
-                            </th>
-
-                            <th className="px-6 py-4 font-semibold text-gray-600">
-                                Exam
-                            </th>
-
-                            <th className="px-6 py-4 font-semibold text-gray-600">
-                                Marks
-                            </th>
-
-                            <th className="px-6 py-4 font-semibold text-gray-600">
-                                Percentage
-                            </th>
-
-                            <th className="px-6 py-4 text-center font-semibold text-gray-600">
-                                Grade
-                            </th>
-                        </tr>
-                    </thead>
-
-                    <tbody>
-                        {filteredResults.map((result) => (
-                            <tr
-                                key={result.id}
-                                className="border-b border-gray-100 last:border-0"
-                            >
-                                <td className="px-6 py-4 font-medium text-gray-900">
-                                    {result.subject}
-                                </td>
-
-                                <td className="px-6 py-4 text-gray-600">
-                                    {result.examId}
-                                </td>
-
-                                <td className="px-6 py-4 text-gray-600">
-                                    {result.obtainedMarks} /{" "}
-                                    {result.totalMarks}
-                                </td>
-
-                                <td className="px-6 py-4 text-gray-600">
-                                    {result.percentage}%
-                                </td>
-
-                                <td className="px-6 py-4 text-center">
-                                    <span className="inline-flex min-w-10 justify-center rounded-full bg-[#e6f4f2] px-3 py-1 text-xs font-semibold text-[#01796f]">
-                                        {result.grade}
-                                    </span>
-                                </td>
-                            </tr>
-                        ))}
-
-                        {filteredResults.length === 0 && (
+            <div className="hidden overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm md:block">
+                <div className="overflow-x-auto">
+                    <table className="w-full text-sm">
+                        <thead className="bg-gray-50 text-gray-700">
                             <tr>
-                                <td
-                                    colSpan={5}
-                                    className="px-6 py-8 text-center text-sm text-gray-500"
-                                >
-                                    No results found.
-                                </td>
+                                <th className="px-5 py-4 font-semibold">
+                                    Subject
+                                </th>
+
+                                <th className="px-5 py-4 font-semibold">
+                                    Exam
+                                </th>
+
+                                <th className="px-5 py-4 font-semibold">
+                                    Marks
+                                </th>
+
+                                <th className="px-5 py-4 font-semibold">
+                                    Percentage
+                                </th>
+
+                                <th className="px-5 py-4 text-center font-semibold">
+                                    Grade
+                                </th>
                             </tr>
-                        )}
-                    </tbody>
-                </table>
+                        </thead>
+
+                        <tbody className="divide-y divide-gray-100">
+                            {filteredResults.map((result) => (
+                                <tr
+                                    key={result.id}
+                                    className="transition hover:bg-gray-50"
+                                >
+                                    <td className="px-5 py-4 font-medium text-gray-900">
+                                        {result.subject}
+                                    </td>
+
+                                    <td className="px-5 py-4 text-gray-600">
+                                        {result.examId}
+                                    </td>
+
+                                    <td className="px-5 py-4 text-gray-600">
+                                        {result.obtainedMarks} /{" "}
+                                        {result.totalMarks}
+                                    </td>
+
+                                    <td className="px-5 py-4 text-gray-600">
+                                        {result.percentage}%
+                                    </td>
+
+                                    <td className="px-5 py-4 text-center">
+                                        <span className="inline-flex min-w-10 justify-center rounded-full bg-[#e6f4f2] px-3 py-1 text-xs font-medium text-[#01796f]">
+                                            {result.grade}
+                                        </span>
+                                    </td>
+                                </tr>
+                            ))}
+
+                            {filteredResults.length === 0 && (
+                                <tr>
+                                    <td
+                                        colSpan={5}
+                                        className="px-5 py-8 text-center text-sm text-gray-500"
+                                    >
+                                        No results found.
+                                    </td>
+                                </tr>
+                            )}
+                        </tbody>
+                    </table>
+                </div>
+                <div className="border-t border-gray-100 px-5 py-4 text-sm text-gray-500">
+                    Showing {filteredResults.length} of {results.length} results
+                </div>
             </div>
 
             {/* Mobile */}
+            <p className="text-sm text-gray-500 md:hidden">
+                Showing {filteredResults.length} of {results.length} results
+            </p>
+
             <div className="space-y-3 md:hidden">
                 {filteredResults.map((result) => (
                     <div
                         key={result.id}
-                        className="rounded-2xl border border-gray-200 bg-white p-4"
+                        className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm"
                     >
                         <div className="flex items-start justify-between gap-3">
                             <div>
@@ -135,7 +146,7 @@ export default function ParentResultsTable({
                                 </p>
                             </div>
 
-                            <span className="rounded-full bg-[#e6f4f2] px-3 py-1 text-xs font-semibold text-[#01796f]">
+                            <span className="rounded-full bg-[#e6f4f2] px-3 py-1 text-xs font-medium text-[#01796f]">
                                 {result.grade}
                             </span>
                         </div>

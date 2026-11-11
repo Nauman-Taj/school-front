@@ -146,7 +146,7 @@ export default function ParentExamsPage() {
 
         <div
           role="alert"
-          className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
+          className="rounded-2xl border border-red-200 bg-red-50 p-4 text-sm text-red-700"
         >
           {profileError}
         </div>
@@ -160,7 +160,7 @@ export default function ParentExamsPage() {
         {header}
 
         <div className="rounded-2xl border border-gray-200 bg-white p-8 text-center">
-          <h2 className="text-lg font-semibold text-gray-800">
+          <h2 className="text-lg font-semibold text-gray-900">
             Child data not found
           </h2>
 
@@ -179,12 +179,12 @@ export default function ParentExamsPage() {
 
       {/* Child Information + Selector */}
       <div className="grid gap-4 lg:grid-cols-[1fr_280px]">
-        <div className="rounded-2xl border border-gray-200 bg-white p-5">
-          <p className="text-sm font-medium text-gray-500">
+        <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
+          <p className="text-sm text-gray-500">
             Selected Child
           </p>
 
-          <h2 className="mt-2 text-xl font-bold text-gray-800">
+          <h2 className="mt-2 text-xl font-bold text-gray-900">
             {selectedStudent.name}
           </h2>
 
@@ -196,7 +196,7 @@ export default function ParentExamsPage() {
           </p>
         </div>
 
-        <div className="rounded-2xl border border-gray-200 bg-white p-5">
+        <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
           <label
             htmlFor="child"
             className="mb-2 block text-sm font-medium text-gray-700"
@@ -229,10 +229,10 @@ export default function ParentExamsPage() {
           return (
             <div
               key={stat.title}
-              className="rounded-2xl border border-gray-200 bg-white p-5"
+              className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm"
             >
               <div className="flex items-center justify-between">
-                <p className="text-sm font-medium text-gray-500">
+                <p className="text-sm text-gray-500">
                   {stat.title}
                 </p>
 
@@ -243,8 +243,8 @@ export default function ParentExamsPage() {
                 </div>
               </div>
 
-              <h2 className="mt-3 text-2xl font-bold text-gray-900">
-                {examsLoading ? "-" : stat.value}
+              <h2 className="mt-2 text-2xl font-bold text-gray-900">
+                {examsLoading ? "0" : stat.value}
               </h2>
             </div>
           );
@@ -254,7 +254,7 @@ export default function ParentExamsPage() {
       {/* Exam Records */}
       <div>
         <div className="mb-4">
-          <h2 className="text-lg font-semibold text-gray-800">
+          <h2 className="text-lg font-semibold text-gray-900">
             Exam Records
           </h2>
 
@@ -266,7 +266,7 @@ export default function ParentExamsPage() {
         {examsError && (
           <div
             role="alert"
-            className="mb-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
+            className="mb-4 rounded-2xl border border-red-200 bg-red-50 p-4 text-sm text-red-700"
           >
             {examsError}
           </div>

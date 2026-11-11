@@ -1,7 +1,6 @@
-
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
   User,
   Mail,
@@ -16,24 +15,13 @@ import {
   AlertCircle,
 } from "lucide-react";
 
-import { getSession } from "@/lib/auth";
-import { getUsers, saveUsers } from "@/lib/users";
+import { updateAuthSession } from "@/lib/auth";
 import {
-  getRegisteredParent,
-  saveRegisteredParent,
-  type RegisteredParent,
-} from "@/lib/registeredProfiles";
-import { parents } from "@/data/parents";
-
-type ParentProfile = {
-  id: number;
-  name: string;
-  email: string;
-  phone: string;
-  occupation: string;
-  address: string;
-  status: "Active" | "Inactive";
-};
+  changeParentPassword,
+  updateParentProfile,
+} from "@/lib/parent";
+import { useParentProfile } from "@/lib/useParentProfile";
+import type { Parent } from "@/types/parent";
 
 type ProfileForm = {
   name: string;
@@ -64,10 +52,22 @@ const emptyPasswordForm: PasswordForm = {
 };
 
 export default function ParentProfilePage() {
-  const [profile, setProfile] = useState<ParentProfile | null>(null);
+  const {
+    profile: loadedProfile,
+    loading,
+    error: profileError,
+  } = useParentProfile();
+
+  // After a save the server response is the freshest copy of the profile, so
+  // it takes over from the value the hook loaded.
+  const [savedProfile, setSavedProfile] = useState<Parent | null>(null);
+
+  const profile = savedProfile ?? loadedProfile;
+
   const [form, setForm] = useState<ProfileForm>(emptyForm);
   const [isEditing, setIsEditing] = useState(false);
-  const [loading, setLoading] = useState(true);
+  const [savingProfile, setSavingProfile] = useState(false);
+  const [savingPassword, setSavingPassword] = useState(false);
 
   const [passwordVisibility, setPasswordVisibility] = useState({
     currentPassword: false,
@@ -83,60 +83,6 @@ export default function ParentProfilePage() {
     message: string;
   } | null>(null);
 
-  useEffect(() => {
-    const session = getSession();
-
-    if (!session || session.role !== "Parent") {
-      setLoading(false);
-      return;
-    }
-
-    const registeredParent = getRegisteredParent(session);
-
-    // Match the signed-in parent, never use parents[0] as a fallback.
-    const sharedParent =
-      parents.find(
-        (item) =>
-          item.email.trim().toLowerCase() ===
-          session.email.trim().toLowerCase()
-      ) ??
-      parents.find(
-        (item) =>
-          item.name.trim().toLowerCase() ===
-          session.name.trim().toLowerCase()
-      ) ??
-      null;
-
-    const matchedParent = registeredParent ?? sharedParent;
-
-    if (!matchedParent) {
-      setLoading(false);
-      return;
-    }
-
-    const nextProfile: ParentProfile = {
-      id: matchedParent.id,
-      name: matchedParent.name,
-      email: matchedParent.email,
-      phone: matchedParent.phone ?? "",
-      occupation: matchedParent.occupation ?? "",
-      address: matchedParent.address ?? "",
-      status:
-        matchedParent.status === "Inactive" ? "Inactive" : "Active",
-    };
-
-    setProfile(nextProfile);
-    setForm({
-      name: nextProfile.name,
-      email: nextProfile.email,
-      phone: nextProfile.phone,
-      occupation: nextProfile.occupation,
-      address: nextProfile.address,
-    });
-
-    setLoading(false);
-  }, []);
-
   const showFeedback = (
     type: "success" | "error",
     message: string
@@ -144,30 +90,38 @@ export default function ParentProfilePage() {
     setFeedback({ type, message });
   };
 
+  const toForm = (source: {
+    name: string;
+    email: string;
+    phone: string;
+    occupation: string;
+    address: string;
+  }): ProfileForm => ({
+    name: source.name ?? "",
+    email: source.email ?? "",
+    phone: source.phone ?? "",
+    occupation: source.occupation ?? "",
+    address: source.address ?? "",
+  });
+
   const handleCancelEdit = () => {
     if (!profile) return;
 
-    setForm({
-      name: profile.name,
-      email: profile.email,
-      phone: profile.phone,
-      occupation: profile.occupation,
-      address: profile.address,
-    });
-
+    setForm(toForm(profile));
     setIsEditing(false);
     setFeedback(null);
   };
 
-  const handleSave = () => {
+  const handleStartEdit = () => {
     if (!profile) return;
 
-    const session = getSession();
+    setForm(toForm(profile));
+    setFeedback(null);
+    setIsEditing(true);
+  };
 
-    if (!session || session.role !== "Parent") {
-      showFeedback("error", "Your session has expired. Please sign in again.");
-      return;
-    }
+  const handleSave = async () => {
+    if (!profile) return;
 
     const name = form.name.trim();
     const email = form.email.trim().toLowerCase();
@@ -177,102 +131,34 @@ export default function ParentProfilePage() {
       return;
     }
 
-    const users = getUsers();
-
-    const duplicateEmail = users.some(
-      (user) =>
-        user.id !== session.id &&
-        user.email.trim().toLowerCase() === email
-    );
-
-    if (duplicateEmail) {
-      showFeedback("error", "That email address is already in use.");
-      return;
-    }
-
-    const updatedProfile: ParentProfile = {
-      ...profile,
-      name,
-      email,
-      phone: form.phone.trim(),
-      occupation: form.occupation.trim(),
-      address: form.address.trim(),
-    };
+    setSavingProfile(true);
 
     try {
-      const registeredParent = getRegisteredParent(session);
-
-      if (registeredParent) {
-        const updatedRegisteredParent: RegisteredParent = {
-          ...registeredParent,
-          name: updatedProfile.name,
-          email: updatedProfile.email,
-          phone: updatedProfile.phone,
-          occupation: updatedProfile.occupation,
-          address: updatedProfile.address,
-          status: updatedProfile.status,
-        };
-
-        saveRegisteredParent(updatedRegisteredParent);
-      } else {
-        // Shared seed records are not modified. Store an editable
-        // profile for this account in the registered-profile collection.
-        saveRegisteredParent({
-          id: session.id,
-          name: updatedProfile.name,
-          email: updatedProfile.email,
-          phone: updatedProfile.phone,
-          occupation: updatedProfile.occupation,
-          address: updatedProfile.address,
-          status: updatedProfile.status,
-        });
-      }
-
-      // Keep the login account consistent with the edited profile.
-      const account = users.find((user) => user.id === session.id);
-
-      if (account) {
-        saveUsers(
-          users.map((user) =>
-            user.id === session.id
-              ? { ...user, name, email }
-              : user
-          )
-        );
-      }
-
-      // Keep whichever storage currently holds the session.
-      const updatedSession = { ...session, name, email };
-      const localSession = localStorage.getItem("auth-session");
-      const sessionStoredLocally = localSession !== null;
-
-      if (sessionStoredLocally) {
-        localStorage.setItem(
-          "auth-session",
-          JSON.stringify(updatedSession)
-        );
-      } else {
-        sessionStorage.setItem(
-          "auth-session",
-          JSON.stringify(updatedSession)
-        );
-      }
-
-      setProfile(updatedProfile);
-      setForm({
-        name: updatedProfile.name,
-        email: updatedProfile.email,
-        phone: updatedProfile.phone,
-        occupation: updatedProfile.occupation,
-        address: updatedProfile.address,
+      const updated = await updateParentProfile({
+        name,
+        email,
+        phone: form.phone.trim(),
+        occupation: form.occupation.trim(),
+        address: form.address.trim(),
       });
+
+      setSavedProfile(updated);
+      setForm(toForm(updated));
       setIsEditing(false);
+
+      // Keep the stored session in step with the edited profile.
+      updateAuthSession({ name: updated.name, email: updated.email });
+
       showFeedback("success", "Profile updated successfully.");
-    } catch {
+    } catch (err: unknown) {
       showFeedback(
         "error",
-        "Could not save your profile. Please try again."
+        err instanceof Error
+          ? err.message
+          : "Could not save your profile. Please try again."
       );
+    } finally {
+      setSavingProfile(false);
     }
   };
 
@@ -285,7 +171,7 @@ export default function ParentProfilePage() {
     }));
   };
 
-  const handlePasswordUpdate = () => {
+  const handlePasswordUpdate = async () => {
     const { currentPassword, newPassword, confirmPassword } =
       passwordForm;
 
@@ -315,29 +201,10 @@ export default function ParentProfilePage() {
       return;
     }
 
-    const session = getSession();
-
-    if (!session || session.role !== "Parent") {
-      showFeedback("error", "Please sign in again.");
-      return;
-    }
-
-    const users = getUsers();
-    const account = users.find((user) => user.id === session.id);
-
-    if (!account || account.password !== currentPassword) {
-      showFeedback("error", "Your current password is incorrect.");
-      return;
-    }
+    setSavingPassword(true);
 
     try {
-      saveUsers(
-        users.map((user) =>
-          user.id === session.id
-            ? { ...user, password: newPassword }
-            : user
-        )
-      );
+      await changeParentPassword(currentPassword, newPassword);
 
       setPasswordForm(emptyPasswordForm);
       setPasswordVisibility({
@@ -347,11 +214,15 @@ export default function ParentProfilePage() {
       });
 
       showFeedback("success", "Password updated successfully.");
-    } catch {
+    } catch (err: unknown) {
       showFeedback(
         "error",
-        "Could not update your password. Please try again."
+        err instanceof Error
+          ? err.message
+          : "Could not update your password. Please try again."
       );
+    } finally {
+      setSavingPassword(false);
     }
   };
 
@@ -359,6 +230,20 @@ export default function ParentProfilePage() {
     return (
       <div className="rounded-2xl border border-gray-200 bg-white p-8 text-center">
         <p className="text-sm text-gray-500">Loading your profile...</p>
+      </div>
+    );
+  }
+
+  if (profileError) {
+    return (
+      <div className="rounded-2xl border border-gray-200 bg-white p-8 text-center">
+        <AlertCircle className="mx-auto mb-3 h-10 w-10 text-red-400" />
+
+        <h2 className="text-lg font-semibold text-gray-900">
+          Profile unavailable
+        </h2>
+
+        <p className="mt-2 text-sm text-gray-500">{profileError}</p>
       </div>
     );
   }
@@ -373,7 +258,7 @@ export default function ParentProfilePage() {
         </h2>
 
         <p className="mt-2 text-sm text-gray-500">
-          We couldn't find a parent profile matching your account. Please
+          We couldn&apos;t find a parent profile matching your account. Please
           contact the school administration.
         </p>
       </div>
@@ -413,7 +298,7 @@ export default function ParentProfilePage() {
       )}
 
       {/* Profile Header */}
-      <section className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm sm:p-6">
+      <section className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
         <div className="flex flex-row items-center gap-3 sm:gap-5">
           <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-[#e6f4f2] text-[#01796F] sm:h-20 sm:w-20">
             <User size={28} className="sm:hidden" />
@@ -429,15 +314,13 @@ export default function ParentProfilePage() {
           </div>
 
           <div className="ml-auto shrink-0">
-
             <button
               type="button"
               onClick={() => {
                 if (isEditing) {
                   handleCancelEdit();
                 } else {
-                  setFeedback(null);
-                  setIsEditing(true);
+                  handleStartEdit();
                 }
               }}
               className="inline-flex items-center justify-center gap-1.5 rounded-full bg-[#01796f] px-3 py-2 text-xs font-medium text-white transition hover:bg-[#015f58] sm:gap-2 sm:px-5 sm:py-2.5 sm:text-sm"
@@ -450,7 +333,7 @@ export default function ParentProfilePage() {
       </section>
 
       {/* Personal Information */}
-      <div className="rounded-2xl border border-gray-200 bg-white p-5 sm:p-6">
+      <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
         <div className="mb-5">
           <h2 className="text-lg font-semibold text-gray-900">
             Personal Information
@@ -506,10 +389,11 @@ export default function ParentProfilePage() {
               <button
                 type="button"
                 onClick={handleSave}
-                className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-[#01796F] px-5 py-3 text-sm font-medium text-white transition hover:bg-[#015f58] sm:w-auto"
+                disabled={savingProfile}
+                className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-[#01796F] px-5 py-3 text-sm font-medium text-white transition hover:bg-[#015f58] disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
               >
                 <Check size={17} />
-                Save Changes
+                {savingProfile ? "Saving..." : "Save Changes"}
               </button>
             </div>
           </div>
@@ -555,7 +439,7 @@ export default function ParentProfilePage() {
       </div>
 
       {/* Change Password */}
-      <div className="rounded-2xl border border-gray-200 bg-white p-5 sm:p-6">
+      <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
         <div className="mb-5">
           <h2 className="text-lg font-semibold text-gray-900">
             Change Password
@@ -611,10 +495,11 @@ export default function ParentProfilePage() {
           <button
             type="button"
             onClick={handlePasswordUpdate}
-            className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-[#01796F] px-5 py-3 text-sm font-medium text-white transition hover:bg-[#015f58] sm:w-auto"
+            disabled={savingPassword}
+            className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-[#01796F] px-5 py-3 text-sm font-medium text-white transition hover:bg-[#015f58] disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
           >
             <Lock size={17} />
-            Update Password
+            {savingPassword ? "Updating..." : "Update Password"}
           </button>
         </div>
       </div>
