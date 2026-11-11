@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
     Award,
     BookOpen,
@@ -8,35 +8,81 @@ import {
     TrendingUp,
 } from "lucide-react";
 
-import { results as sharedResults } from "@/data/results";
-import { students } from "@/data/students";
-import { getCurrentParentChildren } from "@/lib/parent";
+import { fetchChildResults } from "@/lib/results-api";
+import { useParentProfile } from "@/lib/useParentProfile";
+import type { Result } from "@/types/result";
 
 import ParentResultsTable from "./ParentResultsTable";
 
 export default function ParentResultsPage() {
-    const parentChildren = getCurrentParentChildren();
+    const {
+        children,
+        loading: profileLoading,
+        error: profileError,
+    } = useParentProfile();
 
-    const children = parentChildren
-        .map((relation) =>
-            students.find((student) => student.id === relation.studentId)
-        )
-        .filter(
-            (student): student is (typeof students)[number] =>
-                Boolean(student)
-        );
-
-    const [selectedChild, setSelectedChild] = useState(
-        children[0]?.id ?? 0
+    const [selectedChildId, setSelectedChildId] = useState<number | null>(
+        null
     );
 
-    const results = useMemo(
+    const selectedStudent = useMemo(
         () =>
-            sharedResults.filter(
-                (result) => result.studentId === selectedChild
-            ),
-        [selectedChild]
+            children.find((child) => child.id === selectedChildId) ??
+            children[0],
+        [children, selectedChildId]
     );
+
+    const selectedStudentId = selectedStudent?.id ?? null;
+
+    const [resultState, setResultState] = useState<{
+        studentId: number | null;
+        results: Result[];
+        error: string;
+    }>({
+        studentId: null,
+        results: [],
+        error: "",
+    });
+
+    useEffect(() => {
+        if (selectedStudentId === null) return;
+
+        let active = true;
+
+        fetchChildResults(selectedStudentId)
+            .then((data) => {
+                if (!active) return;
+                setResultState({
+                    studentId: selectedStudentId,
+                    results: data,
+                    error: "",
+                });
+            })
+            .catch((err: unknown) => {
+                if (!active) return;
+                setResultState({
+                    studentId: selectedStudentId,
+                    results: [],
+                    error:
+                        err instanceof Error
+                            ? err.message
+                            : "Unable to load results.",
+                });
+            });
+
+        return () => {
+            active = false;
+        };
+    }, [selectedStudentId]);
+
+    // A stored result belongs to the previously selected child until the new
+    // request resolves, so treat that mismatch as loading.
+    const resultsLoading =
+        selectedStudentId !== null &&
+        resultState.studentId !== selectedStudentId;
+
+    const results = resultsLoading ? [] : resultState.results;
+    const resultsError = resultsLoading ? "" : resultState.error;
 
     const average =
         results.length > 0
@@ -55,7 +101,7 @@ export default function ParentResultsPage() {
         : 0;
 
     const passed = results.filter(
-        (result) => result.percentage >= 40
+        (result) => result.status === "Pass"
     ).length;
 
     const stats = [
@@ -85,20 +131,63 @@ export default function ParentResultsPage() {
         },
     ];
 
-    const selectedStudent = children.find(
-        (child) => child.id === selectedChild
+    const header = (
+        <div>
+            <h1 className="text-2xl font-bold text-gray-900 sm:text-3xl">
+                Results
+            </h1>
+
+            <p className="mt-1 text-sm text-gray-500 sm:text-base">
+                View your child&apos;s examination results and academic
+                performance.
+            </p>
+        </div>
     );
+
+    if (profileLoading) {
+        return (
+            <div className="space-y-5">
+                {header}
+
+                <div className="rounded-2xl border border-gray-100 bg-white p-10 text-center shadow-sm">
+                    <div className="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-gray-200 border-t-[#01796F]" />
+                    <p className="mt-4 text-sm text-gray-500">
+                        Loading results...
+                    </p>
+                </div>
+            </div>
+        );
+    }
+
+    if (profileError) {
+        return (
+            <div className="space-y-5">
+                {header}
+
+                <div
+                    role="alert"
+                    className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
+                >
+                    {profileError}
+                </div>
+            </div>
+        );
+    }
 
     if (!selectedStudent) {
         return (
-            <div className="rounded-2xl border border-gray-200 bg-white p-8 text-center">
-                <h2 className="text-lg font-semibold text-gray-800">
-                    Child data not found
-                </h2>
+            <div className="space-y-5">
+                {header}
 
-                <p className="mt-2 text-sm text-gray-500">
-                    No results information is available.
-                </p>
+                <div className="rounded-2xl border border-gray-200 bg-white p-8 text-center">
+                    <h2 className="text-lg font-semibold text-gray-800">
+                        Child data not found
+                    </h2>
+
+                    <p className="mt-2 text-sm text-gray-500">
+                        No results information is available.
+                    </p>
+                </div>
             </div>
         );
     }
@@ -106,16 +195,7 @@ export default function ParentResultsPage() {
     return (
         <div className="space-y-5">
             {/* Heading */}
-            <div>
-                <h1 className="text-2xl font-bold text-gray-900 sm:text-3xl">
-                    Results
-                </h1>
-
-                <p className="mt-1 text-sm text-gray-500 sm:text-base">
-                    View your child&apos;s examination results and academic
-                    performance.
-                </p>
-            </div>
+            {header}
 
             {/* Child Information + Selector */}
             <div className="grid gap-4 lg:grid-cols-[1fr_280px]">
@@ -146,9 +226,9 @@ export default function ParentResultsPage() {
 
                     <select
                         id="child"
-                        value={selectedChild}
+                        value={selectedStudent.id}
                         onChange={(e) =>
-                            setSelectedChild(Number(e.target.value))
+                            setSelectedChildId(Number(e.target.value))
                         }
                         className="w-full rounded-lg border border-gray-200 bg-white px-4 py-2.5 text-sm text-gray-700 outline-none transition focus:border-[#01796F] focus:ring-2 focus:ring-[#01796F]/20"
                     >
@@ -184,7 +264,7 @@ export default function ParentResultsPage() {
                             </div>
 
                             <h2 className="mt-3 text-2xl font-bold text-gray-900">
-                                {stat.value}
+                                {resultsLoading ? "-" : stat.value}
                             </h2>
                         </div>
                     );
@@ -203,7 +283,25 @@ export default function ParentResultsPage() {
                     </p>
                 </div>
 
-                <ParentResultsTable results={results} />
+                {resultsError && (
+                    <div
+                        role="alert"
+                        className="mb-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
+                    >
+                        {resultsError}
+                    </div>
+                )}
+
+                {resultsLoading ? (
+                    <div className="rounded-2xl border border-gray-100 bg-white p-10 text-center shadow-sm">
+                        <div className="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-gray-200 border-t-[#01796F]" />
+                        <p className="mt-4 text-sm text-gray-500">
+                            Loading results records...
+                        </p>
+                    </div>
+                ) : (
+                    <ParentResultsTable results={results} />
+                )}
             </div>
         </div>
     );
