@@ -215,6 +215,14 @@ export default function TeacherAttendancePage() {
         )
       : 0;
 
+  const formatDate = (value: string) =>
+    new Date(`${value}T00:00:00.000Z`).toLocaleDateString("en-GB", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+      timeZone: "UTC",
+    });
+
   const header = (
     <div>
       <h1 className="text-2xl font-bold text-gray-900 sm:text-3xl">
@@ -297,30 +305,35 @@ export default function TeacherAttendancePage() {
         <SummaryCard
           title="Present"
           value={presentCount}
+          loading={loading}
           icon={<Check size={20} />}
           iconClass="text-[#01796f]"
         />
         <SummaryCard
           title="Absent"
           value={absentCount}
+          loading={loading}
           icon={<X size={20} />}
           iconClass="text-[#01796F]"
         />
         <SummaryCard
           title="Late"
           value={lateCount}
+          loading={loading}
           icon={<Clock3 size={20} />}
           iconClass="text-[#01796F]"
         />
         <SummaryCard
           title="Leave"
           value={leaveCount}
+          loading={loading}
           icon={<Plane size={20} />}
           iconClass="text-[#01796F]"
         />
         <SummaryCard
           title="Attendance"
           value={`${attendancePercentage}%`}
+          loading={loading}
           icon={<CalendarDays size={20} />}
           iconClass="text-[#01796f]"
         />
@@ -334,9 +347,18 @@ export default function TeacherAttendancePage() {
           </h2>
 
           <p className="mt-1 text-sm text-gray-500">
-            Select a status for each student, then save your changes.
-            {markedCount} of {filteredRows.length} student(s) marked for
-            this date.
+            {markedCount === 0 ? (
+              <>
+                No attendance has been marked for {formatDate(date)} yet.
+                Select a status for each student below and save your changes.
+              </>
+            ) : (
+              <>
+                Select a status for each student, then save your changes.
+                {markedCount} of {filteredRows.length} student(s) marked for
+                this date.
+              </>
+            )}
           </p>
         </div>
 
@@ -385,11 +407,13 @@ export default function TeacherAttendancePage() {
 function SummaryCard({
   title,
   value,
+  loading,
   icon,
   iconClass,
 }: {
   title: string;
   value: string | number;
+  loading: boolean;
   icon: React.ReactNode;
   iconClass: string;
 }) {
@@ -399,7 +423,11 @@ function SummaryCard({
         <div>
           <p className="text-sm text-gray-500">{title}</p>
 
-          <h2 className="mt-2 text-2xl font-bold text-gray-800">{value}</h2>
+          {loading ? (
+            <div className="mt-2 h-7 w-12 animate-pulse rounded-lg bg-gray-100" />
+          ) : (
+            <h2 className="mt-2 text-2xl font-bold text-gray-800">{value}</h2>
+          )}
         </div>
 
         <div
