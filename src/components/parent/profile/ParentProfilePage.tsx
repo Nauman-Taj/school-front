@@ -51,6 +51,37 @@ const emptyPasswordForm: PasswordForm = {
   confirmPassword: "",
 };
 
+type Feedback = {
+  type: "success" | "error";
+  message: string;
+};
+
+type FeedbackBannerProps = Feedback;
+
+/**
+ * The message shown above a section, so a success or an error is always
+ * next to the form it belongs to.
+ */
+function FeedbackBanner({ type, message }: FeedbackBannerProps) {
+  return (
+    <div
+      role="status"
+      className={`flex items-start gap-2 rounded-xl border p-4 text-sm ${type === "success"
+        ? "border-[#b8e4dd] bg-[#e6f4f2] text-[#015f58]"
+        : "border-red-200 bg-red-50 text-red-700"
+        }`}
+    >
+      {type === "success" ? (
+        <Check size={18} className="mt-0.5 shrink-0" />
+      ) : (
+        <AlertCircle size={18} className="mt-0.5 shrink-0" />
+      )}
+
+      {message}
+    </div>
+  );
+}
+
 export default function ParentProfilePage() {
   const {
     profile: loadedProfile,
@@ -78,16 +109,28 @@ export default function ParentProfilePage() {
   const [passwordForm, setPasswordForm] =
     useState<PasswordForm>(emptyPasswordForm);
 
-  const [feedback, setFeedback] = useState<{
-    type: "success" | "error";
-    message: string;
-  } | null>(null);
+  // Each section keeps its own message, so a password error stays visible
+  // next to the password form instead of scrolling away to the top.
+  const [profileFeedback, setProfileFeedback] = useState<Feedback | null>(
+    null
+  );
 
-  const showFeedback = (
-    type: "success" | "error",
+  const [passwordFeedback, setPasswordFeedback] = useState<Feedback | null>(
+    null
+  );
+
+  const showProfileFeedback = (
+    type: Feedback["type"],
     message: string
   ) => {
-    setFeedback({ type, message });
+    setProfileFeedback({ type, message });
+  };
+
+  const showPasswordFeedback = (
+    type: Feedback["type"],
+    message: string
+  ) => {
+    setPasswordFeedback({ type, message });
   };
 
   const toForm = (source: {
@@ -109,14 +152,14 @@ export default function ParentProfilePage() {
 
     setForm(toForm(profile));
     setIsEditing(false);
-    setFeedback(null);
+    setProfileFeedback(null);
   };
 
   const handleStartEdit = () => {
     if (!profile) return;
 
     setForm(toForm(profile));
-    setFeedback(null);
+    setProfileFeedback(null);
     setIsEditing(true);
   };
 
@@ -127,7 +170,7 @@ export default function ParentProfilePage() {
     const email = form.email.trim().toLowerCase();
 
     if (!name || !email) {
-      showFeedback("error", "Name and email are required.");
+      showProfileFeedback("error", "Name and email are required.");
       return;
     }
 
@@ -149,9 +192,9 @@ export default function ParentProfilePage() {
       // Keep the stored session in step with the edited profile.
       updateAuthSession({ name: updated.name, email: updated.email });
 
-      showFeedback("success", "Profile updated successfully.");
+      showProfileFeedback("success", "Profile updated successfully.");
     } catch (err: unknown) {
-      showFeedback(
+      showProfileFeedback(
         "error",
         err instanceof Error
           ? err.message
@@ -176,12 +219,12 @@ export default function ParentProfilePage() {
       passwordForm;
 
     if (!currentPassword || !newPassword || !confirmPassword) {
-      showFeedback("error", "Please complete all password fields.");
+      showPasswordFeedback("error", "Please complete all password fields.");
       return;
     }
 
     if (newPassword.length < 8) {
-      showFeedback(
+      showPasswordFeedback(
         "error",
         "Your new password must contain at least 8 characters."
       );
@@ -189,12 +232,12 @@ export default function ParentProfilePage() {
     }
 
     if (newPassword !== confirmPassword) {
-      showFeedback("error", "The new passwords do not match.");
+      showPasswordFeedback("error", "The new passwords do not match.");
       return;
     }
 
     if (currentPassword === newPassword) {
-      showFeedback(
+      showPasswordFeedback(
         "error",
         "Your new password must be different from your current password."
       );
@@ -213,9 +256,9 @@ export default function ParentProfilePage() {
         confirmPassword: false,
       });
 
-      showFeedback("success", "Password updated successfully.");
+      showPasswordFeedback("success", "Password updated successfully.");
     } catch (err: unknown) {
-      showFeedback(
+      showPasswordFeedback(
         "error",
         err instanceof Error
           ? err.message
@@ -278,25 +321,6 @@ export default function ParentProfilePage() {
         </p>
       </div>
 
-      {/* Feedback */}
-      {feedback && (
-        <div
-          role="status"
-          className={`flex items-start gap-2 rounded-xl border p-4 text-sm ${feedback.type === "success"
-            ? "border-[#b8e4dd] bg-[#e6f4f2] text-[#015f58]"
-            : "border-red-200 bg-red-50 text-red-700"
-            }`}
-        >
-          {feedback.type === "success" ? (
-            <Check size={18} className="mt-0.5 shrink-0" />
-          ) : (
-            <AlertCircle size={18} className="mt-0.5 shrink-0" />
-          )}
-
-          {feedback.message}
-        </div>
-      )}
-
       {/* Profile Header */}
       <section className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
         <div className="flex flex-row items-center gap-3 sm:gap-5">
@@ -331,6 +355,11 @@ export default function ParentProfilePage() {
           </div>
         </div>
       </section>
+
+      {/* Profile feedback */}
+      {profileFeedback && (
+        <FeedbackBanner {...profileFeedback} />
+      )}
 
       {/* Personal Information */}
       <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
@@ -437,6 +466,11 @@ export default function ParentProfilePage() {
           </div>
         )}
       </div>
+
+      {/* Password feedback */}
+      {passwordFeedback && (
+        <FeedbackBanner {...passwordFeedback} />
+      )}
 
       {/* Change Password */}
       <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
