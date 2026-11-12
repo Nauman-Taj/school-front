@@ -59,6 +59,13 @@ export function mapApiTimetable(item: ApiTimetable): TimetableEntry {
   };
 }
 
+/**
+ * Converts the backend day name into the label used on screen.
+ */
+export function toDisplayDay(day: ApiTimetableDay): TimetableEntry["day"] {
+  return dayLabels[day] ?? "Monday";
+}
+
 function getToken(): string {
   const token = getAuthToken();
 

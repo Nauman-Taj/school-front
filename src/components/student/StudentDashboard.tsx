@@ -195,7 +195,7 @@ export default function StudentDashboard() {
                   </h2>
                 </div>
 
-                <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#01796f]/10 text-[#01796f]">
+                <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#e6f4f2] text-[#01796f]">
                   <Icon
                     size={21}
                     strokeWidth={1.8}

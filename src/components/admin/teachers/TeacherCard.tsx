@@ -77,7 +77,7 @@ export default function TeacherCard({
       <div className="mt-5 flex justify-center gap-2 border-t border-gray-100 pt-4">
         <Link
           href={`/admin/teachers/${teacher.id}`}
-          className="flex h-9 w-9 items-center justify-center rounded-lg text-gray-500 transition hover:bg-[#01796f]/10 hover:text-[#01796f]"
+          className="flex h-9 w-9 items-center justify-center rounded-lg text-gray-500 transition hover:bg-[#e6f4f2] hover:text-[#01796f]"
           aria-label={`View ${teacher.name}`}
         >
           <UserRound size={17} strokeWidth={1.8} />
@@ -85,7 +85,7 @@ export default function TeacherCard({
 
         <Link
           href={`/admin/teachers/${teacher.id}/edit`}
-          className="flex h-9 w-9 items-center justify-center rounded-lg text-gray-500 transition hover:bg-[#01796f]/10 hover:text-[#01796f]"
+          className="flex h-9 w-9 items-center justify-center rounded-lg text-gray-500 transition hover:bg-[#e6f4f2] hover:text-[#01796f]"
           aria-label={`Edit ${teacher.name}`}
         >
           <Pencil size={17} strokeWidth={1.8} />

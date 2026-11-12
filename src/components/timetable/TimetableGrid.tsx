@@ -7,9 +7,11 @@ import type { TimetableEntry } from "@/types/timetable";
 type TimetableGridProps = {
     entries: TimetableEntry[];
     emptyMessage?: string;
+    /** The day columns to render. Defaults to the whole school week. */
+    days?: readonly TimetableEntry["day"][];
 };
 
-const days = [
+const weekDays = [
     "Monday",
     "Tuesday",
     "Wednesday",
@@ -45,6 +47,7 @@ function toMinutes(value: string): number {
 export default function TimetableGrid({
     entries,
     emptyMessage = "No classes scheduled.",
+    days = weekDays,
 }: TimetableGridProps) {
     const times = Array.from(
         new Set(entries.map((entry) => entry.startTime))

@@ -2,63 +2,81 @@
 
 import Link from "next/link";
 import { useParams } from "next/navigation";
+import { useEffect, useState } from "react";
 import {
   ArrowLeft,
+  Users,
+  BookOpen,
+  CalendarDays,
+  UserRound,
   Mail,
   Phone,
-  UserRound,
-  Users,
   GraduationCap,
 } from "lucide-react";
 
-import { getSession } from "@/lib/auth";
-
-import { students } from "@/data/students";
-import { subjects } from "@/data/subjects";
+import { fetchTeacherStudent } from "@/lib/teacher-api";
+import type { TeacherStudent } from "@/lib/teacher-api";
 
 export default function TeacherStudentProfile() {
   const params = useParams();
-  const session = getSession();
-
   const studentId = Number(params.id);
 
-  const student = students.find(
-    (item) => item.id === studentId
+  const invalidStudentId = !Number.isFinite(studentId);
+
+  const [state, setState] = useState<{
+    loaded: boolean;
+    student: TeacherStudent | null;
+    error: string;
+  }>({
+    loaded: false,
+    student: null,
+    error: "",
+  });
+
+  useEffect(() => {
+    if (invalidStudentId) return;
+
+    let active = true;
+
+    fetchTeacherStudent(studentId)
+      .then((student) => {
+        if (!active) return;
+        setState({ loaded: true, student, error: "" });
+      })
+      .catch((err: unknown) => {
+        if (!active) return;
+        setState({
+          loaded: true,
+          student: null,
+          error:
+            err instanceof Error
+              ? err.message
+              : "This student is not assigned to your classes.",
+        });
+      });
+
+    return () => {
+      active = false;
+    };
+  }, [studentId, invalidStudentId]);
+
+  const backLink = (
+    <Link
+      href="/teacher/students"
+      className="inline-flex items-center gap-2 text-sm font-medium text-gray-500 transition hover:text-[#0176f]"
+    >
+      <ArrowLeft size={17} />
+
+      Back to Students
+    </Link>
   );
 
-  const currentTeacherId =
-    subjects.find(
-      (subject) => subject.teacher === session?.name
-    )?.teacherId ?? "T001";
-
-  const teacherSubjects = subjects.filter(
-    (subject) => subject.teacherId === currentTeacherId
-  );
-
-  const teacherClassKeys = new Set(
-    teacherSubjects.map(
-      (subject) => `${subject.className}-${subject.section}`
-    )
-  );
-
-  const isAssignedStudent =
-    student &&
-    teacherClassKeys.has(
-      `${student.className}-${student.section}`
-    );
-
-  if (!student || !isAssignedStudent) {
+  if (invalidStudentId) {
     return (
       <div className="space-y-5">
-        <Link
-          href="/teacher/students"
-          className="inline-flex items-center gap-2 text-sm font-medium text-gray-500 hover:text-[#01796f]"
-        >
-          <ArrowLeft size={17} />
-          Back to Students
-        </Link>
+        {backLink}
 
-        <div className="rounded-2xl border border-gray-200 bg-white p-8 text-center">
+        <div className="rounded-2xl border border-gray-100 bg-white p-8 text-center shadow-sm">
           <h1 className="text-lg font-semibold text-gray-900">
             Student not found
           </h1>
@@ -71,21 +89,55 @@ export default function TeacherStudentProfile() {
     );
   }
 
+  if (!state.loaded) {
+    return (
+      <div className="space-y-5">
+        {backLink}
+
+        <div className="rounded-2xl border border-gray-100 bg-white p-10 text-center shadow-sm">
+          <div className="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-gray-200 border-t-[#0176F]" />
+          <p className="mt-4 text-sm text-gray-500">
+            Loading the student...
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  const student = state.student;
+
+  if (!student) {
+    return (
+      <div className="space-y-5">
+        {backLink}
+
+        <div className="rounded-2xl border border-gray-100 bg-white p-8 text-center shadow-sm">
+          <h1 className="text-lg font-semibold text-gray-900">
+            Student not found
+          </h1>
+
+          <p className="mt-1 text-sm text-gray-500">{state.error}</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-5">
       {/* Header */}
       <div>
         <Link
           href="/teacher/students"
-          className="mb-4 inline-flex items-center gap-2 text-sm font-medium text-gray-500 hover:text-[#01796f]"
+          className="mb-4 inline-flex items-center gap-2 text-sm font-medium text-gray-500 transition hover:text-[#0176f]"
         >
           <ArrowLeft size={17} />
+
           Back to Students
         </Link>
 
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-4">
-            <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-[#01796f]/10 text-[#01796f]">
+            <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-[#e6f4f2] text-[#0176f]">
               <UserRound size={25} />
             </div>
 
@@ -114,7 +166,7 @@ export default function TeacherStudentProfile() {
       </div>
 
       {/* Basic Information */}
-      <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+      <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
         <div className="mb-5">
           <h2 className="text-lg font-semibold text-gray-900">
             Student Information
@@ -126,8 +178,8 @@ export default function TeacherStudentProfile() {
         </div>
 
         <div className="grid gap-5 sm:grid-cols-2">
-          <div className="flex items-center gap-3 rounded-xl bg-gray-50 p-4">
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-[#01796f]/10 text-[#01796f]">
+          <div className="flex items-center gap-3 rounded-xl bg-[#f6f8f8] p-4">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#e6f4f2] text-[#0176f]">
               <Mail size={18} />
             </div>
 
@@ -139,21 +191,21 @@ export default function TeacherStudentProfile() {
             </div>
           </div>
 
-          <div className="flex items-center gap-3 rounded-xl bg-gray-50 p-4">
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-[#01796f]/10 text-[#01796f]">
+          <div className="flex items-center gap-3 rounded-xl bg-[#f6f8f8] p-4">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#e6f4f2] text-[#0176f]">
               <Phone size={18} />
             </div>
 
             <div>
               <p className="text-xs text-gray-500">Phone</p>
               <p className="text-sm font-medium text-gray-900">
-                {student.phone}
+                {student.phone || "-"}
               </p>
             </div>
           </div>
 
-          <div className="flex items-center gap-3 rounded-xl bg-gray-50 p-4">
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-[#01796f]/10 text-[#01796f]">
+          <div className="flex items-center gap-3 rounded-xl bg-[#f6f8f8] p-4">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#e6f4f2] text-[#0176f]">
               <GraduationCap size={18} />
             </div>
 
@@ -165,15 +217,15 @@ export default function TeacherStudentProfile() {
             </div>
           </div>
 
-          <div className="flex items-center gap-3 rounded-xl bg-gray-50 p-4">
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-[#01796f]/10 text-[#01796f]">
+          <div className="flex items-center gap-3 rounded-xl bg-[#f6f8f8] p-4">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#e6f4f2] text-[#0176f]">
               <Users size={18} />
             </div>
 
             <div>
               <p className="text-xs text-gray-500">Parent</p>
               <p className="text-sm font-medium text-gray-900">
-                {student.parentName}
+                {student.parentName || "-"}
               </p>
             </div>
           </div>
@@ -181,31 +233,31 @@ export default function TeacherStudentProfile() {
       </div>
 
       {/* Academic Information */}
-      <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+      <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
         <h2 className="text-lg font-semibold text-gray-900">
           Academic Information
         </h2>
 
         <p className="mt-1 text-sm text-gray-500">
-          Academic details available to you as the student's teacher.
+          Academic details available to you as the student&apos;s teacher.
         </p>
 
         <div className="mt-5 grid gap-4 sm:grid-cols-3">
-          <div className="rounded-xl border border-gray-200 p-4">
+          <div className="rounded-xl border border-gray-100 p-4">
             <p className="text-sm text-gray-500">Class</p>
             <p className="mt-1 font-semibold text-gray-900">
               {student.className} - {student.section}
             </p>
           </div>
 
-          <div className="rounded-xl border border-gray-200 p-4">
+          <div className="rounded-xl border border-gray-100 p-4">
             <p className="text-sm text-gray-500">Roll Number</p>
             <p className="mt-1 font-semibold text-gray-900">
               {student.rollNo}
             </p>
           </div>
 
-          <div className="rounded-xl border border-gray-200 p-4">
+          <div className="rounded-xl border border-gray-100 p-4">
             <p className="text-sm text-gray-500">Status</p>
             <p className="mt-1 font-semibold text-gray-900">
               {student.status}
@@ -215,7 +267,7 @@ export default function TeacherStudentProfile() {
       </div>
 
       {/* Quick Actions */}
-      <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+      <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
         <h2 className="text-lg font-semibold text-gray-900">
           Quick Actions
         </h2>
@@ -225,33 +277,26 @@ export default function TeacherStudentProfile() {
         </p>
 
         <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          <Link
-            href="/teacher/attendance"
-            className="rounded-xl border border-gray-200 p-4 text-sm font-medium text-gray-700 transition hover:border-[#01796f] hover:bg-[#e6f4f2] hover:text-[#01796f]"
-          >
-            Attendance
-          </Link>
+          {[
+            { href: "/teacher/attendance", label: "Attendance", icon: CalendarDays },
+            { href: "/teacher/assignments", label: "Assignments", icon: BookOpen },
+            { href: "/teacher/exams", label: "Exams", icon: GraduationCap },
+            { href: "/teacher/marks", label: "Marks", icon: BookOpen },
+          ].map((action) => {
+            const Icon = action.icon;
 
-          <Link
-            href="/teacher/assignments"
-            className="rounded-xl border border-gray-200 p-4 text-sm font-medium text-gray-700 transition hover:border-[#01796f] hover:bg-[#e6f4f2] hover:text-[#01796f]"
-          >
-            Assignments
-          </Link>
+            return (
+              <Link
+                key={action.href}
+                href={action.href}
+                className="flex items-center gap-2 rounded-xl border border-gray-100 p-4 text-sm font-medium text-gray-700 transition hover:border-[#0176f] hover:bg-[#e6f4f2] hover:text-[#0176f]"
+              >
+                <Icon size={16} className="text-[#0176f]" />
 
-          <Link
-            href="/teacher/exams"
-            className="rounded-xl border border-gray-200 p-4 text-sm font-medium text-gray-700 transition hover:border-[#01796f] hover:bg-[#e6f4f2] hover:text-[#01796f]"
-          >
-            Exams
-          </Link>
-
-          <Link
-            href="/teacher/marks"
-            className="rounded-xl border border-gray-200 p-4 text-sm font-medium text-gray-700 transition hover:border-[#01796f] hover:bg-[#e6f4f2] hover:text-[#01796f]"
-          >
-            Marks
-          </Link>
+                {action.label}
+              </Link>
+            );
+          })}
         </div>
       </div>
     </div>

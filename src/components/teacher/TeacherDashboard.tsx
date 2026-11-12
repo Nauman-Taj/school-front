@@ -163,7 +163,7 @@ export default function TeacherDashboard() {
                   </h2>
                 </div>
 
-                <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#01796f]/10 text-[#01796f]">
+                <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#e6f4f2] text-[#01796f]">
                   <Icon
                     size={21}
                     strokeWidth={2}
@@ -207,7 +207,7 @@ export default function TeacherDashboard() {
                 href={action.href}
                 className="group flex items-center gap-4 rounded-xl border border-gray-200 p-4 text-left transition hover:border-[#01796f] hover:bg-[#e6f4f2]"
               >
-                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[#01796f]/10 text-[#01796f]">
+                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[#e6f4f2] text-[#01796f]">
                   <Icon
                     size={20}
                     strokeWidth={2}
@@ -265,7 +265,7 @@ export default function TeacherDashboard() {
                   key={item.id}
                   className="flex items-center gap-4 rounded-xl bg-gray-50 p-4"
                 >
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-[#01796f]/10 text-[#01796f]">
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#e6f4f2] text-[#01796f]">
                     <CalendarDays
                       size={19}
                       strokeWidth={2}
@@ -323,7 +323,7 @@ export default function TeacherDashboard() {
                   key={exam.id}
                   className="flex items-center gap-4 rounded-xl bg-gray-50 p-4"
                 >
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-[#01796f]/10 text-[#01796f]">
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#e6f4f2] text-[#01796f]">
                     <CalendarDays
                       size={19}
                       strokeWidth={2}

@@ -68,7 +68,7 @@ export default function TeacherAnnouncementTable({
                   >
                     <td className="px-5 py-4">
                       <div className="flex items-start gap-3">
-                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-[#01796f]/10 text-[#01796f]">
+                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#e6f4f2] text-[#01796f]">
                           <Megaphone size={18} />
                         </div>
 
@@ -129,7 +129,7 @@ export default function TeacherAnnouncementTable({
               className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm"
             >
               <div className="flex items-start gap-3">
-                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[#01796f]/10 text-[#01796f]">
+                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[#e6f4f2] text-[#01796f]">
                   <Megaphone size={19} />
                 </div>
 

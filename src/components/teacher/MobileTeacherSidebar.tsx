@@ -83,8 +83,8 @@ export default function MobileTeacherSidebar({
                   className={getNavigationItemClass(isActive)}
                 //  ${
                 //   isActive
-                //     ? "bg-[#01796f]/10 text-[#01796f]"
-                //     : "text-gray-600 hover:bg-[#01796f]/10 hover:text-[#01796f]"
+                //     ? "bg-[#e6f4f2] text-[#01796f]"
+                //     : "text-gray-600 hover:bg-[#e6f4f2] hover:text-[#01796f]"
                 // }`}
                 >
                   <Icon

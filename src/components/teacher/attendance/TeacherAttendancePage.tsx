@@ -1,7 +1,6 @@
-
 "use client";
 
-import { useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   CalendarDays,
   Check,
@@ -10,200 +9,273 @@ import {
   X,
 } from "lucide-react";
 
-import { getSession } from "@/lib/auth";
-import { attendance as initialAttendance } from "@/data/attendance";
-import { subjects } from "@/data/subjects";
-import { teachers } from "@/data/teachers";
-import type { StudentAttendanceRecord } from "@/types/attendance";
+import {
+  fetchTeacherAttendanceSheet,
+  markTeacherAttendance,
+  updateTeacherAttendance,
+} from "@/lib/teacher-api";
+import type { TeacherAttendanceRow } from "@/lib/teacher-api";
+import type { AttendanceStatus } from "@/types/attendance";
 
 import TeacherAttendanceTable from "./TeacherAttendanceTable";
 import TeacherAttendanceCard from "./TeacherAttendanceCard";
 
-type AttendanceStatus = StudentAttendanceRecord["status"];
+type SaveState = {
+  type: "success" | "error";
+  message: string;
+} | null;
 
 export default function TeacherAttendancePage() {
-  const session = getSession();
+  const [date, setDate] = useState(new Date().toISOString().slice(0, 10));
+  const [selectedClass, setSelectedClass] = useState("All");
 
-  const currentTeacher = teachers.find(
-    (teacher) =>
-      (!!session?.email && teacher.email === session.email) ||
-      (!!session?.name && teacher.name === session.name)
+  const [sheet, setSheet] = useState<{
+    classes: { className: string; section: string }[];
+    students: TeacherAttendanceRow[];
+  }>({
+    classes: [],
+    students: [],
+  });
+
+  const [overrides, setOverrides] = useState<
+    Record<number, AttendanceStatus>
+  >({});
+
+  const [loadedDate, setLoadedDate] = useState<string | null>(null);
+  const [saving, setSaving] = useState(false);
+  const [saveState, setSaveState] = useState<SaveState>(null);
+
+  const reloadSheet = useCallback(async (day: string) => {
+    try {
+      const data = await fetchTeacherAttendanceSheet(day);
+
+      setSheet({ classes: data.classes, students: data.students });
+      setOverrides({});
+      setSaveState(null);
+      setLoadedDate(day);
+    } catch (err: unknown) {
+      setSheet({ classes: [], students: [] });
+      setLoadedDate(day);
+      setSaveState({
+        type: "error",
+        message:
+          err instanceof Error
+            ? err.message
+            : "Unable to load the attendance sheet.",
+      });
+    }
+  }, []);
+
+  useEffect(() => {
+    let active = true;
+
+    fetchTeacherAttendanceSheet(date)
+      .then((data) => {
+        if (!active) return;
+        setSheet({ classes: data.classes, students: data.students });
+        setOverrides({});
+        setSaveState(null);
+        setLoadedDate(date);
+      })
+      .catch((err: unknown) => {
+        if (!active) return;
+        setSheet({ classes: [], students: [] });
+        setLoadedDate(date);
+        setSaveState({
+          type: "error",
+          message:
+            err instanceof Error
+              ? err.message
+              : "Unable to load the attendance sheet.",
+        });
+      });
+
+    return () => {
+      active = false;
+    };
+  }, [date]);
+
+  const loading = loadedDate !== date;
+
+  const rows = useMemo(
+    () =>
+      sheet.students.map((student) => ({
+        ...student,
+        status: overrides[student.studentId] ?? student.status,
+      })),
+    [sheet.students, overrides]
   );
 
-  const currentTeacherId = currentTeacher?.id;
+  const filteredRows = useMemo(
+    () =>
+      selectedClass === "All"
+        ? rows
+        : rows.filter(
+            (row) =>
+              `${row.className}-${row.section}` === selectedClass
+          ),
+    [rows, selectedClass]
+  );
 
-  const teacherClassKeys = useMemo(() => {
-    if (!currentTeacherId) return new Set<string>();
+  const handleStatusChange = (
+    studentId: number,
+    status: AttendanceStatus
+  ) => {
+    setOverrides((current) => ({ ...current, [studentId]: status }));
+    setSaveState(null);
+  };
 
-    return new Set(
-      subjects
-        .filter((subject) => subject.teacherId === currentTeacherId)
-        .map((subject) => `${subject.className}-${subject.section}`)
-    );
-  }, [currentTeacherId]);
+  const handleMarkAllPresent = () => {
+    if (filteredRows.length === 0) return;
 
-  const availableClasses = Array.from(teacherClassKeys);
+    setOverrides((current) => {
+      const next = { ...current };
 
-  const [selectedClass, setSelectedClass] = useState("All");
-  const [date, setDate] = useState("2026-09-08");
+      for (const row of filteredRows) {
+        next[row.studentId] = "Present";
+      }
 
-  // Temporary in-memory state until the attendance API is connected.
-  const [attendanceRecords, setAttendanceRecords] =
-    useState(initialAttendance);
+      return next;
+    });
 
-  const [saveMessage, setSaveMessage] = useState("");
+    setSaveState(null);
+  };
 
-  function getFormattedDate(value: string) {
-    const [year, month, day] = value.split("-");
-    const months = [
-      "Jan", "Feb", "Mar", "Apr", "May", "Jun",
-      "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
-    ];
+  const handleSave = async () => {
+    const changed = Object.entries(overrides);
 
-    return `${day} ${months[Number(month) - 1]} ${year}`;
-  }
-
-  const selectedDate = getFormattedDate(date);
-
-  const teacherAttendance = useMemo(() => {
-    if (!currentTeacherId) return [];
-
-    return attendanceRecords.filter(
-      (item): item is StudentAttendanceRecord =>
-        item.role === "Student" &&
-        teacherClassKeys.has(`${item.className}-${item.section}`) &&
-        item.date === selectedDate
-    );
-  }, [attendanceRecords, currentTeacherId, teacherClassKeys, selectedDate]);
-
-  const filteredAttendance =
-    selectedClass === "All"
-      ? teacherAttendance
-      : teacherAttendance.filter(
-          (item) =>
-            `${item.className}-${item.section}` === selectedClass
-        );
-
-  function updateStatus(id: StudentAttendanceRecord["id"], status: AttendanceStatus) {
-    setAttendanceRecords((current) =>
-      current.map((item) =>
-        item.id === id && item.role === "Student"
-          ? { ...item, status }
-          : item
-      )
-    );
-    setSaveMessage("");
-  }
-
-  function handleMarkAllPresent() {
-    if (filteredAttendance.length === 0) return;
-
-    const ids = new Set(filteredAttendance.map((item) => item.id));
-
-    setAttendanceRecords((current) =>
-      current.map((item) =>
-        item.role === "Student" && ids.has(item.id)
-          ? { ...item, status: "Present" }
-          : item
-      )
-    );
-
-    setSaveMessage("");
-  }
-
-  function handleSave() {
-    if (filteredAttendance.length === 0) {
-      setSaveMessage("There are no attendance records to save.");
+    if (changed.length === 0) {
+      setSaveState({
+        type: "error",
+        message: "There are no attendance changes to save.",
+      });
       return;
     }
 
-    // This confirms the current in-memory changes only.
-    // Connect this handler to the backend API for durable saving.
-    setSaveMessage(
-      "Attendance updated for this session. Connect the backend API to save it permanently."
-    );
-  }
+    setSaving(true);
 
-  const presentCount = filteredAttendance.filter(
-    (item) => item.status === "Present"
+    try {
+      for (const [studentId, status] of changed) {
+        const row = sheet.students.find(
+          (student) => student.studentId === Number(studentId)
+        );
+
+        if (!row) continue;
+
+        if (row.recordId) {
+          await updateTeacherAttendance(row.recordId, status);
+        } else {
+          await markTeacherAttendance(row.studentId, date, status);
+        }
+      }
+
+      await reloadSheet(date);
+
+      setSaveState({
+        type: "success",
+        message: `Attendance saved for ${changed.length} student(s).`,
+      });
+    } catch (err: unknown) {
+      setSaveState({
+        type: "error",
+        message:
+          err instanceof Error
+            ? err.message
+            : "Could not save the attendance. Please try again.",
+      });
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const presentCount = filteredRows.filter(
+    (row) => row.status === "Present"
   ).length;
-  const absentCount = filteredAttendance.filter(
-    (item) => item.status === "Absent"
+
+  const absentCount = filteredRows.filter(
+    (row) => row.status === "Absent"
   ).length;
-  const lateCount = filteredAttendance.filter(
-    (item) => item.status === "Late"
+
+  const lateCount = filteredRows.filter(
+    (row) => row.status === "Late"
   ).length;
-  const leaveCount = filteredAttendance.filter(
-    (item) => item.status === "Leave"
+
+  const leaveCount = filteredRows.filter(
+    (row) => row.status === "Leave"
+  ).length;
+
+  const markedCount = filteredRows.filter(
+    (row) => row.status !== null
   ).length;
 
   const attendancePercentage =
-    filteredAttendance.length > 0
+    filteredRows.length > 0
       ? Math.round(
-          ((presentCount + lateCount) / filteredAttendance.length) * 100
+          ((presentCount + lateCount) / filteredRows.length) * 100
         )
       : 0;
 
-  if (!currentTeacher) {
-    return (
-      <div className="rounded-2xl border border-gray-200 bg-white p-6">
-        <h1 className="text-xl font-bold text-gray-900">Attendance</h1>
-        <p className="mt-2 text-sm text-gray-500">
-          We couldn't match your session to a teacher account. Check the
-          logged-in user's email or name and the shared teachers data.
-        </p>
-      </div>
-    );
-  }
+  const header = (
+    <div>
+      <h1 className="text-2xl font-bold text-gray-900 sm:text-3xl">
+        Attendance
+      </h1>
+
+      <p className="mt-1 text-sm text-gray-500 sm:text-base">
+        Mark attendance for the classes assigned to you.
+      </p>
+    </div>
+  );
 
   return (
     <div className="space-y-5">
-      <div>
-        <h1 className="text-2xl font-bold text-gray-900 sm:text-3xl">
-          Attendance
-        </h1>
-        <p className="mt-1 text-sm text-gray-500">
-          Mark attendance for classes assigned to {currentTeacher.name}.
-        </p>
-      </div>
+      {header}
 
-      <div className="rounded-2xl border border-gray-200 bg-white shadow-sm">
-        <div className="grid gap-4 p-5 sm:grid-cols-2 lg:grid-cols-[1fr_1fr_auto] sm:p-6">
+      {/* Filters */}
+      <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-[1fr_1fr_auto]">
           <div>
-            <label htmlFor="attendanceClass" className="mb-2 block text-sm font-medium text-gray-700">
+            <label
+              htmlFor="attendanceClass"
+              className="mb-2 block text-sm font-medium text-gray-700"
+            >
               Class
             </label>
+
             <select
               id="attendanceClass"
               value={selectedClass}
-              onChange={(event) => {
-                setSelectedClass(event.target.value);
-                setSaveMessage("");
-              }}
-              className="w-full rounded-full border border-gray-200 bg-white px-4 py-2.5 text-sm text-gray-700 outline-none focus:border-[#01796f] focus:ring-2 focus:ring-[#01796f]/10"
+              onChange={(event) => setSelectedClass(event.target.value)}
+              className="w-full rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm text-gray-700 outline-none transition focus:border-[#01796F] focus:ring-2 focus:ring-[#01796F]/20"
             >
               <option value="All">All Classes</option>
-              {availableClasses.map((className) => (
-                <option key={className} value={className}>
-                  {className}
-                </option>
-              ))}
+
+              {sheet.classes.map((schoolClass) => {
+                const key = `${schoolClass.className}-${schoolClass.section}`;
+
+                return (
+                  <option key={key} value={key}>
+                    {key}
+                  </option>
+                );
+              })}
             </select>
           </div>
 
           <div>
-            <label htmlFor="attendanceDate" className="mb-2 block text-sm font-medium text-gray-700">
+            <label
+              htmlFor="attendanceDate"
+              className="mb-2 block text-sm font-medium text-gray-700"
+            >
               Date
             </label>
+
             <input
               id="attendanceDate"
               type="date"
               value={date}
-              onChange={(event) => {
-                setDate(event.target.value);
-                setSaveMessage("");
-              }}
-              className="w-full rounded-full border border-gray-200 bg-white px-4 py-2.5 text-sm text-gray-700 outline-none focus:border-[#01796f] focus:ring-2 focus:ring-[#01796f]/10"
+              onChange={(event) => setDate(event.target.value)}
+              className="w-full rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm text-gray-700 outline-none transition focus:border-[#01796F] focus:ring-2 focus:ring-[#01796F]/20"
             />
           </div>
 
@@ -211,7 +283,7 @@ export default function TeacherAttendancePage() {
             <button
               type="button"
               onClick={handleMarkAllPresent}
-              disabled={filteredAttendance.length === 0}
+              disabled={filteredRows.length === 0}
               className="w-full whitespace-nowrap rounded-full bg-[#01796f] px-6 py-2.5 text-sm font-semibold text-white transition hover:bg-[#015f58] disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto"
             >
               Mark All Present
@@ -220,42 +292,89 @@ export default function TeacherAttendancePage() {
         </div>
       </div>
 
+      {/* Summary */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
-        <SummaryCard title="Present" value={presentCount} icon={<Check size={20} />} iconClass="text-[#01796f]" />
-        <SummaryCard title="Absent" value={absentCount} icon={<X size={20} />} iconClass="text-red-500" />
-        <SummaryCard title="Late" value={lateCount} icon={<Clock3 size={20} />} iconClass="text-yellow-500" />
-        <SummaryCard title="Leave" value={leaveCount} icon={<Plane size={20} />} iconClass="text-blue-500" />
-        <SummaryCard title="Attendance" value={`${attendancePercentage}%`} icon={<CalendarDays size={20} />} iconClass="text-[#01796f]" />
+        <SummaryCard
+          title="Present"
+          value={presentCount}
+          icon={<Check size={20} />}
+          iconClass="text-[#01796f]"
+        />
+        <SummaryCard
+          title="Absent"
+          value={absentCount}
+          icon={<X size={20} />}
+          iconClass="text-red-500"
+        />
+        <SummaryCard
+          title="Late"
+          value={lateCount}
+          icon={<Clock3 size={20} />}
+          iconClass="text-yellow-500"
+        />
+        <SummaryCard
+          title="Leave"
+          value={leaveCount}
+          icon={<Plane size={20} />}
+          iconClass="text-blue-500"
+        />
+        <SummaryCard
+          title="Attendance"
+          value={`${attendancePercentage}%`}
+          icon={<CalendarDays size={20} />}
+          iconClass="text-[#01796f]"
+        />
       </div>
 
+      {/* Records */}
       <div>
         <div className="mb-4">
           <h2 className="text-lg font-semibold text-gray-900">
             Attendance Records
           </h2>
+
           <p className="mt-1 text-sm text-gray-500">
             Select a status for each student, then save your changes.
+            {markedCount} of {filteredRows.length} student(s) marked for
+            this date.
           </p>
         </div>
 
-        <TeacherAttendanceTable
-          attendance={filteredAttendance}
-          onStatusChange={updateStatus}
-          onSave={handleSave}
-        />
+        {loading ? (
+          <div className="rounded-2xl border border-gray-100 bg-white p-10 text-center shadow-sm">
+            <div className="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-gray-200 border-t-[#01796F]" />
+            <p className="mt-4 text-sm text-gray-500">
+              Loading the attendance sheet...
+            </p>
+          </div>
+        ) : (
+          <>
+            <TeacherAttendanceTable
+              attendance={filteredRows}
+              onStatusChange={handleStatusChange}
+              onSave={handleSave}
+              saving={saving}
+            />
 
-        <TeacherAttendanceCard
-          attendance={filteredAttendance}
-          onStatusChange={updateStatus}
-          onSave={handleSave}
-        />
+            <TeacherAttendanceCard
+              attendance={filteredRows}
+              onStatusChange={handleStatusChange}
+              onSave={handleSave}
+              saving={saving}
+            />
+          </>
+        )}
 
-        {saveMessage && (
+        {saveState && (
           <p
             role="status"
-            className="mt-3 rounded-xl border border-[#01796f]/15 bg-[#e6f4f2] px-4 py-3 text-sm text-[#015f58]"
+            className={`mt-3 rounded-xl border px-4 py-3 text-sm ${
+              saveState.type === "success"
+                ? "border-[#01796f]/15 bg-[#e6f4f2] text-[#015f58]"
+                : "border-red-200 bg-red-50 text-red-700"
+            }`}
           >
-            {saveMessage}
+            {saveState.message}
           </p>
         )}
       </div>
@@ -275,17 +394,20 @@ function SummaryCard({
   iconClass: string;
 }) {
   return (
-    <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm transition hover:shadow-md">
+    <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
       <div className="flex items-start justify-between">
         <div>
-          <p className="text-sm font-medium text-gray-500">{title}</p>
-          <h2 className="mt-2 text-2xl font-bold text-gray-900">{value}</h2>
+          <p className="text-sm text-gray-500">{title}</p>
+
+          <h2 className="mt-2 text-2xl font-bold text-gray-800">{value}</h2>
         </div>
-        <div className={`rounded-xl bg-[#e6f4f2] p-2.5 ${iconClass}`}>
+
+        <div
+          className={`flex h-11 w-11 items-center justify-center rounded-xl bg-[#e6f4f2] ${iconClass}`}
+        >
           {icon}
         </div>
       </div>
-      <p className="mt-3 text-sm text-gray-500">Attendance record</p>
     </div>
   );
 }

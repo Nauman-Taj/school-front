@@ -1,31 +1,31 @@
 "use client";
 
 import Link from "next/link";
-import {
-  Search,
-  UserRound,
-} from "lucide-react";
+import { Search } from "lucide-react";
 
-import { Student } from "@/types/student";
+import type { TeacherStudent } from "@/lib/teacher-api";
 
 type TeacherStudentTableProps = {
-  students: Student[];
+  students: TeacherStudent[];
   search: string;
   setSearch: (value: string) => void;
+  total: number;
 };
 
 export default function TeacherStudentTable({
   students,
   search,
   setSearch,
+  total,
 }: TeacherStudentTableProps) {
   return (
-    <div className="hidden overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm md:block">
-      <div className="border-b border-gray-200 p-5">
-        <div className="relative max-w-full">
+    <div className="space-y-5">
+      {/* Search */}
+      <div className="rounded-2xl border border-gray-100 bg-white p-4 shadow-sm">
+        <div className="relative">
           <Search
-            size={18}
-            className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+            size={17}
+            className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
           />
 
           <input
@@ -33,112 +33,96 @@ export default function TeacherStudentTable({
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search students"
-            className="w-full rounded-full border border-gray-200 py-2.5 pl-10 pr-4 text-sm outline-none focus:border-[#01796f]"
+            className="w-full rounded-xl border border-gray-200 bg-gray-50 py-3 pl-11 pr-4 text-sm outline-none transition placeholder:text-gray-400 focus:border-[#01796F] focus:bg-white focus:ring-2 focus:ring-[#01796F]/10"
           />
         </div>
       </div>
 
-      <div className="overflow-x-auto">
-        <table className="w-full">
-          <thead>
-            <tr className="border-b border-gray-200 bg-gray-50 text-left">
-              <th className="px-5 py-4 text-sm font-semibold text-gray-600">
-                Student
-              </th>
+      {/* Desktop table */}
+      <div className="hidden overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm md:block">
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead className="bg-gray-50 text-gray-700">
+              <tr>
+                <th className="px-5 py-4 font-semibold">Student</th>
+                <th className="px-5 py-4 font-semibold">Class</th>
+                <th className="px-5 py-4 font-semibold">Roll No</th>
+                <th className="px-5 py-4 font-semibold">Parent</th>
+                <th className="px-5 py-4 font-semibold">Status</th>
+                <th className="px-5 py-4 text-center font-semibold">
+                  Action
+                </th>
+              </tr>
+            </thead>
 
-              <th className="px-5 py-4 text-sm font-semibold text-gray-600">
-                Class
-              </th>
-
-              <th className="px-5 py-4 text-sm font-semibold text-gray-600">
-                Roll No
-              </th>
-
-              <th className="px-5 py-4 text-sm font-semibold text-gray-600">
-                Parent
-              </th>
-
-              <th className="px-5 py-4 text-sm font-semibold text-gray-600">
-                Status
-              </th>
-
-              <th className="px-5 py-4 text-right text-sm font-semibold text-gray-600">
-                Action
-              </th>
-            </tr>
-          </thead>
-
-          <tbody>
-            {students.length > 0 ? (
-              students.map((student) => (
+            <tbody className="divide-y divide-gray-100">
+              {students.map((student) => (
                 <tr
                   key={student.id}
-                  className="border-b border-gray-100 last:border-0"
+                  className="transition hover:bg-gray-50"
                 >
                   <td className="px-5 py-4">
-                    <div className="flex items-center gap-3">
-                      <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#01796f]/10 text-[#01796f]">
-                        <UserRound size={18} />
-                      </div>
+                    <p className="font-medium text-gray-900">
+                      {student.name}
+                    </p>
 
-                      <div>
-                        <p className="font-semibold text-gray-900">
-                          {student.name}
-                        </p>
-
-                        <p className="text-xs text-gray-500">
-                          {student.email}
-                        </p>
-                      </div>
-                    </div>
+                    <p className="mt-1 text-xs text-gray-500">
+                      {student.email}
+                    </p>
                   </td>
 
-                  <td className="px-5 py-4 text-sm text-gray-600">
-                    {student.className}
+                  <td className="px-5 py-4 text-gray-600">
+                    {student.className} - {student.section}
                   </td>
 
-                  <td className="px-5 py-4 text-sm text-gray-600">
+                  <td className="px-5 py-4 text-gray-600">
                     {student.rollNo}
                   </td>
 
-                  <td className="px-5 py-4 text-sm text-gray-600">
-                    {student.parentName}
+                  <td className="px-5 py-4 text-gray-600">
+                    {student.parentName || "-"}
                   </td>
 
                   <td className="px-5 py-4">
                     <span
-                      className={`rounded-full px-3 py-1 text-xs font-medium ${student.status === "Active"
+                      className={`inline-flex shrink-0 rounded-full px-3 py-1 text-xs font-medium ${
+                        student.status === "Active"
                           ? "bg-green-50 text-green-600"
                           : "bg-red-50 text-red-600"
-                        }`}
+                      }`}
                     >
                       {student.status}
                     </span>
                   </td>
 
-                  <td className="px-5 py-4 text-right">
+                  <td className="px-5 py-4 text-center">
                     <Link
                       href={`/teacher/students/${student.id}`}
-                      className="inline-flex items-center gap-2 rounded-full border border-gray-200 px-3 py-2 text-sm font-medium text-gray-600 transition hover:border-[#01796f] hover:bg-[#e6f4f2] hover:text-[#01796f]"
+                      className="inline-flex items-center justify-center rounded-full border border-gray-200 px-4 py-2 text-xs font-medium text-gray-700 transition hover:border-[#01796f] hover:bg-[#e6f4f2] hover:text-[#01796f]"
                     >
-                      <UserRound size={16} />
                       View
                     </Link>
                   </td>
                 </tr>
-              ))
-            ) : (
-              <tr>
-                <td
-                  colSpan={6}
-                  className="px-5 py-10 text-center text-sm text-gray-500"
-                >
-                  No students found.
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
+              ))}
+
+              {students.length === 0 && (
+                <tr>
+                  <td
+                    colSpan={6}
+                    className="px-5 py-8 text-center text-sm text-gray-500"
+                  >
+                    No students found.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+
+        <div className="border-t border-gray-100 px-5 py-4 text-sm text-gray-500">
+          Showing {students.length} of {total} students
+        </div>
       </div>
     </div>
   );

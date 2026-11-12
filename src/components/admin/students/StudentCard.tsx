@@ -24,7 +24,7 @@ export default function StudentCard({
       {/* Header */}
       <div className="flex items-start justify-between gap-4">
         <div className="flex items-center gap-3">
-          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[#01796f]/10 text-[#01796f]">
+          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[#e6f4f2] text-[#01796f]">
             <UserRound size={21} strokeWidth={1.8} />
           </div>
 
@@ -57,7 +57,7 @@ export default function StudentCard({
             Class
           </span>
 
-          <span className="rounded-full bg-[#01796f]/10 px-2.5 py-1 text-sm font-medium text-[#01796f]">
+          <span className="rounded-full bg-[#e6f4f2] px-2.5 py-1 text-sm font-medium text-[#01796f]">
             {student.className}
           </span>
         </div>
@@ -88,14 +88,14 @@ export default function StudentCard({
         <Link
           href={`/admin/students/${student.id}`}
           aria-label={`View ${student.name}`}
-          className="flex items-center justify-center rounded-lg border-gray-200 px-3 py-2.5 text-gray-700 transition hover:border-[#01796f] hover:bg-[#01796f]/10 hover:text-[#01796f]"
+          className="flex items-center justify-center rounded-lg border-gray-200 px-3 py-2.5 text-gray-700 transition hover:border-[#01796f] hover:bg-[#e6f4f2] hover:text-[#01796f]"
         >
           <UserRound size={17} strokeWidth={1.8} />
         </Link>
 
         <Link
           href={`/admin/students/${student.id}/edit`}
-          className="flex items-center justify-center rounded-lg border-gray-200 px-3 py-2.5 text-gray-500 transition hover:border-[#01796f] hover:bg-[#01796f]/10 hover:text-[#01796f]"
+          className="flex items-center justify-center rounded-lg border-gray-200 px-3 py-2.5 text-gray-500 transition hover:border-[#01796f] hover:bg-[#e6f4f2] hover:text-[#01796f]"
           aria-label={`Edit ${student.name}`}
         >
           <Pencil size={17} strokeWidth={1.8} />

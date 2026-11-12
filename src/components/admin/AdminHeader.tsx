@@ -366,7 +366,7 @@ export default function AdminHeader({
           {/* User profile */}
           <Link href="/admin/profile" aria-label="Open admin profile" className="ml-2 flex items-center gap-3 border-l border-gray-200 pl-4 transition hover:opacity-80">
             <div className="hidden text-right sm:block"><p className="text-sm font-semibold text-gray-900">{session?.name || session?.username || "Admin"}</p><p className="text-xs text-gray-500">{session?.role || "Admin"}</p></div>
-            <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#01796f]/10 text-[#01796f]"><User size={19} strokeWidth={1.8} /></div>
+            <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#e6f4f2] text-[#01796f]"><User size={19} strokeWidth={1.8} /></div>
           </Link>
 
           {/* Logout */}

@@ -59,7 +59,7 @@ export default function StudyMaterialTable({
             <button
                 type="button"
                 onClick={() => handleDownload(item.title)}
-                className="flex h-9 w-9 items-center justify-center rounded-lg text-gray-500 transition hover:bg-[#01796f]/10 hover:text-[#01796f]"
+                className="flex h-9 w-9 items-center justify-center rounded-lg text-gray-500 transition hover:bg-[#e6f4f2] hover:text-[#01796f]"
                 aria-label={`Download ${item.title}`}
                 title="Download"
             >
@@ -68,7 +68,7 @@ export default function StudyMaterialTable({
 
             <Link
                 href={`/teacher/study-material/${item.id}/edit`}
-                className="flex h-9 w-9 items-center justify-center rounded-lg text-gray-500 transition hover:bg-[#01796f]/10 hover:text-[#01796f]"
+                className="flex h-9 w-9 items-center justify-center rounded-lg text-gray-500 transition hover:bg-[#e6f4f2] hover:text-[#01796f]"
                 aria-label={`Edit ${item.title}`}
                 title="Edit"
             >
