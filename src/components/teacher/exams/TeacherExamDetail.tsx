@@ -159,7 +159,7 @@ export default function TeacherExamDetail({ examId }: Props) {
       {/* Students */}
       <div className="overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm">
         <div className="overflow-x-auto">
-          <table className="w-full min-w-[720px] text-sm">
+          <table className="w-full min-w-[720px] text-left text-sm">
             <thead className="bg-gray-50 text-gray-700">
               <tr>
                 <th className="px-5 py-4 font-semibold">Roll No</th>
