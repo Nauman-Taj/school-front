@@ -107,7 +107,7 @@ export default function TeacherAttendanceTable({
                                 .value as AttendanceStatus
                             )
                           }
-                          className={`rounded-full border-0 px-4 py-2 text-sm font-medium outline-none focus:ring-2 focus:ring-[#0176f]/20 ${statusClass(item.status)}`}
+                          className={`rounded-full border-0 px-4 py-2 text-sm font-medium outline-none focus:ring-2 focus:ring-[#01796F]/20 ${statusClass(item.status)}`}
                         >
                           <option value="">Not marked</option>
 

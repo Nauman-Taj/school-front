@@ -7,7 +7,10 @@ import TeacherHeader from "@/components/teacher/TeacherHeader";
 import TeacherSidebar from "@/components/teacher/TeacherSidebar";
 import MobileTeacherSidebar from "@/components/teacher/MobileTeacherSidebar";
 
-import { getSession } from "@/lib/auth";
+import {
+  useAuthSession,
+  useSessionHydrated,
+} from "@/lib/useAuthSession";
 
 export default function TeacherLayout({
   children,
@@ -16,11 +19,16 @@ export default function TeacherLayout({
 }>) {
   const router = useRouter();
 
+  // The session lives outside React, so it is read through
+  // `useAuthSession()` instead of being copied into state inside an effect.
+  const session = useAuthSession();
+  const hydrated = useSessionHydrated();
+
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
-  const [checkingAuth, setCheckingAuth] = useState(true);
 
   useEffect(() => {
-    const session = getSession();
+    // The stored session is only read after the first client render.
+    if (!hydrated) return;
 
     // Not logged in
     if (!session) {
@@ -39,14 +47,10 @@ export default function TeacherLayout({
       } else {
         router.replace("/");
       }
-
-      return;
     }
+  }, [hydrated, router, session]);
 
-    setCheckingAuth(false);
-  }, [router]);
-
-  if (checkingAuth) {
+  if (!hydrated || !session || session.role !== "Teacher") {
     return null;
   }
 

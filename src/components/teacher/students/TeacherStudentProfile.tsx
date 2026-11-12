@@ -63,7 +63,7 @@ export default function TeacherStudentProfile() {
   const backLink = (
     <Link
       href="/teacher/students"
-      className="inline-flex items-center gap-2 text-sm font-medium text-gray-500 transition hover:text-[#0176f]"
+      className="inline-flex items-center gap-2 text-sm font-medium text-gray-500 transition hover:text-[#01796F]"
     >
       <ArrowLeft size={17} />
 
@@ -128,7 +128,7 @@ export default function TeacherStudentProfile() {
       <div>
         <Link
           href="/teacher/students"
-          className="mb-4 inline-flex items-center gap-2 text-sm font-medium text-gray-500 transition hover:text-[#0176f]"
+          className="mb-4 inline-flex items-center gap-2 text-sm font-medium text-gray-500 transition hover:text-[#01796F]"
         >
           <ArrowLeft size={17} />
 
@@ -137,7 +137,7 @@ export default function TeacherStudentProfile() {
 
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-4">
-            <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-[#e6f4f2] text-[#0176f]">
+            <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-[#e6f4f2] text-[#01796F]">
               <UserRound size={25} />
             </div>
 
@@ -179,7 +179,7 @@ export default function TeacherStudentProfile() {
 
         <div className="grid gap-5 sm:grid-cols-2">
           <div className="flex items-center gap-3 rounded-xl bg-[#f6f8f8] p-4">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#e6f4f2] text-[#0176f]">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#e6f4f2] text-[#01796F]">
               <Mail size={18} />
             </div>
 
@@ -192,7 +192,7 @@ export default function TeacherStudentProfile() {
           </div>
 
           <div className="flex items-center gap-3 rounded-xl bg-[#f6f8f8] p-4">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#e6f4f2] text-[#0176f]">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#e6f4f2] text-[#01796F]">
               <Phone size={18} />
             </div>
 
@@ -205,7 +205,7 @@ export default function TeacherStudentProfile() {
           </div>
 
           <div className="flex items-center gap-3 rounded-xl bg-[#f6f8f8] p-4">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#e6f4f2] text-[#0176f]">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#e6f4f2] text-[#01796F]">
               <GraduationCap size={18} />
             </div>
 
@@ -218,7 +218,7 @@ export default function TeacherStudentProfile() {
           </div>
 
           <div className="flex items-center gap-3 rounded-xl bg-[#f6f8f8] p-4">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#e6f4f2] text-[#0176f]">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#e6f4f2] text-[#01796F]">
               <Users size={18} />
             </div>
 
@@ -289,9 +289,9 @@ export default function TeacherStudentProfile() {
               <Link
                 key={action.href}
                 href={action.href}
-                className="flex items-center gap-2 rounded-xl border border-gray-100 p-4 text-sm font-medium text-gray-700 transition hover:border-[#0176f] hover:bg-[#e6f4f2] hover:text-[#0176f]"
+                className="flex items-center gap-2 rounded-xl border border-gray-100 p-4 text-sm font-medium text-gray-700 transition hover:border-[#01796F] hover:bg-[#e6f4f2] hover:text-[#01796F]"
               >
-                <Icon size={16} className="text-[#0176f]" />
+                <Icon size={16} className="text-[#01796F]" />
 
                 {action.label}
               </Link>

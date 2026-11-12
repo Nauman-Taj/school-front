@@ -16,6 +16,10 @@ function subscribe(onStoreChange: () => void) {
   };
 }
 
+function subscribeToNothing() {
+  return () => {};
+}
+
 /**
  * Reads the signed-in session from the browser storage.
  *
@@ -27,4 +31,20 @@ function subscribe(onStoreChange: () => void) {
  */
 export function useAuthSession(): AuthSession | null {
   return useSyncExternalStore(subscribe, getSession, () => null);
+}
+
+/**
+ * Reports whether the browser storage has been read.
+ *
+ * The server render has no session, so the first client render still uses the
+ * server snapshot. A guard that redirects on a missing session has to wait for
+ * this flag, otherwise it would send a signed-in user to the landing page
+ * before the stored session has been read.
+ */
+export function useSessionHydrated(): boolean {
+  return useSyncExternalStore(
+    subscribeToNothing,
+    () => true,
+    () => false
+  );
 }

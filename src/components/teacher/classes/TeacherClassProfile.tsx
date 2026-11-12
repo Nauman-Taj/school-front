@@ -60,7 +60,7 @@ export default function TeacherClassProfile() {
   const backLink = (
     <Link
       href="/teacher/classes"
-      className="inline-flex items-center gap-2 text-sm font-medium text-gray-500 transition hover:text-[#0176f]"
+      className="inline-flex items-center gap-2 text-sm font-medium text-gray-500 transition hover:text-[#01796F]"
     >
       <ArrowLeft size={17} strokeWidth={2} />
 
@@ -132,7 +132,7 @@ export default function TeacherClassProfile() {
       <div>
         <Link
           href="/teacher/classes"
-          className="mb-4 inline-flex items-center gap-2 text-sm font-medium text-gray-500 transition hover:text-[#0176f]"
+          className="mb-4 inline-flex items-center gap-2 text-sm font-medium text-gray-500 transition hover:text-[#01796F]"
         >
           <ArrowLeft size={17} strokeWidth={2} />
 
@@ -151,7 +151,7 @@ export default function TeacherClassProfile() {
           </div>
 
           {detail.isClassTeacher && (
-            <span className="w-fit rounded-full bg-[#e6f4f2] px-4 py-2 text-sm font-medium text-[#0176f]">
+            <span className="w-fit rounded-full bg-[#e6f4f2] px-4 py-2 text-sm font-medium text-[#01796F]">
               Class Teacher
             </span>
           )}
@@ -162,7 +162,7 @@ export default function TeacherClassProfile() {
       <div className="grid gap-4 sm:grid-cols-3">
         <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
           <div className="flex items-center gap-3">
-            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#e6f4f2] text-[#0176f]">
+            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#e6f4f2] text-[#01796F]">
               <Users size={20} strokeWidth={2} />
             </div>
 
@@ -178,7 +178,7 @@ export default function TeacherClassProfile() {
 
         <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
           <div className="flex items-center gap-3">
-            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#e6f4f2] text-[#0176f]">
+            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#e6f4f2] text-[#01796F]">
               <BookOpen size={20} strokeWidth={2} />
             </div>
 
@@ -194,7 +194,7 @@ export default function TeacherClassProfile() {
 
         <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
           <div className="flex items-center gap-3">
-            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#e6f4f2] text-[#0176f]">
+            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#e6f4f2] text-[#01796F]">
               <CalendarDays size={20} strokeWidth={2} />
             </div>
 
@@ -222,7 +222,7 @@ export default function TeacherClassProfile() {
             </p>
           </div>
 
-          <span className="shrink-0 rounded-full bg-[#e6f4f2] px-3 py-1 text-sm font-medium text-[#0176f]">
+          <span className="shrink-0 rounded-full bg-[#e6f4f2] px-3 py-1 text-sm font-medium text-[#01796F]">
             {detail.students.length} Students
           </span>
         </div>
@@ -234,7 +234,7 @@ export default function TeacherClassProfile() {
                 key={student.id}
                 className="flex items-center gap-3 rounded-xl bg-[#f6f8f8] p-4"
               >
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#e6f4f2] text-[#0176f]">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#e6f4f2] text-[#01796F]">
                   <UserRound size={18} strokeWidth={2} />
                 </div>
 
@@ -250,7 +250,7 @@ export default function TeacherClassProfile() {
 
                 <Link
                   href={`/teacher/students/${student.id}`}
-                  className="rounded-full border border-gray-200 px-4 py-2 text-sm font-medium text-gray-600 transition hover:border-[#0176f] hover:bg-[#e6f4f2] hover:text-[#0176f]"
+                  className="rounded-full border border-gray-200 px-4 py-2 text-sm font-medium text-gray-600 transition hover:border-[#01796F] hover:bg-[#e6f4f2] hover:text-[#01796F]"
                 >
                   View
                 </Link>

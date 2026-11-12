@@ -21,7 +21,7 @@ export default function TeacherStudentCard({
             className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm"
           >
             <div className="flex items-start gap-3">
-              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[#e6f4f2] text-[#0176f]">
+              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[#e6f4f2] text-[#01796F]">
                 <UserRound size={19} />
               </div>
 
@@ -70,7 +70,7 @@ export default function TeacherStudentCard({
 
             <Link
               href={`/teacher/students/${student.id}`}
-              className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-full border border-gray-200 px-4 py-2.5 text-sm font-medium text-gray-600 transition hover:border-[#0176f] hover:bg-[#e6f4f2] hover:text-[#0176f]"
+              className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-full border border-gray-200 px-4 py-2.5 text-sm font-medium text-gray-600 transition hover:border-[#01796F] hover:bg-[#e6f4f2] hover:text-[#01796F]"
             >
               View Student
             </Link>

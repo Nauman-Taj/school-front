@@ -93,21 +93,21 @@ export default function StudentAttendanceTable() {
           title="Absent"
           value={absentCount}
           icon={<X size={20} />}
-          iconClass="text-red-500"
+          iconClass="text-[#01796F]"
         />
 
         <SummaryCard
           title="Late"
           value={lateCount}
           icon={<Clock3 size={20} />}
-          iconClass="text-yellow-500"
+          iconClass="text-[#01796F]"
         />
 
         <SummaryCard
           title="Leave"
           value={leaveCount}
           icon={<Plane size={20} />}
-          iconClass="text-blue-500"
+          iconClass="text-[#01796F]"
         />
 
         <SummaryCard

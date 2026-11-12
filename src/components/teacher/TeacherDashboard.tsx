@@ -1,109 +1,152 @@
 "use client";
 
 import Link from "next/link";
+import { useEffect, useMemo, useState } from "react";
 import {
   ArrowRight,
   BookOpen,
   CalendarDays,
   ClipboardCheck,
   FileText,
+  GraduationCap,
   Users,
 } from "lucide-react";
 
-import { getSession } from "@/lib/auth";
+import {
+  fetchTeacherAssignments,
+  fetchTeacherClasses,
+  fetchTeacherExams,
+  fetchTeacherStudents,
+  fetchTeacherTimetable,
+} from "@/lib/teacher-api";
+import type {
+  TeacherAssignment,
+  TeacherClassView,
+  TeacherExam,
+  TeacherStudent,
+} from "@/lib/teacher-api";
+import type { TimetableEntry } from "@/types/timetable";
+import { useTeacherProfile } from "@/lib/useTeacherProfile";
 
-import { teachers } from "@/data/teachers";
-import { students } from "@/data/students";
-import { subjects } from "@/data/subjects";
-import { assignments } from "@/data/assignments";
-import { exams } from "@/data/exams";
-import { timetable } from "@/data/timetable";
+type DashboardData = {
+  classes: TeacherClassView[];
+  students: TeacherStudent[];
+  assignments: TeacherAssignment[];
+  exams: TeacherExam[];
+  periods: TimetableEntry[];
+};
+
+const emptyData: DashboardData = {
+  classes: [],
+  students: [],
+  assignments: [],
+  exams: [],
+  periods: [],
+};
 
 export default function TeacherDashboard() {
-  const session = getSession();
+  const { profile, loading: profileLoading } = useTeacherProfile();
 
-  const currentTeacher =
-    teachers.find(
-      (teacher) =>
-        teacher.email === session?.email ||
-        teacher.name === session?.name
-    ) ?? teachers[0];
+  const [data, setData] = useState<DashboardData>(emptyData);
+  const [loaded, setLoaded] = useState(false);
+  const [failures, setFailures] = useState<string[]>([]);
 
-  const teacherSubjects = subjects.filter(
-    (subject) => subject.teacherId === currentTeacher.id
+  useEffect(() => {
+    let active = true;
+
+    const load = async () => {
+      const [classes, students, assignments, exams, timetable] =
+        await Promise.allSettled([
+          fetchTeacherClasses(),
+          fetchTeacherStudents(),
+          fetchTeacherAssignments(),
+          fetchTeacherExams(),
+          fetchTeacherTimetable(),
+        ]);
+
+      if (!active) return;
+
+      const missing: string[] = [];
+
+      const value = <T,>(
+        result: PromiseSettledResult<T>,
+        label: string,
+        fallback: T
+      ): T => {
+        if (result.status === "fulfilled") return result.value;
+
+        missing.push(label);
+
+        return fallback;
+      };
+
+      const timetableValue =
+        timetable.status === "fulfilled" ? timetable.value : null;
+
+      if (!timetableValue) missing.push("Timetable");
+
+      setData({
+        classes: value(classes, "Classes", []),
+        students: value(students, "Students", []),
+        assignments: value(assignments, "Assignments", []),
+        exams: value(exams, "Exams", []),
+        periods: timetableValue?.periods ?? [],
+      });
+
+      setFailures(missing);
+      setLoaded(true);
+    };
+
+    void load();
+
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  const todayName = useMemo(
+    () =>
+      new Date().toLocaleDateString("en-US", { weekday: "long" }),
+    []
   );
 
-  const teacherAssignments = assignments.filter(
-    (assignment) => assignment.teacherId === currentTeacher.id
+  const todayClasses = useMemo(
+    () => data.periods.filter((period) => period.day === todayName),
+    [data.periods, todayName]
   );
 
-  const teacherExams = exams.filter(
-    (exam) => exam.teacherId === currentTeacher.id
-  );
-
-  const teacherTimetable = timetable.filter(
-    (entry) => entry.teacherId === currentTeacher.id
-  );
-
-  const teacherClassKeys = Array.from(
-    new Set(
-      teacherSubjects.map(
-        (subject) =>
-          `${subject.className}-${subject.section}`
-      )
-    )
-  );
-
-  const teacherStudents = students.filter((student) =>
-    teacherClassKeys.includes(
-      `${student.className}-${student.section}`
-    )
-  );
-
-  const pendingAssignments = teacherAssignments.filter(
+  const pendingAssignments = data.assignments.filter(
     (assignment) => assignment.status === "Pending"
   ).length;
 
-  const upcomingExams = teacherExams.filter(
+  const upcomingExams = data.exams.filter(
     (exam) => exam.status === "Upcoming"
-  );
-
-  const today = new Intl.DateTimeFormat("en-US", {
-    weekday: "long",
-  }).format(new Date());
-
-  const todayClasses = teacherTimetable
-    .filter((item) => item.day === today)
-    .slice(0, 4);
+  ).length;
 
   const stats = [
     {
       title: "My Classes",
-      value: teacherClassKeys.length,
-      change: `${teacherSubjects.length}`,
-      description: "subjects assigned",
-      icon: BookOpen,
+      value: data.classes.length,
+      description: "classes assigned",
+      icon: GraduationCap,
     },
     {
       title: "My Students",
-      value: teacherStudents.length,
-      change: `${teacherClassKeys.length}`,
-      description: "classes",
+      value: data.students.length,
+      description: "students enrolled",
       icon: Users,
     },
     {
       title: "Pending Assignments",
       value: pendingAssignments,
-      change: `${teacherAssignments.length}`,
       description: "total assignments",
       icon: FileText,
     },
     {
       title: "Upcoming Exams",
-      value: upcomingExams.length,
-      change: `${teacherExams.length}`,
+      value: upcomingExams,
       description: "total exams",
-      icon: CalendarDays,
+      icon: ClipboardCheck,
     },
   ];
 
@@ -128,6 +171,29 @@ export default function TeacherDashboard() {
     },
   ];
 
+  if (profileLoading || !loaded) {
+    return (
+      <main className="space-y-5">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900 sm:text-3xl">
+            Dashboard
+          </h1>
+
+          <p className="mt-1 text-sm text-gray-500 sm:text-base">
+            Loading your dashboard...
+          </p>
+        </div>
+
+        <div className="rounded-2xl border border-gray-100 bg-white p-10 text-center shadow-sm">
+          <div className="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-gray-200 border-t-[#01796F]" />
+          <p className="mt-4 text-sm text-gray-500">
+            Loading your classes...
+          </p>
+        </div>
+      </main>
+    );
+  }
+
   return (
     <main className="space-y-5">
       {/* Header */}
@@ -137,10 +203,19 @@ export default function TeacherDashboard() {
         </h1>
 
         <p className="mt-1 text-sm text-gray-500 sm:text-base">
-          Welcome back, {currentTeacher.name}. Here's what's happening with
-          your classes today.
+          Welcome back, {profile?.name ?? "teacher"}. Here&apos;s what&apos;s
+          happening with your classes today.
         </p>
       </div>
+
+      {failures.length > 0 && (
+        <div
+          role="alert"
+          className="rounded-2xl border border-red-200 bg-red-50 p-4 text-sm text-red-700"
+        >
+          Could not load: {failures.join(", ")}.
+        </div>
+      )}
 
       {/* Stats */}
       <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-4">
@@ -150,43 +225,32 @@ export default function TeacherDashboard() {
           return (
             <div
               key={stat.title}
-              className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm transition-shadow hover:shadow-md"
+              className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm"
             >
               <div className="flex items-start justify-between">
                 <div>
-                  <p className="text-sm font-medium text-gray-500">
-                    {stat.title}
-                  </p>
+                  <p className="text-sm text-gray-500">{stat.title}</p>
 
-                  <h2 className="mt-2 text-2xl font-bold text-gray-900">
+                  <h2 className="mt-2 text-2xl font-bold text-gray-800">
                     {stat.value}
                   </h2>
                 </div>
 
-                <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#e6f4f2] text-[#01796f]">
-                  <Icon
-                    size={21}
-                    strokeWidth={2}
-                  />
+                <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#e6f4f2] text-[#01796F]">
+                  <Icon size={21} strokeWidth={2} />
                 </div>
               </div>
 
-              <div className="mt-4 flex items-center gap-2 text-sm">
-                <span className="font-semibold text-[#01796f]">
-                  {stat.change}
-                </span>
-
-                <span className="text-gray-500">
-                  {stat.description}
-                </span>
-              </div>
+              <p className="mt-3 text-sm text-gray-500">
+                {stat.description}
+              </p>
             </div>
           );
         })}
       </div>
 
       {/* Quick Actions */}
-      <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
+      <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
         <div className="mb-6">
           <h2 className="text-lg font-semibold text-gray-900">
             Quick Actions
@@ -205,13 +269,10 @@ export default function TeacherDashboard() {
               <Link
                 key={action.title}
                 href={action.href}
-                className="group flex items-center gap-4 rounded-xl border border-gray-200 p-4 text-left transition hover:border-[#01796f] hover:bg-[#e6f4f2]"
+                className="group flex items-center gap-4 rounded-xl border border-gray-100 p-4 text-left transition hover:border-[#01796F] hover:bg-[#e6f4f2]"
               >
-                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[#e6f4f2] text-[#01796f]">
-                  <Icon
-                    size={20}
-                    strokeWidth={2}
-                  />
+                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[#e6f4f2] text-[#01796F]">
+                  <Icon size={20} strokeWidth={2} />
                 </div>
 
                 <div className="min-w-0 flex-1">
@@ -227,7 +288,7 @@ export default function TeacherDashboard() {
                 <ArrowRight
                   size={17}
                   strokeWidth={2}
-                  className="text-gray-400 transition group-hover:translate-x-1 group-hover:text-[#01796f]"
+                  className="text-gray-400 transition group-hover:translate-x-1 group-hover:text-[#01796F]"
                 />
               </Link>
             );
@@ -238,11 +299,11 @@ export default function TeacherDashboard() {
       {/* Classes + Exams */}
       <div className="grid gap-5 xl:grid-cols-2">
         {/* Today's Classes */}
-        <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
+        <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
           <div className="mb-6 flex items-start justify-between gap-4">
             <div>
               <h2 className="text-lg font-semibold text-gray-900">
-                Today's Classes
+                Today&apos;s Classes
               </h2>
 
               <p className="mt-1 text-sm text-gray-500">
@@ -252,7 +313,7 @@ export default function TeacherDashboard() {
 
             <Link
               href="/teacher/classes"
-              className="text-sm font-medium text-[#01796f] hover:text-[#015f58]"
+              className="text-sm font-medium text-[#01796F] hover:text-[#015f58]"
             >
               View all
             </Link>
@@ -263,13 +324,10 @@ export default function TeacherDashboard() {
               todayClasses.map((item) => (
                 <div
                   key={item.id}
-                  className="flex items-center gap-4 rounded-xl bg-gray-50 p-4"
+                  className="flex items-center gap-4 rounded-xl bg-[#f6f8f8] p-4"
                 >
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#e6f4f2] text-[#01796f]">
-                    <CalendarDays
-                      size={19}
-                      strokeWidth={2}
-                    />
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#e6f4f2] text-[#01796F]">
+                    <CalendarDays size={19} strokeWidth={2} />
                   </div>
 
                   <div className="min-w-0 flex-1">
@@ -282,7 +340,7 @@ export default function TeacherDashboard() {
                     </p>
                   </div>
 
-                  <p className="shrink-0 text-sm font-medium text-[#01796f]">
+                  <p className="shrink-0 text-sm font-medium text-[#01796F]">
                     {item.startTime} - {item.endTime}
                   </p>
                 </div>
@@ -296,7 +354,7 @@ export default function TeacherDashboard() {
         </div>
 
         {/* Upcoming Exams */}
-        <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
+        <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
           <div className="mb-6 flex items-start justify-between gap-4">
             <div>
               <h2 className="text-lg font-semibold text-gray-900">
@@ -310,41 +368,41 @@ export default function TeacherDashboard() {
 
             <Link
               href="/teacher/exams"
-              className="text-sm font-medium text-[#01796f] hover:text-[#015f58]"
+              className="text-sm font-medium text-[#01796F] hover:text-[#015f58]"
             >
               View all
             </Link>
           </div>
 
           <div className="space-y-3">
-            {upcomingExams.length > 0 ? (
-              upcomingExams.slice(0, 4).map((exam) => (
-                <div
-                  key={exam.id}
-                  className="flex items-center gap-4 rounded-xl bg-gray-50 p-4"
-                >
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#e6f4f2] text-[#01796f]">
-                    <CalendarDays
-                      size={19}
-                      strokeWidth={2}
-                    />
-                  </div>
+            {upcomingExams > 0 ? (
+              data.exams
+                .filter((exam) => exam.status === "Upcoming")
+                .slice(0, 4)
+                .map((exam) => (
+                  <div
+                    key={exam.id}
+                    className="flex items-center gap-4 rounded-xl bg-[#f6f8f8] p-4"
+                  >
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#e6f4f2] text-[#01796F]">
+                      <CalendarDays size={19} strokeWidth={2} />
+                    </div>
 
-                  <div className="min-w-0 flex-1">
-                    <p className="text-sm font-semibold text-gray-900">
-                      {exam.subject}
+                    <div className="min-w-0 flex-1">
+                      <p className="text-sm font-semibold text-gray-900">
+                        {exam.subject}
+                      </p>
+
+                      <p className="mt-1 text-xs text-gray-500">
+                        {exam.className} - {exam.section} · {exam.examDate}
+                      </p>
+                    </div>
+
+                    <p className="shrink-0 text-sm font-medium text-[#01796F]">
+                      {exam.totalMarks} marks
                     </p>
-
-                    <p className="mt-1 text-xs text-gray-500">
-                      {exam.className} - {exam.section}
-                    </p>
                   </div>
-
-                  <p className="shrink-0 text-xs font-medium text-[#01796f]">
-                    {exam.examDate}
-                  </p>
-                </div>
-              ))
+                ))
             ) : (
               <p className="py-6 text-center text-sm text-gray-500">
                 No upcoming exams.

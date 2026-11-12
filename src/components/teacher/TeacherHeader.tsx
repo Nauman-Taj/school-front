@@ -14,8 +14,9 @@ import {
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 
-import { getSession, logout, AuthSession } from "@/lib/auth";
+import { logout } from "@/lib/auth";
 import { navigationByRole} from "@/data/navigation";
+import { useAuthSession } from "@/lib/useAuthSession";
 import { useHeaderNotifications } from "@/components/layout/useHeaderNotifications";
 
 type TeacherHeaderProps = {
@@ -30,8 +31,7 @@ export default function TeacherHeader({
   const searchRef = useRef<HTMLDivElement>(null);
   const notificationRef = useRef<HTMLDivElement>(null);
 
-  const [session, setSession] =
-    useState<AuthSession | null>(null);
+  const session = useAuthSession();
 
   const [searchOpen, setSearchOpen] =
     useState(false);
@@ -51,11 +51,6 @@ export default function TeacherHeader({
     markAsRead,
     markAllAsRead,
   } = useHeaderNotifications(session?.role, session?.id);
-  
-
-  useEffect(() => {
-    setSession(getSession());
-  }, []);
 
   // Close search and notifications when clicking outside
   useEffect(() => {
@@ -360,7 +355,7 @@ export default function TeacherHeader({
                       </p>
 
                       <p className="mt-1 text-xs text-gray-400">
-                        You're all caught up.
+                        You&apos;re all caught up.
                       </p>
                     </div>
                   )}

@@ -1,4 +1,4 @@
-import TeacherExamForm from "@/components/teacher/exams/TeacherExamForm";
+import TeacherExamDetail from "@/components/teacher/exams/TeacherExamDetail";
 
 type Props = {
   params: Promise<{
@@ -6,10 +6,8 @@ type Props = {
   }>;
 };
 
-export default async function TeacherExamEditPage({
-  params,
-}: Props) {
+export default async function TeacherExamDetailPage({ params }: Props) {
   const { id } = await params;
 
-  return <TeacherExamForm examId={id} />;
+  return <TeacherExamDetail examId={id} />;
 }

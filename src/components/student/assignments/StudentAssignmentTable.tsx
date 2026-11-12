@@ -88,21 +88,21 @@ export default function StudentAssignmentTable({
           title="Pending"
           value={pendingCount}
           icon={<Clock3 size={20} />}
-          iconClass="text-yellow-500"
+          iconClass="text-[#01796F]"
         />
 
         <SummaryCard
           title="Submitted"
           value={submittedCount}
           icon={<CheckCircle2 size={20} />}
-          iconClass="text-green-500"
+          iconClass="text-[#01796F]"
         />
 
         <SummaryCard
           title="Overdue"
           value={overdueCount}
           icon={<XCircle size={20} />}
-          iconClass="text-red-500"
+          iconClass="text-[#01796F]"
         />
       </div>
 

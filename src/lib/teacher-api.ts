@@ -353,3 +353,241 @@ export async function updateTeacherAttendance(
     body: JSON.stringify({ status: attendanceStatusToApi(status) }),
   });
 }
+
+export type ApiTeacherAssignment = {
+  id: string;
+  title: string;
+  subjectId: string;
+  subject: string;
+  className: string;
+  section: string;
+  teacherId: string;
+  teacher: string;
+  dueDate: string;
+  status: string;
+};
+
+export type TeacherAssignment = Omit<ApiTeacherAssignment, "status"> & {
+  status: "Pending" | "Submitted" | "Overdue";
+};
+
+export type ApiTeacherExam = {
+  id: string;
+  name: string;
+  subjectId: string;
+  subject: string;
+  className: string;
+  section: string;
+  teacherId: string;
+  teacher: string;
+  examDate: string;
+  totalMarks: number;
+  status: string;
+};
+
+export type TeacherExam = Omit<ApiTeacherExam, "status"> & {
+  status: "Upcoming" | "Completed";
+};
+
+const assignmentStatusLabels: Record<string, TeacherAssignment["status"]> = {
+  PENDING: "Pending",
+  SUBMITTED: "Submitted",
+  OVERDUE: "Overdue",
+};
+
+export function mapTeacherAssignment(
+  item: ApiTeacherAssignment
+): TeacherAssignment {
+  return {
+    ...item,
+    status: assignmentStatusLabels[item.status.toUpperCase()] ?? "Pending",
+  };
+}
+
+export function mapTeacherExam(item: ApiTeacherExam): TeacherExam {
+  return {
+    ...item,
+    status: item.status === "Upcoming" ? "Upcoming" : "Completed",
+  };
+}
+
+/**
+ * Loads the assignments of the subjects the signed-in teacher teaches.
+ */
+export async function fetchTeacherAssignments(): Promise<TeacherAssignment[]> {
+  const data = await apiRequest<ApiTeacherAssignment[]>(
+    "/teachers/me/assignments",
+    { token: getToken() }
+  );
+
+  return data.map(mapTeacherAssignment);
+}
+
+/**
+ * Loads the exams of the classes the signed-in teacher is involved in.
+ */
+export async function fetchTeacherExams(): Promise<TeacherExam[]> {
+  const data = await apiRequest<ApiTeacherExam[]>("/teachers/me/exams", {
+    token: getToken(),
+  });
+
+  return data.map(mapTeacherExam);
+}
+
+export type TeacherAssignmentInput = {
+  title: string;
+  subjectId: string;
+  dueDate: string;
+  status?: "PENDING" | "SUBMITTED" | "OVERDUE";
+};
+
+/**
+ * Creates an assignment for one of the signed-in teacher's subjects.
+ */
+export async function createTeacherAssignment(
+  input: TeacherAssignmentInput
+): Promise<TeacherAssignment> {
+  const data = await apiRequest<ApiTeacherAssignment>(
+    "/teachers/me/assignments",
+    {
+      method: "POST",
+      token: getToken(),
+      body: JSON.stringify(input),
+    }
+  );
+
+  return mapTeacherAssignment(data);
+}
+
+/**
+ * Updates one of the signed-in teacher's assignments.
+ */
+export async function updateTeacherAssignment(
+  id: string,
+  input: Partial<TeacherAssignmentInput>
+): Promise<TeacherAssignment> {
+  const data = await apiRequest<ApiTeacherAssignment>(
+    `/teachers/me/assignments/${id}`,
+    {
+      method: "PATCH",
+      token: getToken(),
+      body: JSON.stringify(input),
+    }
+  );
+
+  return mapTeacherAssignment(data);
+}
+
+/**
+ * Deletes one of the signed-in teacher's assignments.
+ */
+export async function deleteTeacherAssignment(id: string): Promise<void> {
+  await apiRequest(`/teachers/me/assignments/${id}`, {
+    method: "DELETE",
+    token: getToken(),
+  });
+}
+
+export type ApiTeacherExamStudent = {
+  studentId: number;
+  name: string;
+  rollNo: string;
+  className: string;
+  section: string;
+  resultId: number | null;
+  obtainedMarks: number | null;
+  percentage: number | null;
+  grade: string | null;
+  status: string | null;
+};
+
+export type ApiTeacherExamDetail = {
+  exam: ApiTeacherExam;
+  students: ApiTeacherExamStudent[];
+};
+
+/**
+ * Loads one of the signed-in teacher's exams with its students and the marks
+ * already recorded for it.
+ */
+export async function fetchTeacherExamDetail(
+  examId: string
+): Promise<ApiTeacherExamDetail> {
+  return apiRequest<ApiTeacherExamDetail>(
+    `/teachers/me/exams/${encodeURIComponent(examId)}`,
+    { token: getToken() }
+  );
+}
+
+/**
+ * Records the marks of one of the teacher's students, creating the result when
+ * it does not exist yet and updating it otherwise.
+ */
+export async function saveTeacherMark(input: {
+  studentId: number;
+  examId: string;
+  obtainedMarks: number;
+  resultId: number | null;
+}): Promise<void> {
+  if (input.resultId) {
+    await apiRequest(`/teachers/me/results/${input.resultId}`, {
+      method: "PATCH",
+      token: getToken(),
+      body: JSON.stringify({ obtainedMarks: input.obtainedMarks }),
+    });
+
+    return;
+  }
+
+  await apiRequest("/teachers/me/results", {
+    method: "POST",
+    token: getToken(),
+    body: JSON.stringify({
+      studentId: input.studentId,
+      examId: input.examId,
+      obtainedMarks: input.obtainedMarks,
+    }),
+  });
+}
+
+export type UpdateTeacherProfileInput = {
+  name?: string;
+  email?: string;
+  phone?: string;
+  qualification?: string;
+  joiningDate?: string;
+};
+
+/**
+ * Updates the signed-in teacher's own profile.
+ *
+ * Only the fields a teacher owns can be changed here; the id, the linked
+ * account, the status and the class and subject assignments are managed by the
+ * school administration.
+ */
+export async function updateTeacherProfile(
+  input: UpdateTeacherProfileInput
+): Promise<ApiTeacherProfile> {
+  return apiRequest<ApiTeacherProfile>("/teachers/me", {
+    method: "PATCH",
+    token: getToken(),
+    body: JSON.stringify(input),
+  });
+}
+
+/**
+ * Changes the password of the signed-in account.
+ *
+ * The password belongs to the login account, so it goes through
+ * `PATCH /auth/me` with the current password for verification.
+ */
+export async function changeTeacherPassword(
+  currentPassword: string,
+  newPassword: string
+): Promise<void> {
+  await apiRequest("/auth/me", {
+    method: "PATCH",
+    token: getToken(),
+    body: JSON.stringify({ currentPassword, newPassword }),
+  });
+}
