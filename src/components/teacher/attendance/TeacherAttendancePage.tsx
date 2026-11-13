@@ -241,7 +241,7 @@ export default function TeacherAttendancePage() {
 
       {/* Filters */}
       <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-[1fr_1fr_auto]">
+        <div className="grid gap-4 sm:grid-cols-[1fr_1fr_auto]">
           <div>
             <label
               htmlFor="attendanceClass"
@@ -254,7 +254,7 @@ export default function TeacherAttendancePage() {
               id="attendanceClass"
               value={selectedClass}
               onChange={(event) => setSelectedClass(event.target.value)}
-              className="w-full rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm text-gray-700 outline-none transition focus:border-[#01796F] focus:ring-2 focus:ring-[#01796F]/20"
+              className="h-[38px] w-full rounded-xl border border-gray-200 bg-white px-4 text-sm text-gray-700 outline-none transition focus:border-[#01796F] focus:ring-2 focus:ring-[#01796F]/20"
             >
               <option value="All">All Classes</option>
 
@@ -283,7 +283,7 @@ export default function TeacherAttendancePage() {
               type="date"
               value={date}
               onChange={(event) => setDate(event.target.value)}
-              className="w-full rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm text-gray-700 outline-none transition focus:border-[#01796F] focus:ring-2 focus:ring-[#01796F]/20"
+              className="h-[38px] w-full rounded-xl border border-gray-200 bg-white px-4 text-sm text-gray-700 outline-none transition focus:border-[#01796F] focus:ring-2 focus:ring-[#01796F]/20"
             />
           </div>
 
@@ -292,7 +292,7 @@ export default function TeacherAttendancePage() {
               type="button"
               onClick={handleMarkAllPresent}
               disabled={filteredRows.length === 0}
-              className="w-full whitespace-nowrap rounded-full bg-[#01796f] px-6 py-2.5 text-sm font-semibold text-white transition hover:bg-[#015f58] disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto"
+              className="h-[38px] w-full whitespace-nowrap rounded-full bg-[#01796f] px-6 text-sm font-semibold text-white transition hover:bg-[#015f58] disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto"
             >
               Mark All Present
             </button>

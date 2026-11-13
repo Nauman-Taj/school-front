@@ -147,6 +147,11 @@ export const navigationByRole: Record<UserRole, NavigationItem[]> = {
       icon: ClipboardList,
     },
     {
+      label: "Study Material",
+      href: "/teacher/study-material",
+      icon: BookOpen,
+    },
+    {
       label: "Exams",
       href: "/teacher/exams",
       icon: FileText,
@@ -160,11 +165,6 @@ export const navigationByRole: Record<UserRole, NavigationItem[]> = {
       label: "Attendance",
       href: "/teacher/attendance",
       icon: ClipboardCheck,
-    },
-    {
-      label: "Study Material",
-      href: "/teacher/study-material",
-      icon: BookOpen,
     },
     {
       label: "Timetable",

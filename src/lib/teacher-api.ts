@@ -700,3 +700,30 @@ export async function deleteTeacherStudyMaterial(id: number): Promise<void> {
     token: getToken(),
   });
 }
+
+/**
+ * Today's date, in the same UTC convention the API uses for the due dates.
+ */
+export function teacherToday(): string {
+  return new Date().toISOString().slice(0, 10);
+}
+
+/**
+ * The status a teacher sees for an assignment.
+ *
+ * The stored status is class level and is whatever the last edit set, so a
+ * pending assignment whose due date has already passed is shown as overdue:
+ * that is the assignment the teacher still has to chase.
+ */
+export function teacherAssignmentStatus(
+  assignment: TeacherAssignment,
+  today: string
+): TeacherAssignment["status"] {
+  if (assignment.status === "Overdue") return "Overdue";
+
+  if (assignment.status === "Pending" && assignment.dueDate < today) {
+    return "Overdue";
+  }
+
+  return assignment.status;
+}

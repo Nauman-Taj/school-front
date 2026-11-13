@@ -4,6 +4,10 @@ import Link from "next/link";
 import { ClipboardList, Eye, Search } from "lucide-react";
 
 import type { TeacherAssignment } from "@/lib/teacher-api";
+import {
+  teacherAssignmentStatus,
+  teacherToday,
+} from "@/lib/teacher-api";
 
 type Props = {
   assignments: TeacherAssignment[];
@@ -24,6 +28,8 @@ export default function TeacherAssignmentTable({
   setSearch,
   total,
 }: Props) {
+  const today = teacherToday();
+
   return (
     <div className="space-y-5">
       {/* Search */}
@@ -63,7 +69,10 @@ export default function TeacherAssignmentTable({
 
             <tbody className="divide-y divide-gray-100">
               {assignments.length > 0 ? (
-                assignments.map((assignment) => (
+                assignments.map((assignment) => {
+                  const status = teacherAssignmentStatus(assignment, today);
+
+                  return (
                   <tr
                     key={assignment.id}
                     className="transition hover:bg-gray-50"
@@ -99,9 +108,9 @@ export default function TeacherAssignmentTable({
 
                     <td className="px-5 py-4">
                       <span
-                        className={`inline-flex shrink-0 rounded-full px-3 py-1 text-xs font-medium ${statusStyles[assignment.status]}`}
+                        className={`inline-flex shrink-0 rounded-full px-3 py-1 text-xs font-medium ${statusStyles[status]}`}
                       >
-                        {assignment.status}
+                        {status}
                       </span>
                     </td>
 
@@ -115,9 +124,9 @@ export default function TeacherAssignmentTable({
                       </Link>
                     </td>
                   </tr>
-                ))
-              ) : (
-                <tr>
+                  );
+                })
+              ) : (                <tr>
                   <td
                     colSpan={6}
                     className="px-5 py-8 text-center text-sm text-gray-500"
@@ -138,7 +147,10 @@ export default function TeacherAssignmentTable({
       {/* Mobile cards */}
       <div className="space-y-3 md:hidden">
         {assignments.length > 0 ? (
-          assignments.map((assignment) => (
+          assignments.map((assignment) => {
+            const status = teacherAssignmentStatus(assignment, today);
+
+            return (
             <div
               key={assignment.id}
               className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm"
@@ -160,9 +172,9 @@ export default function TeacherAssignmentTable({
                 </div>
 
                 <span
-                  className={`shrink-0 rounded-full px-3 py-1 text-xs font-medium ${statusStyles[assignment.status]}`}
+                  className={`shrink-0 rounded-full px-3 py-1 text-xs font-medium ${statusStyles[status]}`}
                 >
-                  {assignment.status}
+                  {status}
                 </span>
               </div>
 
@@ -178,7 +190,8 @@ export default function TeacherAssignmentTable({
                 Edit Assignment
               </Link>
             </div>
-          ))
+            );
+          })
         ) : (
           <div className="rounded-2xl border border-gray-100 bg-white p-8 text-center text-sm text-gray-500 shadow-sm">
             No assignments found.

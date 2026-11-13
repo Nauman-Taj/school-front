@@ -3,22 +3,22 @@
 import {
   AlertCircle,
   CalendarClock,
+  CheckCircle2,
   ClipboardList,
-  Clock3,
 } from "lucide-react";
 
 type TeacherAssignmentStatsProps = {
   totalAssignments: number;
   dueSoon: number;
-  pending: number;
   overdue: number;
+  submitted: number;
 };
 
 export default function TeacherAssignmentStats({
   totalAssignments,
   dueSoon,
-  pending,
   overdue,
+  submitted,
 }: TeacherAssignmentStatsProps) {
   const stats = [
     {
@@ -32,14 +32,14 @@ export default function TeacherAssignmentStats({
       icon: CalendarClock,
     },
     {
-      title: "Pending",
-      value: pending,
-      icon: Clock3,
-    },
-    {
       title: "Overdue",
       value: overdue,
       icon: AlertCircle,
+    },
+    {
+      title: "Submitted",
+      value: submitted,
+      icon: CheckCircle2,
     },
   ];
 

@@ -6,6 +6,10 @@ import { Plus } from "lucide-react";
 
 import { fetchTeacherAssignments } from "@/lib/teacher-api";
 import type { TeacherAssignment } from "@/lib/teacher-api";
+import {
+  teacherAssignmentStatus,
+  teacherToday,
+} from "@/lib/teacher-api";
 
 import TeacherAssignmentStats from "./TeacherAssignmentStats";
 import TeacherAssignmentTable from "./TeacherAssignmentTable";
@@ -64,7 +68,7 @@ export default function TeacherAssignmentsPage() {
     );
   }, [search, state.assignments]);
 
-  const today = new Date().toISOString().slice(0, 10);
+  const today = teacherToday();
 
   // Seven days from today, counted from UTC midnight so the window does not
   // drift with the local timezone.
@@ -81,12 +85,12 @@ export default function TeacherAssignmentsPage() {
       assignment.dueDate <= weekAhead
   ).length;
 
-  const pending = state.assignments.filter(
-    (assignment) => assignment.status === "Pending"
+  const overdue = state.assignments.filter(
+    (assignment) => teacherAssignmentStatus(assignment, today) === "Overdue"
   ).length;
 
-  const overdue = state.assignments.filter(
-    (assignment) => assignment.status === "Overdue"
+  const submitted = state.assignments.filter(
+    (assignment) => assignment.status === "Submitted"
   ).length;
 
   const header = (
@@ -142,8 +146,8 @@ export default function TeacherAssignmentsPage() {
       <TeacherAssignmentStats
         totalAssignments={state.assignments.length}
         dueSoon={dueSoon}
-        pending={pending}
         overdue={overdue}
+        submitted={submitted}
       />
 
       <TeacherAssignmentTable
