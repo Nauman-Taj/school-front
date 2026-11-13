@@ -433,11 +433,9 @@ function SummaryCard({
         </div>
       </div>
 
-      {loading ? (
-        <div className="mt-2 h-7 w-12 animate-pulse rounded-lg bg-gray-100" />
-      ) : (
-        <p className="mt-2 text-2xl font-bold text-gray-800">{value}</p>
-      )}
+      <p className="mt-2 text-2xl font-bold text-gray-800">
+        {loading ? "0" : value}
+      </p>
     </div>
   );
 }
