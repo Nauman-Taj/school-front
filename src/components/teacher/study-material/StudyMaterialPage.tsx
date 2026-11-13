@@ -1,141 +1,165 @@
-
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import {
   BookOpen,
-  FileText,
-  Video,
   ClipboardList,
+  FileText,
   Plus,
+  Video,
 } from "lucide-react";
 
-import { getSession } from "@/lib/auth";
-import {
-  getTeacherStudyMaterials,
-  saveStudyMaterials,
-  getStudyMaterials,
-} from "@/data/studyMaterial";
-import { StudyMaterial } from "@/types/studyMaterial";
+import { fetchTeacherStudyMaterials } from "@/lib/teacher-api";
+import type { ApiStudyMaterial } from "@/lib/teacher-api";
+
 import StudyMaterialTable from "./StudyMaterialTable";
 
 export default function StudyMaterialPage() {
-  const [materials, setMaterials] = useState<StudyMaterial[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+  const [search, setSearch] = useState("");
 
-  useEffect(() => {
-    const session = getSession();
+  const [state, setState] = useState<{
+    loaded: boolean;
+    materials: ApiStudyMaterial[];
+    error: string;
+  }>({
+    loaded: false,
+    materials: [],
+    error: "",
+  });
 
-    if (!session || session.role !== "Teacher") {
-      setMaterials([]);
-      setLoading(false);
-      return;
-    }
-
-    setMaterials(getTeacherStudyMaterials(session.email));
-    setLoading(false);
+  const load = useCallback(() => {
+    fetchTeacherStudyMaterials()
+      .then((materials) => {
+        setState({ loaded: true, materials, error: "" });
+      })
+      .catch((err: unknown) => {
+        setState({
+          loaded: true,
+          materials: [],
+          error:
+            err instanceof Error
+              ? err.message
+              : "Unable to load your study materials.",
+        });
+      });
   }, []);
 
-  const handleDelete = (id: number) => {
-    const session = getSession();
+  useEffect(() => {
+    let active = true;
 
-    if (!session || session.role !== "Teacher") {
-      setError("Please log in with a teacher account.");
-      return;
-    }
+    fetchTeacherStudyMaterials()
+      .then((materials) => {
+        if (!active) return;
+        setState({ loaded: true, materials, error: "" });
+      })
+      .catch((err: unknown) => {
+        if (!active) return;
+        setState({
+          loaded: true,
+          materials: [],
+          error:
+            err instanceof Error
+              ? err.message
+              : "Unable to load your study materials.",
+        });
+      });
 
-    const currentMaterials = getStudyMaterials();
-    const teacherMaterials = getTeacherStudyMaterials(session.email);
+    return () => {
+      active = false;
+    };
+  }, []);
 
-    const belongsToTeacher = teacherMaterials.some(
-      (material) => material.id === id
+  const filteredMaterials = useMemo(() => {
+    const value = search.trim().toLowerCase();
+
+    if (!value) return state.materials;
+
+    return state.materials.filter(
+      (material) =>
+        material.title.toLowerCase().includes(value) ||
+        material.subject.toLowerCase().includes(value) ||
+        material.className.toLowerCase().includes(value) ||
+        material.section.toLowerCase().includes(value) ||
+        material.type.toLowerCase().includes(value) ||
+        material.date.toLowerCase().includes(value)
     );
-
-    if (!belongsToTeacher) {
-      setError("You cannot delete this study material.");
-      return;
-    }
-
-    const updatedMaterials = currentMaterials.filter(
-      (material) => material.id !== id
-    );
-
-    if (!saveStudyMaterials(updatedMaterials)) {
-      setError("Unable to save changes. Please check your browser storage.");
-      return;
-    }
-
-    setMaterials(
-      updatedMaterials.filter((material) =>
-        teacherMaterials.some(
-          (teacherMaterial) => teacherMaterial.teacherId === material.teacherId
-        )
-      ).filter((material) => material.teacherId === teacherMaterials[0]?.teacherId)
-    );
-
-    setError("");
-  };
+  }, [search, state.materials]);
 
   const stats = [
     {
       title: "Total Materials",
-      value: materials.length,
+      value: state.materials.length,
       icon: BookOpen,
     },
     {
       title: "PDF Files",
-      value: materials.filter((item) => item.type === "PDF").length,
+      value: state.materials.filter((item) => item.type === "PDF").length,
       icon: FileText,
     },
     {
       title: "Notes",
-      value: materials.filter((item) => item.type === "Notes").length,
+      value: state.materials.filter((item) => item.type === "Notes").length,
       icon: ClipboardList,
     },
     {
       title: "Videos",
-      value: materials.filter((item) => item.type === "Video").length,
+      value: state.materials.filter((item) => item.type === "Video").length,
       icon: Video,
     },
   ];
 
-  if (loading) {
+  const header = (
+    <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+      <div>
+        <h1 className="text-2xl font-bold text-gray-900 sm:text-3xl">
+          Study Material
+        </h1>
+
+        <p className="mt-1 text-sm text-gray-500 sm:text-base">
+          Manage and access your educational learning materials.
+        </p>
+      </div>
+
+      <Link
+        href="/teacher/study-material/add"
+        className="inline-flex w-fit items-center gap-2 rounded-full bg-[#01796F] px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-[#015f58]"
+      >
+        <Plus size={17} />
+        Add Material
+      </Link>
+    </div>
+  );
+
+  if (!state.loaded && !state.error) {
     return (
-      <div className="rounded-2xl border border-gray-200 bg-white p-8 text-center text-sm text-gray-500">
-        Loading your study materials...
+      <div className="space-y-5">
+        {header}
+
+        <div className="rounded-2xl border border-gray-100 bg-white p-10 text-center shadow-sm">
+          <div className="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-gray-200 border-t-[#01796F]" />
+          <p className="mt-4 text-sm text-gray-500">
+            Loading your study materials...
+          </p>
+        </div>
       </div>
     );
   }
 
   return (
     <div className="space-y-5">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900 sm:text-3xl">
-            Study Material
-          </h1>
-        <p className="mt-1 text-sm text-gray-500 sm:text-base">
-            Manage and access your educational learning materials.
-          </p>
-        </div>
+      {header}
 
-        <Link
-          href="/teacher/study-material/add"
-          className="inline-flex w-fit items-center gap-2 rounded-full bg-[#01796F] px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-[#015f58]"
+      {state.error && (
+        <div
+          role="alert"
+          className="rounded-2xl border border-red-200 bg-red-50 p-4 text-sm text-red-700"
         >
-          <Plus size={17} />
-          Add Material
-        </Link>
-      </div>
-
-      {error && (
-        <p className="rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-600">
-          {error}
-        </p>
+          {state.error}
+        </div>
       )}
 
+      {/* Summary */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {stats.map((stat) => {
           const Icon = stat.icon;
@@ -143,30 +167,30 @@ export default function StudyMaterialPage() {
           return (
             <div
               key={stat.title}
-              className="rounded-2xl border border-gray-200 bg-white p-5"
+              className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm"
             >
               <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-500">
-                    {stat.title}
-                  </p>
-                  <h2 className="mt-2 text-2xl font-bold text-gray-800">
-                    {stat.value}
-                  </h2>
-                </div>
+                <p className="text-sm text-gray-500">{stat.title}</p>
 
                 <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#e6f4f2] text-[#01796F]">
-                  <Icon size={21} />
+                  <Icon size={20} />
                 </div>
               </div>
+
+              <p className="mt-2 text-2xl font-bold text-gray-800">
+                {stat.value}
+              </p>
             </div>
           );
         })}
       </div>
 
       <StudyMaterialTable
-        materials={materials}
-        onDelete={handleDelete}
+        materials={filteredMaterials}
+        search={search}
+        setSearch={setSearch}
+        total={state.materials.length}
+        onDeleted={load}
       />
     </div>
   );

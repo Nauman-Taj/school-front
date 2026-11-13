@@ -591,3 +591,112 @@ export async function changeTeacherPassword(
     body: JSON.stringify({ currentPassword, newPassword }),
   });
 }
+
+export type StudyMaterialType = "PDF" | "Document" | "Video" | "Notes";
+
+export type ApiStudyMaterial = {
+  id: number;
+  title: string;
+  description: string;
+  subjectId: string;
+  subject: string;
+  className: string;
+  section: string;
+  teacherId: string;
+  teacher: string;
+  type: StudyMaterialType;
+  date: string;
+  fileUrl: string | null;
+  fileName: string | null;
+};
+
+export type TeacherStudyMaterialInput = {
+  title: string;
+  description: string;
+  subjectId: string;
+  type: StudyMaterialType;
+  date: string;
+  fileUrl?: string;
+  fileName?: string;
+};
+
+/**
+ * The API stores the type as an enum, the portal shows it in words.
+ */
+const studyMaterialTypeToApi: Record<StudyMaterialType, string> = {
+  PDF: "PDF",
+  Document: "DOCUMENT",
+  Video: "VIDEO",
+  Notes: "NOTES",
+};
+
+/**
+ * Loads the study material of the signed-in teacher.
+ */
+export async function fetchTeacherStudyMaterials(): Promise<
+  ApiStudyMaterial[]
+> {
+  return apiRequest<ApiStudyMaterial[]>("/teachers/me/study-materials", {
+    token: getToken(),
+  });
+}
+
+/**
+ * Loads one of the signed-in teacher's study materials.
+ */
+export async function fetchTeacherStudyMaterial(
+  id: number
+): Promise<ApiStudyMaterial> {
+  return apiRequest<ApiStudyMaterial>(
+    `/teachers/me/study-materials/${id}`,
+    { token: getToken() }
+  );
+}
+
+/**
+ * Publishes a study material for one of the teacher's subjects.
+ */
+export async function createTeacherStudyMaterial(
+  input: TeacherStudyMaterialInput
+): Promise<ApiStudyMaterial> {
+  return apiRequest<ApiStudyMaterial>("/teachers/me/study-materials", {
+    method: "POST",
+    token: getToken(),
+    body: JSON.stringify({
+      ...input,
+      type: studyMaterialTypeToApi[input.type],
+    }),
+  });
+}
+
+/**
+ * Updates one of the signed-in teacher's study materials.
+ */
+export async function updateTeacherStudyMaterial(
+  id: number,
+  input: Partial<TeacherStudyMaterialInput>
+): Promise<ApiStudyMaterial> {
+  return apiRequest<ApiStudyMaterial>(
+    `/teachers/me/study-materials/${id}`,
+    {
+      method: "PATCH",
+      token: getToken(),
+      body: JSON.stringify({
+        ...input,
+        ...(input.type
+          ? { type: studyMaterialTypeToApi[input.type] }
+          : {}),
+      }),
+    }
+  );
+}
+
+/**
+ * Removes one of the signed-in teacher's study materials.
+ */
+export async function deleteTeacherStudyMaterial(id: number): Promise<void> {
+  await apiRequest(`/teachers/me/study-materials/${id}`, {
+    method: "DELETE",
+    token: getToken(),
+  });
+}
