@@ -57,11 +57,10 @@ function FeedbackBanner({ type, message }: Feedback) {
   return (
     <div
       role="status"
-      className={`flex items-start gap-2 rounded-xl border p-4 text-sm ${
-        type === "success"
-          ? "border-[#b8e4dd] bg-[#e6f4f2] text-[#015f58]"
-          : "border-red-200 bg-red-50 text-red-700"
-      }`}
+      className={`flex items-start gap-2 rounded-xl border p-4 text-sm ${type === "success"
+        ? "border-[#b8e4dd] bg-[#e6f4f2] text-[#015f58]"
+        : "border-red-200 bg-red-50 text-red-700"
+        }`}
     >
       {type === "success" ? (
         <Check size={18} className="mt-0.5 shrink-0" />
@@ -303,7 +302,7 @@ export default function TeacherProfilePage() {
         </h2>
 
         <p className="mt-2 text-sm text-gray-500">
-          We couldn&apos;t find a teacher profile matching your account. Please
+          We couldn't find a teacher profile matching your account. Please
           contact the school administration.
         </p>
       </div>
@@ -354,8 +353,8 @@ export default function TeacherProfilePage() {
               }}
               className="inline-flex items-center justify-center gap-1.5 rounded-full bg-[#01796F] px-3 py-2 text-xs font-medium text-white transition hover:bg-[#015f58] sm:gap-2 sm:px-5 sm:py-2.5 sm:text-sm"
             >
-              {isEditing ? <User size={14} /> : <Pencil size={14} />}
-              {isEditing ? "Cancel" : "Edit Profile"}
+              {/* {isEditing ? <User size={14} /> : <Pencil size={14} />} */}
+              {isEditing ? "Cancel" : <><Pencil size={14} /> Edit Profile</>}
             </button>
           </div>
         </div>

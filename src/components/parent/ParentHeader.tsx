@@ -364,7 +364,7 @@ export default function ParentHeader({
                       </p>
 
                       <p className="mt-1 text-xs text-gray-400">
-                        You&apos;re all caught up.
+                        You're all caught up.
                       </p>
                     </div>
                   )}

@@ -203,7 +203,7 @@ export default function TeacherDashboard() {
         </h1>
 
         <p className="mt-1 text-sm text-gray-500 sm:text-base">
-          Welcome back, {profile?.name ?? "teacher"}. Here&apos;s what&apos;s
+          Welcome back, {profile?.name ?? "teacher"}. Here's what's
           happening with your classes today.
         </p>
       </div>
@@ -303,7 +303,7 @@ export default function TeacherDashboard() {
           <div className="mb-6 flex items-start justify-between gap-4">
             <div>
               <h2 className="text-lg font-semibold text-gray-900">
-                Today&apos;s Classes
+                Today's Classes
               </h2>
 
               <p className="mt-1 text-sm text-gray-500">

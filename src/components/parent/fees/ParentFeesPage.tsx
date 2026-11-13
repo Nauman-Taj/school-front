@@ -133,7 +133,7 @@ export default function ParentFeesPage() {
       </h1>
 
       <p className="mt-1 text-sm text-gray-500 sm:text-base">
-        View your child&apos;s fee details and payment status.
+        View your child's fee details and payment status.
       </p>
     </div>
   );

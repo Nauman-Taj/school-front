@@ -301,7 +301,7 @@ export default function ParentProfilePage() {
         </h2>
 
         <p className="mt-2 text-sm text-gray-500">
-          We couldn&apos;t find a parent profile matching your account. Please
+          We couldn't find a parent profile matching your account. Please
           contact the school administration.
         </p>
       </div>
@@ -349,8 +349,7 @@ export default function ParentProfilePage() {
               }}
               className="inline-flex items-center justify-center gap-1.5 rounded-full bg-[#01796f] px-3 py-2 text-xs font-medium text-white transition hover:bg-[#015f58] sm:gap-2 sm:px-5 sm:py-2.5 sm:text-sm"
             >
-              {isEditing ? <User size={14} /> : <Pencil size={14} />}
-              {isEditing ? "Cancel" : "Edit Profile"}
+              {isEditing ? "Cancel" : <><Pencil size={14} /> Edit Profile</>}
             </button>
           </div>
         </div>

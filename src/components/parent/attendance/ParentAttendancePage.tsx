@@ -136,7 +136,7 @@ export default function ParentAttendancePage() {
       </h1>
 
       <p className="mt-1 text-sm text-gray-500 sm:text-base">
-        View your child&apos;s attendance records and attendance
+        View your child's attendance records and attendance
         performance.
       </p>
     </div>

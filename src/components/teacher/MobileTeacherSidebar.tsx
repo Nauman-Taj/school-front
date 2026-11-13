@@ -81,11 +81,6 @@ export default function MobileTeacherSidebar({
                   onClick={onClose}
                   aria-current={isActive ? "page" : undefined}
                   className={getNavigationItemClass(isActive)}
-                //  ${
-                //   isActive
-                //     ? "bg-[#e6f4f2] text-[#01796f]"
-                //     : "text-gray-600 hover:bg-[#e6f4f2] hover:text-[#01796f]"
-                // }`}
                 >
                   <Icon
                     size={19}

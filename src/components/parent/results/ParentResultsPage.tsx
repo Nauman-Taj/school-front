@@ -138,7 +138,7 @@ export default function ParentResultsPage() {
             </h1>
 
             <p className="mt-1 text-sm text-gray-500 sm:text-base">
-                View your child&apos;s examination results and academic
+                View your child's examination results and academic
                 performance.
             </p>
         </div>
