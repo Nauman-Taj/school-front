@@ -27,7 +27,9 @@ export default function TeacherMarksPage() {
     text: string;
   } | null>(null);
 
-  const loading = examId !== loadedExamId;
+  // The sheet is loading while the selected exam is not the loaded one. With
+  // no exam selected there is nothing to load, so the page is not loading.
+  const loading = examId !== "" && examId !== loadedExamId;
 
   useEffect(() => {
     let active = true;
@@ -60,6 +62,7 @@ export default function TeacherMarksPage() {
   }, []);
 
   useEffect(() => {
+    // No exam is selected, so there is nothing to load.
     if (!examId) return;
 
     let active = true;
@@ -218,7 +221,7 @@ export default function TeacherMarksPage() {
             Loading the marks sheet...
           </p>
         </div>
-      ) : (
+      ) : examId ? (
         <TeacherMarksTable
           exam={selectedExam}
           detail={detail}
@@ -227,6 +230,16 @@ export default function TeacherMarksPage() {
           onSave={handleSave}
           saving={saving}
         />
+      ) : (
+        <div className="rounded-2xl border border-gray-100 bg-white p-10 text-center shadow-sm">
+          <p className="text-sm font-medium text-gray-700">
+            No exam selected
+          </p>
+
+          <p className="mt-2 text-sm text-gray-500">
+            Choose an exam above to enter the marks of its students.
+          </p>
+        </div>
       )}
     </div>
   );

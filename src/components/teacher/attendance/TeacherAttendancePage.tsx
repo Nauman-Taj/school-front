@@ -67,6 +67,9 @@ export default function TeacherAttendancePage() {
   }, []);
 
   useEffect(() => {
+    // Without a date there is no sheet to load.
+    if (!date) return;
+
     let active = true;
 
     fetchTeacherAttendanceSheet(date)
@@ -95,7 +98,9 @@ export default function TeacherAttendancePage() {
     };
   }, [date]);
 
-  const loading = loadedDate !== date;
+  // With no date selected there is nothing to load, so the page is not
+  // loading. Otherwise the page waits for the selected date to be loaded.
+  const loading = date !== "" && loadedDate !== date;
 
   const rows = useMemo(
     () =>
@@ -367,6 +372,14 @@ export default function TeacherAttendancePage() {
             <div className="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-gray-200 border-t-[#01796F]" />
             <p className="mt-4 text-sm text-gray-500">
               Loading the attendance sheet...
+            </p>
+          </div>
+        ) : !date ? (
+          <div className="rounded-2xl border border-gray-100 bg-white p-10 text-center shadow-sm">
+            <p className="text-sm font-medium text-gray-700">No date selected</p>
+
+            <p className="mt-2 text-sm text-gray-500">
+              Choose a date above to load the attendance sheet.
             </p>
           </div>
         ) : (
