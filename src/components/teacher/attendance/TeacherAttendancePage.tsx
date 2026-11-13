@@ -312,35 +312,30 @@ export default function TeacherAttendancePage() {
           value={presentCount}
           loading={loading}
           icon={<Check size={20} />}
-          iconClass="text-[#01796f]"
         />
         <SummaryCard
           title="Absent"
           value={absentCount}
           loading={loading}
           icon={<X size={20} />}
-          iconClass="text-[#01796F]"
         />
         <SummaryCard
           title="Late"
           value={lateCount}
           loading={loading}
           icon={<Clock3 size={20} />}
-          iconClass="text-[#01796F]"
         />
         <SummaryCard
           title="Leave"
           value={leaveCount}
           loading={loading}
           icon={<Plane size={20} />}
-          iconClass="text-[#01796F]"
         />
         <SummaryCard
           title="Attendance"
           value={`${attendancePercentage}%`}
           loading={loading}
           icon={<CalendarDays size={20} />}
-          iconClass="text-[#01796f]"
         />
       </div>
 
@@ -422,33 +417,27 @@ function SummaryCard({
   value,
   loading,
   icon,
-  iconClass,
 }: {
   title: string;
   value: string | number;
   loading: boolean;
   icon: React.ReactNode;
-  iconClass: string;
 }) {
   return (
     <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
-      <div className="flex items-start justify-between">
-        <div>
-          <p className="text-sm text-gray-500">{title}</p>
+      <div className="flex items-center justify-between">
+        <p className="text-sm text-gray-500">{title}</p>
 
-          {loading ? (
-            <div className="mt-2 h-7 w-12 animate-pulse rounded-lg bg-gray-100" />
-          ) : (
-            <h2 className="mt-2 text-2xl font-bold text-gray-800">{value}</h2>
-          )}
-        </div>
-
-        <div
-          className={`flex h-11 w-11 items-center justify-center rounded-xl bg-[#e6f4f2] ${iconClass}`}
-        >
+        <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#e6f4f2] text-[#01796F]">
           {icon}
         </div>
       </div>
+
+      {loading ? (
+        <div className="mt-2 h-7 w-12 animate-pulse rounded-lg bg-gray-100" />
+      ) : (
+        <p className="mt-2 text-2xl font-bold text-gray-800">{value}</p>
+      )}
     </div>
   );
 }
