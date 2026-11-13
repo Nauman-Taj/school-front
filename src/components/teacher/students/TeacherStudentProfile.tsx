@@ -239,7 +239,7 @@ export default function TeacherStudentProfile() {
         </h2>
 
         <p className="mt-1 text-sm text-gray-500">
-          Academic details available to you as the student's teacher.
+          Academic details available to you as the student&apos;s teacher.
         </p>
 
         <div className="mt-5 grid gap-4 sm:grid-cols-3">

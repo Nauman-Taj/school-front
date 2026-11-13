@@ -29,7 +29,7 @@ export default function ChildProfilePage() {
         <div>
             <h1 className="text-2xl font-bold text-gray-900 sm:text-3xl" >Child Profile</h1>
             <p className="mt-1 text-sm text-gray-500 sm:text-base">
-                View your child's academic and personal information.
+                View your child&apos;s academic and personal information.
             </p>
         </div>
     );

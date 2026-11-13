@@ -119,7 +119,7 @@ export default function ParentExamsPage() {
       </h1>
 
       <p className="mt-1 text-sm text-gray-500 sm:text-base">
-        View your child's examination schedule and details.
+        View your child&apos;s examination schedule and details.
       </p>
     </div>
   );

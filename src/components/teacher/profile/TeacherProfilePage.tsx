@@ -302,7 +302,7 @@ export default function TeacherProfilePage() {
         </h2>
 
         <p className="mt-2 text-sm text-gray-500">
-          We couldn't find a teacher profile matching your account. Please
+          We couldn&apos;t find a teacher profile matching your account. Please
           contact the school administration.
         </p>
       </div>

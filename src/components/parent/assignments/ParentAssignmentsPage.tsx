@@ -132,7 +132,7 @@ export default function ParentAssignmentsPage() {
             </h1>
 
             <p className="mt-1 text-sm text-gray-500 sm:text-base">
-                View your child's assignments and submission status.
+                View your child&apos;s assignments and submission status.
             </p>
         </div>
     );

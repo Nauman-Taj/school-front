@@ -26,7 +26,7 @@ type Profile = {
 type ProfileResponse = Partial<Profile> & Pick<Profile, "id">;
 type Feedback = { type: "success" | "error" | "info"; message: string } | null;
 
-export default function ProfilePage() {
+export default function AdminProfilePage() {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");

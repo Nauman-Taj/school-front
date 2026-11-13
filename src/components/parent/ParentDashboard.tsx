@@ -331,7 +331,7 @@ export default function ParentDashboard() {
                 </h1>
 
                 <p className="mt-1 text-sm text-gray-500 sm:text-base">
-                    Monitor your child's academic progress and school
+                    Monitor your child&apos;s academic progress and school
                     activities.
                 </p>
             </div>
