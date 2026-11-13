@@ -6,6 +6,7 @@ import { fetchTeacherStudents } from "@/lib/teacher-api";
 import type { TeacherStudent } from "@/lib/teacher-api";
 
 import TeacherStudentCard from "./TeacherStudentCard";
+import TeacherStudentStats from "./TeacherStudentStats";
 import TeacherStudentTable from "./TeacherStudentTable";
 
 export default function TeacherStudentsPage() {
@@ -63,6 +64,16 @@ export default function TeacherStudentsPage() {
     );
   }, [search, state.students]);
 
+  const activeStudents = state.students.filter(
+    (student) => student.status === "Active"
+  ).length;
+
+  const inactiveStudents = state.students.length - activeStudents;
+
+  const classCount = new Set(
+    state.students.map((student) => `${student.className}-${student.section}`)
+  ).size;
+
   const header = (
     <div>
       <h1 className="text-2xl font-bold text-gray-900 sm:text-3xl">
@@ -102,6 +113,13 @@ export default function TeacherStudentsPage() {
           {state.error}
         </div>
       )}
+
+      <TeacherStudentStats
+        totalStudents={state.students.length}
+        activeStudents={activeStudents}
+        inactiveStudents={inactiveStudents}
+        classCount={classCount}
+      />
 
       <TeacherStudentTable
         students={filteredStudents}

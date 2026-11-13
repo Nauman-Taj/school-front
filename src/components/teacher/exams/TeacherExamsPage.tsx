@@ -5,6 +5,7 @@ import { useEffect, useMemo, useState } from "react";
 import { fetchTeacherExams } from "@/lib/teacher-api";
 import type { TeacherExam } from "@/lib/teacher-api";
 
+import TeacherExamStats from "./TeacherExamStats";
 import TeacherExamTable from "./TeacherExamTable";
 
 export default function TeacherExamsPage() {
@@ -61,6 +62,18 @@ export default function TeacherExamsPage() {
     );
   }, [search, state.exams]);
 
+  const upcoming = state.exams.filter(
+    (exam) => exam.status === "Upcoming"
+  ).length;
+
+  const completed = state.exams.filter(
+    (exam) => exam.status === "Completed"
+  ).length;
+
+  const classCount = new Set(
+    state.exams.map((exam) => `${exam.className}-${exam.section}`)
+  ).size;
+
   const header = (
     <div>
       <h1 className="text-2xl font-bold text-gray-900 sm:text-3xl">
@@ -100,6 +113,13 @@ export default function TeacherExamsPage() {
           {state.error}
         </div>
       )}
+
+      <TeacherExamStats
+        totalExams={state.exams.length}
+        upcoming={upcoming}
+        completed={completed}
+        classCount={classCount}
+      />
 
       <TeacherExamTable
         exams={filteredExams}

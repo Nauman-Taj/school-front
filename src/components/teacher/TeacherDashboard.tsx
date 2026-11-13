@@ -127,25 +127,21 @@ export default function TeacherDashboard() {
     {
       title: "My Classes",
       value: data.classes.length,
-      description: "classes assigned",
       icon: GraduationCap,
     },
     {
       title: "My Students",
       value: data.students.length,
-      description: "students enrolled",
       icon: Users,
     },
     {
       title: "Pending Assignments",
       value: pendingAssignments,
-      description: "total assignments",
       icon: FileText,
     },
     {
       title: "Upcoming Exams",
       value: upcomingExams,
-      description: "total exams",
       icon: ClipboardCheck,
     },
   ];
@@ -227,22 +223,16 @@ export default function TeacherDashboard() {
               key={stat.title}
               className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm"
             >
-              <div className="flex items-start justify-between">
-                <div>
-                  <p className="text-sm text-gray-500">{stat.title}</p>
-
-                  <h2 className="mt-2 text-2xl font-bold text-gray-800">
-                    {stat.value}
-                  </h2>
-                </div>
+              <div className="flex items-center justify-between">
+                <p className="text-sm text-gray-500">{stat.title}</p>
 
                 <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#e6f4f2] text-[#01796F]">
-                  <Icon size={21} strokeWidth={2} />
+                  <Icon size={20} />
                 </div>
               </div>
 
-              <p className="mt-3 text-sm text-gray-500">
-                {stat.description}
+              <p className="mt-2 text-2xl font-bold text-gray-800">
+                {stat.value}
               </p>
             </div>
           );

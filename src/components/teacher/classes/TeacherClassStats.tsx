@@ -56,7 +56,7 @@ export default function TeacherClassStats({
             <div className="flex items-center justify-between">
               <p className="text-sm text-gray-500">{stat.title}</p>
 
-              <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#e6f4f2] text-[#01796f]">
+              <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#e6f4f2] text-[#01796F]">
                 <Icon size={20} />
               </div>
             </div>
