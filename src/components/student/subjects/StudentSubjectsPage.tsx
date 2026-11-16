@@ -1,139 +1,144 @@
 "use client";
 
+import { useEffect, useMemo, useState } from "react";
 import {
   BookOpen,
-  CheckCircle2,
   GraduationCap,
+  School,
   Users,
 } from "lucide-react";
 
-import { students } from "@/data/students";
-import { subjects } from "@/data/subjects";
+import { fetchStudentSubjects } from "@/lib/student-api";
+import type { ApiStudentSubject } from "@/lib/student-api";
+import { useStudentProfile } from "@/lib/useStudentProfile";
 
+import StudentStatCards from "../StudentStatCards";
 import StudentSubjectTable from "./StudentSubjectTable";
 
 export default function StudentSubjectsPage() {
-  const currentStudent = students.find(
-    (student) => student.id === 1
-  );
+  const { profile } = useStudentProfile();
 
-  const studentSubjects = currentStudent
-    ? subjects.filter(
-        (subject) =>
-          subject.className === currentStudent.className &&
-          subject.section === currentStudent.section
-      )
-    : [];
+  const [search, setSearch] = useState("");
 
-  const activeSubjects = studentSubjects.filter(
-    (subject) => subject.status === "Active"
-  ).length;
+  const [state, setState] = useState<{
+    loaded: boolean;
+    subjects: ApiStudentSubject[];
+    error: string;
+  }>({
+    loaded: false,
+    subjects: [],
+    error: "",
+  });
 
-  const teachers = new Set(
-    studentSubjects.map((subject) => subject.teacher)
-  ).size;
+  useEffect(() => {
+    let active = true;
 
-  const statsData = [
+    fetchStudentSubjects()
+      .then((subjects) => {
+        if (!active) return;
+        setState({ loaded: true, subjects, error: "" });
+      })
+      .catch((err: unknown) => {
+        if (!active) return;
+        setState({
+          loaded: true,
+          subjects: [],
+          error:
+            err instanceof Error
+              ? err.message
+              : "Unable to load your subjects.",
+        });
+      });
+
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  const filteredSubjects = useMemo(() => {
+    const value = search.trim().toLowerCase();
+
+    if (!value) return state.subjects;
+
+    return state.subjects.filter(
+      (subject) =>
+        subject.name.toLowerCase().includes(value) ||
+        subject.code.toLowerCase().includes(value) ||
+        subject.teacher.toLowerCase().includes(value) ||
+        subject.className.toLowerCase().includes(value) ||
+        subject.section.toLowerCase().includes(value)
+    );
+  }, [search, state.subjects]);
+
+  const teacherCount = new Set(state.subjects.map((s) => s.teacherId)).size;
+
+  const stats = [
     {
       title: "Total Subjects",
-      value: studentSubjects.length.toString(),
-      change: studentSubjects.length.toString(),
-      description: "enrolled subjects",
+      value: state.subjects.length,
       icon: BookOpen,
     },
     {
       title: "Active Subjects",
-      value: activeSubjects.toString(),
-      change: activeSubjects.toString(),
-      description: "currently active",
-      icon: CheckCircle2,
+      value: state.subjects.filter((s) => s.status === "ACTIVE").length,
+      icon: GraduationCap,
     },
     {
       title: "Teachers",
-      value: teachers.toString(),
-      change: teachers.toString(),
-      description: "subject teachers",
+      value: teacherCount,
       icon: Users,
     },
     {
-      title: "Current Class",
-      value: currentStudent
-        ? `${currentStudent.className}-${currentStudent.section}`
-        : "N/A",
-      change: currentStudent
-        ? currentStudent.className
-        : "N/A",
-      description: currentStudent
-        ? `${currentStudent.section} section`
-        : "class not available",
-      icon: GraduationCap,
+      title: "My Class",
+      value: profile ? `${profile.className} - ${profile.section}` : "-",
+      icon: School,
     },
   ];
 
+  const header = (
+    <div>
+      <h1 className="text-2xl font-bold text-gray-900 sm:text-3xl">Subjects</h1>
+
+      <p className="mt-1 text-sm text-gray-500 sm:text-base">
+        The subjects you are enrolled in this term.
+      </p>
+    </div>
+  );
+
+  if (!state.loaded && !state.error) {
+    return (
+      <div className="space-y-5">
+        {header}
+
+        <div className="rounded-2xl border border-gray-100 bg-white p-10 text-center shadow-sm">
+          <div className="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-gray-200 border-t-[#01796F]" />
+          <p className="mt-4 text-sm text-gray-500">Loading your subjects...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <main className="space-y-5">
-      {/* Page Header */}
-      <div>
-        <h1 className="text-2xl font-bold text-gray-900 sm:text-3xl">
-          Subjects
-        </h1>
+    <div className="space-y-5">
+      {header}
 
-        <p className="mt-1 text-sm text-gray-500 sm:text-base">
-          View your enrolled subjects and academic information.
-        </p>
-      </div>
+      {state.error && (
+        <div
+          role="alert"
+          className="rounded-2xl border border-red-200 bg-red-50 p-4 text-sm text-red-700"
+        >
+          {state.error}
+        </div>
+      )}
 
-      {/* Subject Stats */}
-      <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-4">
-        {statsData.map((stat) => {
-          const Icon = stat.icon;
+      <StudentStatCards stats={stats} />
 
-          return (
-            <div
-              key={stat.title}
-              className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm transition-shadow hover:shadow-md"
-            >
-              <div className="flex items-start justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-500">
-                    {stat.title}
-                  </p>
-
-                  <h2
-                    className={`mt-2 font-bold text-gray-900 ${
-                      stat.title === "Current Class"
-                        ? "text-xl"
-                        : "text-2xl"
-                    }`}
-                  >
-                    {stat.value}
-                  </h2>
-                </div>
-
-                <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#e6f4f2] text-[#01796f]">
-                  <Icon
-                    size={21}
-                    strokeWidth={1.8}
-                  />
-                </div>
-              </div>
-
-              <div className="mt-4 flex items-center gap-2 text-sm">
-                <span className="font-semibold text-[#01796f]">
-                  {stat.change}
-                </span>
-
-                <span className="text-gray-500">
-                  {stat.description}
-                </span>
-              </div>
-            </div>
-          );
-        })}
-      </div>
-
-      {/* Subject Cards */}
-      <StudentSubjectTable />
-    </main>
+      <StudentSubjectTable
+        subjects={filteredSubjects}
+        search={search}
+        setSearch={setSearch}
+        total={state.subjects.length}
+      />
+    </div>
   );
 }

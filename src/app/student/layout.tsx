@@ -3,10 +3,14 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
-import { getSession } from "@/lib/auth";
 import StudentSidebar from "@/components/student/StudentSidebar";
 import MobileStudentSidebar from "@/components/student/MobileStudentSidebar";
 import StudentHeader from "@/components/student/StudentHeader";
+
+import {
+  useAuthSession,
+  useSessionHydrated,
+} from "@/lib/useAuthSession";
 
 export default function StudentLayout({
   children,
@@ -15,17 +19,24 @@ export default function StudentLayout({
 }>) {
   const router = useRouter();
 
-  const [checkingAuth, setCheckingAuth] = useState(true);
+  // The session lives outside React, so it is read through
+  // `useAuthSession()` instead of being copied into state inside an effect.
+  const session = useAuthSession();
+  const hydrated = useSessionHydrated();
+
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
 
   useEffect(() => {
-    const session = getSession();
+    // The stored session is only read after the first client render.
+    if (!hydrated) return;
 
+    // Not logged in
     if (!session) {
       router.replace("/");
       return;
     }
 
+    // Only Student can access /student
     if (session.role !== "Student") {
       if (session.role === "Admin") {
         router.replace("/admin");
@@ -33,15 +44,13 @@ export default function StudentLayout({
         router.replace("/teacher");
       } else if (session.role === "Parent") {
         router.replace("/parent");
+      } else {
+        router.replace("/");
       }
-
-      return;
     }
+  }, [hydrated, router, session]);
 
-    setCheckingAuth(false);
-  }, [router]);
-
-  if (checkingAuth) {
+  if (!hydrated || !session || session.role !== "Student") {
     return null;
   }
 
@@ -60,7 +69,7 @@ export default function StudentLayout({
         <StudentSidebar />
 
         <main className="min-w-0 flex-1 lg:ml-64">
-          <div className="p-6 sm:p-8">
+          <div className="min-w-0 p-4 sm:p-6 lg:p-8">
             {children}
           </div>
         </main>

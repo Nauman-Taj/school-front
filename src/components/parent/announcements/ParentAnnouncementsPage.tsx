@@ -1,6 +1,12 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import {
+    CalendarCheck,
+    Megaphone,
+    Users,
+    UsersRound,
+} from "lucide-react";
 
 import { fetchAnnouncements } from "@/lib/announcements";
 import type { Announcement } from "@/types/announcement";
@@ -42,24 +48,28 @@ export default function ParentAnnouncementsPage() {
             {
                 title: "Total",
                 value: announcements.length,
+                icon: Megaphone,
             },
             {
                 title: "For Everyone",
                 value: announcements.filter(
                     (item) => item.audience === "All"
                 ).length,
+                icon: Users,
             },
             {
                 title: "For Parents",
                 value: announcements.filter(
                     (item) => item.audience === "Parents"
                 ).length,
+                icon: UsersRound,
             },
             {
                 title: "Published",
                 value: announcements.filter(
                     (item) => item.status === "Published"
                 ).length,
+                icon: CalendarCheck,
             },
         ],
         [announcements]
@@ -81,21 +91,30 @@ export default function ParentAnnouncementsPage() {
 
             {/* Stats */}
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                {stats.map((stat) => (
-                    <div
-                        key={stat.title}
-                        className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm"
-                    >
-                        {/* The icon box is left out on this page, so the row
-                            keeps the same height as the other modules. */}
-                        <div className="flex min-h-[44px] items-center justify-between">
-                            <p className="text-sm text-gray-500">{stat.title}</p>
+                {stats.map((stat) => {
+                    const Icon = stat.icon;
+
+                    return (
+                        <div
+                            key={stat.title}
+                            className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm"
+                        >
+                            <div className="flex items-center justify-between">
+                                <p className="text-sm text-gray-500">
+                                    {stat.title}
+                                </p>
+
+                                <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#e6f4f2] text-[#01796F]">
+                                    <Icon size={20} />
+                                </div>
+                            </div>
+
+                            <h2 className="mt-2 text-2xl font-bold text-gray-900">
+                                {loading ? "0" : stat.value}
+                            </h2>
                         </div>
-                        <h2 className="mt-2 text-2xl font-bold text-gray-900">
-                            {loading ? "0" : stat.value}
-                        </h2>
-                    </div>
-                ))}
+                    );
+                })}
             </div>
 
             {error && (

@@ -1,103 +1,143 @@
-import { BookOpen, ClipboardList, FileText, Video } from "lucide-react";
+"use client";
 
-import { students } from "@/data/students";
-import { studyMaterial } from "@/data/studyMaterial";
+import { useEffect, useMemo, useState } from "react";
+import {
+  BookOpen,
+  ClipboardList,
+  FileText,
+  Video,
+} from "lucide-react";
+
+import { fetchStudentStudyMaterials } from "@/lib/student-api";
+import type { ApiStudentStudyMaterial } from "@/lib/student-api";
+
+import StudentStatCards from "../StudentStatCards";
 import StudentStudyMaterialTable from "./StudentStudyMaterialTable";
 
 export default function StudentStudyMaterialPage() {
-  const currentStudent = students.find(
-    (student) => student.id === 1
-  );
+  const [search, setSearch] = useState("");
 
-  const studentMaterials = currentStudent
-    ? studyMaterial.filter(
-        (item) =>
-          item.className === currentStudent.className &&
-          item.section === currentStudent.section
-      )
-    : [];
+  const [state, setState] = useState<{
+    loaded: boolean;
+    materials: ApiStudentStudyMaterial[];
+    error: string;
+  }>({
+    loaded: false,
+    materials: [],
+    error: "",
+  });
 
-  const total = studentMaterials.length;
+  useEffect(() => {
+    let active = true;
 
-  const pdfs = studentMaterials.filter(
-    (item) => item.type === "PDF"
-  ).length;
+    fetchStudentStudyMaterials()
+      .then((materials) => {
+        if (!active) return;
+        setState({ loaded: true, materials, error: "" });
+      })
+      .catch((err: unknown) => {
+        if (!active) return;
+        setState({
+          loaded: true,
+          materials: [],
+          error:
+            err instanceof Error
+              ? err.message
+              : "Unable to load the study material.",
+        });
+      });
 
-  const notes = studentMaterials.filter(
-    (item) => item.type === "Notes"
-  ).length;
+    return () => {
+      active = false;
+    };
+  }, []);
 
-  const videos = studentMaterials.filter(
-    (item) => item.type === "Video"
-  ).length;
+  const filteredMaterials = useMemo(() => {
+    const value = search.trim().toLowerCase();
+
+    if (!value) return state.materials;
+
+    return state.materials.filter(
+      (material) =>
+        material.title.toLowerCase().includes(value) ||
+        material.subject.toLowerCase().includes(value) ||
+        material.description.toLowerCase().includes(value) ||
+        material.type.toLowerCase().includes(value) ||
+        material.date.toLowerCase().includes(value)
+    );
+  }, [search, state.materials]);
 
   const stats = [
     {
       title: "Total Materials",
-      value: total,
+      value: state.materials.length,
       icon: BookOpen,
     },
     {
       title: "PDF Files",
-      value: pdfs,
+      value: state.materials.filter((item) => item.type === "PDF").length,
       icon: FileText,
     },
     {
       title: "Notes",
-      value: notes,
+      value: state.materials.filter((item) => item.type === "Notes").length,
       icon: ClipboardList,
     },
     {
       title: "Videos",
-      value: videos,
+      value: state.materials.filter((item) => item.type === "Video").length,
       icon: Video,
     },
   ];
 
+  const header = (
+    <div>
+      <h1 className="text-2xl font-bold text-gray-900 sm:text-3xl">
+        Study Material
+      </h1>
+
+      <p className="mt-1 text-sm text-gray-500 sm:text-base">
+        Access the learning materials published for your class.
+      </p>
+    </div>
+  );
+
+  if (!state.loaded && !state.error) {
+    return (
+      <div className="space-y-5">
+        {header}
+
+        <div className="rounded-2xl border border-gray-100 bg-white p-10 text-center shadow-sm">
+          <div className="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-gray-200 border-t-[#01796F]" />
+          <p className="mt-4 text-sm text-gray-500">
+            Loading the study material...
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <main className="space-y-5">
-      <div>
-        <h1 className="text-2xl font-bold text-gray-800 sm:text-3xl">
-          Study Material
-        </h1>
+    <div className="space-y-5">
+      {header}
 
-        <p className="mt-1 text-sm text-gray-500 sm:text-base">
-          Access your available educational learning materials.
-        </p>
-      </div>
+      {state.error && (
+        <div
+          role="alert"
+          className="rounded-2xl border border-red-200 bg-red-50 p-4 text-sm text-red-700"
+        >
+          {state.error}
+        </div>
+      )}
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {stats.map((stat) => {
-          const Icon = stat.icon;
-
-          return (
-            <div
-              key={stat.title}
-              className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm"
-            >
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-500">
-                    {stat.title}
-                  </p>
-
-                  <h2 className="mt-2 text-2xl font-bold text-gray-800">
-                    {stat.value}
-                  </h2>
-                </div>
-
-                <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#e6f4f2] text-[#01796F]">
-                  <Icon size={21} strokeWidth={1.8} />
-                </div>
-              </div>
-            </div>
-          );
-        })}
-      </div>
+      <StudentStatCards stats={stats} />
 
       <StudentStudyMaterialTable
-        materials={studentMaterials}
+        materials={filteredMaterials}
+        search={search}
+        setSearch={setSearch}
+        total={state.materials.length}
       />
-    </main>
+    </div>
   );
 }

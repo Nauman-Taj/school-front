@@ -2,10 +2,10 @@
 
 import { useEffect, useMemo, useState } from "react";
 import {
-  Bell,
-  CalendarDays,
+  CalendarCheck,
   Megaphone,
   Users,
+  UsersRound,
 } from "lucide-react";
 
 import { fetchAnnouncements } from "@/lib/announcements";
@@ -54,21 +54,21 @@ export default function TeacherAnnouncementsPage() {
         value: announcements.filter(
           (item) => item.audience === "All"
         ).length,
-        icon: Bell,
+        icon: Users,
       },
       {
         title: "For Teachers",
         value: announcements.filter(
           (item) => item.audience === "Teachers"
         ).length,
-        icon: Users,
+        icon: UsersRound,
       },
       {
-        title: "Latest Date",
-        value: announcements.length
-          ? announcements[announcements.length - 1].date
-          : "-",
-        icon: CalendarDays,
+        title: "Published",
+        value: announcements.filter(
+          (item) => item.status === "Published"
+        ).length,
+        icon: CalendarCheck,
       },
     ],
     [announcements]

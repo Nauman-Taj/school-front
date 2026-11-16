@@ -95,7 +95,7 @@ export default function StudyMaterialTable({
       {/* Desktop table */}
       <div className="hidden overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm md:block">
         <div className="overflow-x-auto">
-          <table className="w-full min-w-[760px] text-sm">
+          <table className="w-full min-w-[760px] text-left text-sm">
             <thead className="bg-gray-50 text-gray-700">
               <tr>
                 <th className="px-5 py-4 font-semibold">Material</th>

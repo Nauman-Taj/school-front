@@ -1,226 +1,146 @@
 "use client";
 
-import {
-  CalendarDays,
-  Check,
-  Clock3,
-  Plane,
-  X,
-} from "lucide-react";
+import { CalendarCheck, Check, Clock3, Search, X } from "lucide-react";
 
-import { attendance } from "@/data/attendance";
-import { students } from "@/data/students";
-import { AttendanceRecord, StudentAttendanceRecord, } from "@/types/attendance";
+import type { AttendanceStatus } from "@/types/attendance";
 
-function StatusBadge({
-  status,
-}: {
-  status: AttendanceRecord["status"];
-}) {
-  const styles = {
-    Present: "bg-green-50 text-green-700",
-    Absent: "bg-red-50 text-red-700",
-    Late: "bg-yellow-50 text-yellow-700",
-    Leave: "bg-blue-50 text-blue-700",
-  };
+type Props = {
+  records: { id: number; date: string; status: AttendanceStatus }[];
+  search: string;
+  setSearch: (value: string) => void;
+  total: number;
+};
 
-  const icons = {
-    Present: <Check size={14} />,
-    Absent: <X size={14} />,
-    Late: <Clock3 size={14} />,
-    Leave: <Plane size={14} />,
-  };
+const statusStyles: Record<AttendanceStatus, string> = {
+  Present: "bg-green-50 text-green-700",
+  Absent: "bg-red-50 text-red-700",
+  Late: "bg-yellow-50 text-yellow-700",
+  Leave: "bg-blue-50 text-blue-700",
+};
 
-  return (
-    <span
-      className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium ${styles[status]}`}
-    >
-      {icons[status]}
-      {status}
-    </span>
-  );
-}
+const statusIcons = {
+  Present: Check,
+  Absent: X,
+  Late: Clock3,
+  Leave: CalendarCheck,
+};
 
-export default function StudentAttendanceTable() {
-  const currentStudent = students.find(
-    (student) => student.id === 1
-  );
-
-  const studentAttendance: StudentAttendanceRecord[] = currentStudent
-    ? attendance.filter(
-      (record): record is StudentAttendanceRecord =>
-        record.role === "Student" &&
-        record.studentId === currentStudent.id
-    )
-    : [];
-
-  const presentCount = studentAttendance.filter(
-    (record) => record.status === "Present"
-  ).length;
-
-  const absentCount = studentAttendance.filter(
-    (record) => record.status === "Absent"
-  ).length;
-
-  const lateCount = studentAttendance.filter(
-    (record) => record.status === "Late"
-  ).length;
-
-  const leaveCount = studentAttendance.filter(
-    (record) => record.status === "Leave"
-  ).length;
-
-  const totalRecords = studentAttendance.length;
-  const attendedCount = presentCount + lateCount;
-
-  const attendancePercentage =
-    totalRecords > 0
-      ? Math.round((attendedCount / totalRecords) * 100)
-      : 0;
-
+export default function StudentAttendanceTable({
+  records,
+  search,
+  setSearch,
+  total,
+}: Props) {
   return (
     <div className="space-y-5">
-      {/* Summary */}
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
-        <SummaryCard
-          title="Present"
-          value={presentCount}
-          icon={<Check size={20} />}
-          iconClass="text-[#01796f]"
-        />
+      {/* Search */}
+      <div className="rounded-2xl border border-gray-100 bg-white p-4 shadow-sm">
+        <div className="relative">
+          <Search
+            size={17}
+            className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
+          />
 
-        <SummaryCard
-          title="Absent"
-          value={absentCount}
-          icon={<X size={20} />}
-          iconClass="text-[#01796F]"
-        />
-
-        <SummaryCard
-          title="Late"
-          value={lateCount}
-          icon={<Clock3 size={20} />}
-          iconClass="text-[#01796F]"
-        />
-
-        <SummaryCard
-          title="Leave"
-          value={leaveCount}
-          icon={<Plane size={20} />}
-          iconClass="text-[#01796F]"
-        />
-
-        <SummaryCard
-          title="Attendance"
-          value={`${attendancePercentage}%`}
-          icon={<CalendarDays size={20} />}
-          iconClass="text-[#01796f]"
-        />
+          <input
+            type="search"
+            placeholder="Search attendance"
+            value={search}
+            onChange={(event) => setSearch(event.target.value)}
+            className="w-full rounded-full border border-gray-200 bg-gray-50 py-3 pl-11 pr-4 text-sm outline-none transition placeholder:text-gray-400 focus:border-[#01796F] focus:bg-white focus:ring-2 focus:ring-[#01796F]/10"
+          />
+        </div>
       </div>
 
-      {/* Attendance Records */}
-      <div>
-        <div className="mb-4">
-          <h2 className="text-lg font-semibold text-gray-900">
-            Attendance Records
-          </h2>
+      {/* Desktop table */}
+      <div className="hidden overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm md:block">
+        <div className="overflow-x-auto">
+          <table className="w-full text-left text-sm">
+            <thead className="bg-gray-50 text-gray-700">
+              <tr>
+                <th className="px-5 py-4 font-semibold">Date</th>
+                <th className="px-5 py-4 font-semibold">Status</th>
+              </tr>
+            </thead>
 
-          <p className="mt-1 text-sm text-gray-500">
-            Your attendance history.
-          </p>
-        </div>
+            <tbody className="divide-y divide-gray-100">
+              {records.length > 0 ? (
+                records.map((record) => {
+                  const Icon = statusIcons[record.status];
 
-        <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
-          <div className="overflow-x-auto">
-            <table className="w-full min-w-[650px]">
-              <thead className="border-b border-gray-200 bg-gray-50">
-                <tr>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-gray-600">
-                    Date
-                  </th>
-
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-gray-600">
-                    Class
-                  </th>
-
-                  <th className="px-6 py-4 text-center text-sm font-semibold text-gray-600">
-                    Status
-                  </th>
-                </tr>
-              </thead>
-
-              <tbody className="divide-y divide-gray-100">
-                {studentAttendance.map((record) => (
-                  <tr
-                    key={record.id}
-                    className="hover:bg-gray-50"
-                  >
-                    <td className="px-6 py-4 text-sm text-gray-600">
-                      {record.date}
-                    </td>
-
-                    <td className="px-6 py-4 text-sm text-gray-600">
-                      {record.className}-{record.section}
-                    </td>
-
-                    <td className="px-6 py-4 text-center">
-                      <StatusBadge status={record.status} />
-                    </td>
-                  </tr>
-                ))}
-
-                {studentAttendance.length === 0 && (
-                  <tr>
-                    <td
-                      colSpan={3}
-                      className="px-6 py-10 text-center text-sm text-gray-500"
+                  return (
+                    <tr
+                      key={record.id}
+                      className="transition hover:bg-gray-50"
                     >
-                      No attendance records found.
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
+                      <td className="px-5 py-4 text-gray-700">
+                        {record.date}
+                      </td>
+
+                      <td className="px-5 py-4">
+                        <span
+                          className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium ${statusStyles[record.status]}`}
+                        >
+                          <Icon size={15} />
+                          {record.status}
+                        </span>
+                      </td>
+                    </tr>
+                  );
+                })
+              ) : (
+                <tr>
+                  <td
+                    colSpan={2}
+                    className="px-5 py-12 text-center text-sm text-gray-500"
+                  >
+                    No attendance records found.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+
+        <div className="border-t border-gray-100 px-5 py-4 text-sm text-gray-500">
+          Showing {records.length} of {total} records
+        </div>
+      </div>
+
+      {/* Mobile cards */}
+      <div className="space-y-3 md:hidden">
+        {records.length > 0 ? (
+          records.map((record) => {
+            const Icon = statusIcons[record.status];
+
+            return (
+              <div
+                key={record.id}
+                className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm"
+              >
+                <div className="flex items-center justify-between gap-3">
+                  <p className="text-sm font-medium text-gray-900">
+                    {record.date}
+                  </p>
+
+                  <span
+                    className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium ${statusStyles[record.status]}`}
+                  >
+                    <Icon size={15} />
+                    {record.status}
+                  </span>
+                </div>
+              </div>
+            );
+          })
+        ) : (
+          <div className="rounded-2xl border border-gray-100 bg-white p-10 text-center text-sm text-gray-500 shadow-sm">
+            No attendance records found.
           </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function SummaryCard({
-  title,
-  value,
-  icon,
-  iconClass,
-}: {
-  title: string;
-  value: string | number;
-  icon: React.ReactNode;
-  iconClass: string;
-}) {
-  return (
-    <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
-      <div className="flex items-start justify-between">
-        <div>
-          <p className="text-sm font-medium text-gray-500">
-            {title}
-          </p>
-
-          <h2 className="mt-2 text-2xl font-bold text-gray-900">
-            {value}
-          </h2>
-        </div>
-
-        <div
-          className={`rounded-xl bg-[#e6f4f2] p-2.5 ${iconClass}`}
-        >
-          {icon}
-        </div>
+        )}
       </div>
 
-      <p className="mt-3 text-sm text-gray-500">
-        Attendance record
+      <p className="text-sm text-gray-500 md:hidden">
+        Showing {records.length} of {total} records
       </p>
     </div>
   );

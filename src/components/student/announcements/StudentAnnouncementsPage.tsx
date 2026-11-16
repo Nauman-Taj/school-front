@@ -1,16 +1,145 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { Megaphone, Search } from "lucide-react";
+import {
+  CalendarCheck,
+  Megaphone,
+  Users,
+  UsersRound,
+} from "lucide-react";
+
 import { fetchAnnouncements } from "@/lib/announcements";
 import type { Announcement } from "@/types/announcement";
 
+import StudentStatCards from "../StudentStatCards";
+import StudentAnnouncementTable from "./StudentAnnouncementTable";
+
 export default function StudentAnnouncementsPage() {
-  const [announcements, setAnnouncements] = useState<Announcement[]>([]);
   const [search, setSearch] = useState("");
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
-  useEffect(() => { let active = true; fetchAnnouncements().then((data) => { if (active) setAnnouncements(data); }).catch((err: unknown) => { if (active) setError(err instanceof Error ? err.message : "Unable to load announcements."); }).finally(() => { if (active) setLoading(false); }); return () => { active = false; }; }, []);
-  const filtered = useMemo(() => { const q = search.trim().toLowerCase(); return announcements.filter((item) => !q || [item.title, item.description, item.audience, item.date].join(" ").toLowerCase().includes(q)); }, [announcements, search]);
-  return <div className="space-y-5"><div><h1 className="text-2xl font-bold text-gray-900 sm:text-3xl">Announcements</h1><p className="mt-1 text-sm text-gray-500 sm:text-base">View important school announcements and updates.</p></div><div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm"><div className="relative"><Search size={17} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"/><input type="search" placeholder="Search announcements" value={search} onChange={(event) => setSearch(event.target.value)} className="w-full rounded-full border border-gray-200 bg-gray-50 py-3 pl-10 pr-4 text-sm outline-none transition focus:border-[#01796f] focus:bg-white focus:ring-2 focus:ring-[#01796f]/10"/></div></div>{error && <div role="alert" className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{error}</div>}{loading ? <div className="rounded-2xl border border-gray-100 bg-white p-10 text-center shadow-sm"><div className="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-gray-200 border-t-[#01796F]"/><p className="mt-4 text-sm text-gray-500">Loading announcements...</p></div> : <div className="space-y-4">{filtered.length ? filtered.map((item) => <article key={item.id} className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm"><div className="flex gap-4"><div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[#e6f4f2] text-[#01796f]"><Megaphone size={20}/></div><div className="min-w-0 flex-1"><div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between"><div><h2 className="font-semibold text-gray-900">{item.title}</h2><p className="mt-1 text-sm text-gray-500">{item.description}</p></div><span className="w-fit shrink-0 rounded-full bg-[#e6f4f2] px-3 py-1 text-xs font-semibold text-[#01796f]">Published</span></div><div className="mt-4 flex flex-wrap items-center gap-3 text-xs text-gray-500"><span>Date: {item.date}</span><span className="text-gray-300">•</span><span>Audience: {item.audience}</span></div></div></div></article>) : <div className="rounded-2xl border border-gray-100 bg-white p-8 text-center shadow-sm"><p className="text-sm text-gray-500">No announcements found.</p></div>}</div>}</div>;
+
+  const [state, setState] = useState<{
+    loaded: boolean;
+    announcements: Announcement[];
+    error: string;
+  }>({
+    loaded: false,
+    announcements: [],
+    error: "",
+  });
+
+  useEffect(() => {
+    let active = true;
+
+    fetchAnnouncements()
+      .then((announcements) => {
+        if (!active) return;
+        setState({ loaded: true, announcements, error: "" });
+      })
+      .catch((err: unknown) => {
+        if (!active) return;
+        setState({
+          loaded: true,
+          announcements: [],
+          error:
+            err instanceof Error
+              ? err.message
+              : "Unable to load announcements.",
+        });
+      });
+
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  const filtered = useMemo(() => {
+    const value = search.trim().toLowerCase();
+
+    if (!value) return state.announcements;
+
+    return state.announcements.filter(
+      (item) =>
+        item.title.toLowerCase().includes(value) ||
+        item.description.toLowerCase().includes(value) ||
+        item.audience.toLowerCase().includes(value) ||
+        item.date.toLowerCase().includes(value)
+    );
+  }, [search, state.announcements]);
+
+  const stats = [
+    {
+      title: "Total",
+      value: state.announcements.length,
+      icon: Megaphone,
+    },
+    {
+      title: "For Everyone",
+      value: state.announcements.filter((item) => item.audience === "All").length,
+      icon: Users,
+    },
+    {
+      title: "For Students",
+      value: state.announcements.filter(
+        (item) => item.audience === "Students"
+      ).length,
+      icon: UsersRound,
+    },
+    {
+      title: "Published",
+      value: state.announcements.filter((item) => item.status === "Published")
+        .length,
+      icon: CalendarCheck,
+    },
+  ];
+
+  const header = (
+    <div>
+      <h1 className="text-2xl font-bold text-gray-900 sm:text-3xl">
+        Announcements
+      </h1>
+
+      <p className="mt-1 text-sm text-gray-500 sm:text-base">
+        View important school announcements and updates.
+      </p>
+    </div>
+  );
+
+  if (!state.loaded && !state.error) {
+    return (
+      <div className="space-y-5">
+        {header}
+
+        <div className="rounded-2xl border border-gray-100 bg-white p-10 text-center shadow-sm">
+          <div className="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-gray-200 border-t-[#01796F]" />
+          <p className="mt-4 text-sm text-gray-500">
+            Loading announcements...
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-5">
+      {header}
+
+      {state.error && (
+        <div
+          role="alert"
+          className="rounded-2xl border border-red-200 bg-red-50 p-4 text-sm text-red-700"
+        >
+          {state.error}
+        </div>
+      )}
+
+      <StudentStatCards stats={stats} />
+
+      <StudentAnnouncementTable
+        announcements={filtered}
+        search={search}
+        setSearch={setSearch}
+        total={state.announcements.length}
+      />
+    </div>
+  );
 }

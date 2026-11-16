@@ -214,7 +214,7 @@ export default function TeacherDashboard() {
       )}
 
       {/* Stats */}
-      <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-4">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {stats.map((stat) => {
           const Icon = stat.icon;
 
@@ -287,7 +287,7 @@ export default function TeacherDashboard() {
       </div>
 
       {/* Classes + Exams */}
-      <div className="grid gap-5 xl:grid-cols-2">
+      <div className="grid gap-5 lg:grid-cols-2">
         {/* Today's Classes */}
         <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
           <div className="mb-6 flex items-start justify-between gap-4">

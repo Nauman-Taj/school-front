@@ -1,236 +1,196 @@
 "use client";
 
-import { useState } from "react";
-import {
-  CalendarDays,
-  CheckCircle2,
-  Clock3,
-  Search,
-} from "lucide-react";
+import { CalendarDays, Search } from "lucide-react";
 
-import { Fee } from "@/types/fee";
+import type { ApiStudentFee } from "@/lib/student-api";
 
-type StudentFeeTableProps = {
-  fees: Fee[];
+type Props = {
+  fees: ApiStudentFee[];
+  search: string;
+  setSearch: (value: string) => void;
+  total: number;
+};
+
+const statusStyles: Record<string, string> = {
+  Paid: "bg-green-50 text-green-700",
+  Partial: "bg-yellow-50 text-yellow-700",
+  Pending: "bg-red-50 text-red-700",
+  Overdue: "bg-red-50 text-red-700",
 };
 
 export default function StudentFeeTable({
   fees,
-}: StudentFeeTableProps) {
-  const [search, setSearch] = useState("");
-
-  const filteredFees = fees.filter((fee) =>
-    `${fee.feeType} ${fee.status} ${fee.dueDate}`
-      .toLowerCase()
-      .includes(search.toLowerCase())
-  );
-
+  search,
+  setSearch,
+  total,
+}: Props) {
   return (
-    <div className="rounded-2xl border border-gray-200 bg-white shadow-sm">
-      <div className="border-b border-gray-200 p-5">
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <h2 className="text-lg font-semibold text-gray-900">
-              Fee Records
-            </h2>
+    <div className="space-y-5">
+      {/* Search */}
+      <div className="rounded-2xl border border-gray-100 bg-white p-4 shadow-sm">
+        <div className="relative">
+          <Search
+            size={17}
+            className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
+          />
 
-            <p className="mt-1 text-sm text-gray-500">
-              Your fee payment history.
-            </p>
-          </div>
-
-          <div className="relative w-full sm:w-64">
-            <Search
-              size={17}
-              className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
-            />
-
-            <input
-              type="text"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search fees"
-              className="w-full rounded-full border border-gray-200 py-2.5 pl-9 pr-4 text-sm outline-none transition focus:border-[#01796f] focus:ring-2 focus:ring-[#01796f]/10"
-            />
-          </div>
+          <input
+            type="search"
+            placeholder="Search fee records"
+            value={search}
+            onChange={(event) => setSearch(event.target.value)}
+            className="w-full rounded-full border border-gray-200 bg-gray-50 py-3 pl-11 pr-4 text-sm outline-none transition placeholder:text-gray-400 focus:border-[#01796F] focus:bg-white focus:ring-2 focus:ring-[#01796F]/10"
+          />
         </div>
       </div>
 
-      {/* Desktop */}
-      <div className="hidden overflow-x-auto md:block">
-        <table className="w-full min-w-[800px]">
-          <thead className="border-b border-gray-200 bg-gray-50">
-            <tr>
-              <th className="px-5 py-4 text-left text-sm font-semibold text-gray-600">
-                Fee Type
-              </th>
-
-              <th className="px-5 py-4 text-right text-sm font-semibold text-gray-600">
-                Amount
-              </th>
-
-              <th className="px-5 py-4 text-right text-sm font-semibold text-gray-600">
-                Paid
-              </th>
-
-              <th className="px-5 py-4 text-right text-sm font-semibold text-gray-600">
-                Remaining
-              </th>
-
-              <th className="px-5 py-4 text-left text-sm font-semibold text-gray-600">
-                Due Date
-              </th>
-
-              <th className="px-5 py-4 text-center text-sm font-semibold text-gray-600">
-                Status
-              </th>
-            </tr>
-          </thead>
-
-          <tbody className="divide-y divide-gray-100">
-            {filteredFees.map((fee) => (
-              <tr
-                key={fee.id}
-                className="transition-colors hover:bg-gray-50"
-              >
-                <td className="px-5 py-4 text-sm font-medium text-gray-900">
-                  {fee.feeType}
-                </td>
-
-                <td className="px-5 py-4 text-right text-sm text-gray-600">
-                  Rs. {fee.amount.toLocaleString()}
-                </td>
-
-                <td className="px-5 py-4 text-right text-sm text-gray-600">
-                  Rs. {fee.paidAmount.toLocaleString()}
-                </td>
-
-                <td className="px-5 py-4 text-right text-sm font-medium text-gray-900">
-                  Rs. {fee.remainingAmount.toLocaleString()}
-                </td>
-
-                <td className="px-5 py-4 text-sm text-gray-600">
-                  {fee.dueDate}
-                </td>
-
-                <td className="px-5 py-4 text-center">
-                  <StatusBadge status={fee.status} />
-                </td>
-              </tr>
-            ))}
-
-            {filteredFees.length === 0 && (
+      {/* Desktop table */}
+      <div className="hidden overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm md:block">
+        <div className="overflow-x-auto">
+          <table className="w-full text-left text-sm">
+            <thead className="bg-gray-50 text-gray-700">
               <tr>
-                <td
-                  colSpan={6}
-                  className="px-5 py-10 text-center text-sm text-gray-500"
-                >
-                  No fee records found.
-                </td>
+                <th className="px-5 py-4 font-semibold">Invoice</th>
+                <th className="px-5 py-4 font-semibold">Fee Type</th>
+                <th className="px-5 py-4 font-semibold">Amount</th>
+                <th className="px-5 py-4 font-semibold">Paid</th>
+                <th className="px-5 py-4 font-semibold">Remaining</th>
+                <th className="px-5 py-4 font-semibold">Due Date</th>
+                <th className="px-5 py-4 font-semibold">Status</th>
               </tr>
-            )}
-          </tbody>
-        </table>
+            </thead>
+
+            <tbody className="divide-y divide-gray-100">
+              {fees.length > 0 ? (
+                fees.map((fee) => (
+                  <tr key={fee.id} className="transition hover:bg-gray-50">
+                    <td className="px-5 py-4">
+                      <div className="flex items-center gap-3">
+                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#e6f4f2] text-[#01796F]">
+                          <CalendarDays size={18} />
+                        </div>
+
+                        <p className="font-medium text-gray-900">
+                          {fee.invoiceNumber}
+                        </p>
+                      </div>
+                    </td>
+
+                    <td className="px-5 py-4 text-gray-600">{fee.feeType}</td>
+
+                    <td className="px-5 py-4 text-gray-600">
+                      Rs. {fee.amount.toLocaleString()}
+                    </td>
+
+                    <td className="px-5 py-4 text-gray-600">
+                      Rs. {fee.paidAmount.toLocaleString()}
+                    </td>
+
+                    <td className="px-5 py-4 text-gray-600">
+                      Rs. {fee.remainingAmount.toLocaleString()}
+                    </td>
+
+                    <td className="px-5 py-4 text-gray-600">{fee.dueDate}</td>
+
+                    <td className="px-5 py-4">
+                      <span
+                        className={`inline-flex shrink-0 rounded-full px-3 py-1 text-xs font-medium ${
+                          statusStyles[fee.status] ??
+                          "bg-gray-100 text-gray-600"
+                        }`}
+                      >
+                        {fee.status}
+                      </span>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td
+                    colSpan={7}
+                    className="px-5 py-12 text-center text-sm text-gray-500"
+                  >
+                    No fee records found.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+
+        <div className="border-t border-gray-100 px-5 py-4 text-sm text-gray-500">
+          Showing {fees.length} of {total} fee records
+        </div>
       </div>
 
-      {/* Mobile */}
-      <div className="space-y-3 p-4 md:hidden">
-        {filteredFees.map((fee) => (
-          <div
-            key={fee.id}
-            className="rounded-xl border border-gray-100 p-4"
-          >
-            <div className="flex items-start justify-between gap-3">
-              <div>
-                <h3 className="font-semibold text-gray-900">
-                  {fee.feeType}
-                </h3>
+      {/* Mobile cards */}
+      <div className="space-y-3 md:hidden">
+        {fees.length > 0 ? (
+          fees.map((fee) => (
+            <div
+              key={fee.id}
+              className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm"
+            >
+              <div className="flex items-start justify-between gap-3">
+                <div className="flex min-w-0 items-center gap-3">
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#e6f4f2] text-[#01796F]">
+                    <CalendarDays size={18} />
+                  </div>
 
-                <p className="mt-1 text-sm text-gray-500">
-                  Rs. {fee.amount.toLocaleString()}
-                </p>
+                  <div className="min-w-0">
+                    <p className="font-semibold text-gray-900">
+                      {fee.feeType}
+                    </p>
+
+                    <p className="mt-1 text-xs text-gray-500">
+                      {fee.invoiceNumber} · due {fee.dueDate}
+                    </p>
+                  </div>
+                </div>
+
+                <span
+                  className={`shrink-0 rounded-full px-3 py-1 text-xs font-medium ${
+                    statusStyles[fee.status] ?? "bg-gray-100 text-gray-600"
+                  }`}
+                >
+                  {fee.status}
+                </span>
               </div>
 
-              <StatusBadge status={fee.status} />
+              <div className="mt-4 grid grid-cols-3 gap-3 border-t border-gray-100 pt-4 text-center">
+                <div>
+                  <p className="text-xs text-gray-500">Amount</p>
+                  <p className="mt-1 text-sm font-medium text-gray-900">
+                    {fee.amount.toLocaleString()}
+                  </p>
+                </div>
+
+                <div>
+                  <p className="text-xs text-gray-500">Paid</p>
+                  <p className="mt-1 text-sm font-medium text-gray-900">
+                    {fee.paidAmount.toLocaleString()}
+                  </p>
+                </div>
+
+                <div>
+                  <p className="text-xs text-gray-500">Remaining</p>
+                  <p className="mt-1 text-sm font-medium text-gray-900">
+                    {fee.remainingAmount.toLocaleString()}
+                  </p>
+                </div>
+              </div>
             </div>
-
-            <div className="mt-4 grid grid-cols-2 gap-3">
-              <div>
-                <p className="text-xs text-gray-400">
-                  Paid
-                </p>
-
-                <p className="mt-1 text-sm font-medium text-gray-900">
-                  Rs. {fee.paidAmount.toLocaleString()}
-                </p>
-              </div>
-
-              <div>
-                <p className="text-xs text-gray-400">
-                  Remaining
-                </p>
-
-                <p className="mt-1 text-sm font-medium text-gray-900">
-                  Rs. {fee.remainingAmount.toLocaleString()}
-                </p>
-              </div>
-
-              <div className="col-span-2">
-                <p className="flex items-center gap-1.5 text-xs text-gray-400">
-                  <CalendarDays size={14} />
-                  Due Date
-                </p>
-
-                <p className="mt-1 text-sm text-gray-600">
-                  {fee.dueDate}
-                </p>
-              </div>
-            </div>
-          </div>
-        ))}
-
-        {filteredFees.length === 0 && (
-          <div className="py-10 text-center text-sm text-gray-500">
+          ))
+        ) : (
+          <div className="rounded-2xl border border-gray-100 bg-white p-10 text-center text-sm text-gray-500 shadow-sm">
             No fee records found.
           </div>
         )}
       </div>
+
+      <p className="text-sm text-gray-500 md:hidden">
+        Showing {fees.length} of {total} fee records
+      </p>
     </div>
-  );
-}
-
-function StatusBadge({
-  status,
-}: {
-  status: Fee["status"];
-}) {
-  const config = {
-    Paid: {
-      className: "bg-green-50 text-green-700",
-      icon: <CheckCircle2 size={14} />,
-    },
-    Partial: {
-      className: "bg-yellow-50 text-yellow-700",
-      icon: <Clock3 size={14} />,
-    },
-    Pending: {
-      className: "bg-blue-50 text-blue-700",
-      icon: <Clock3 size={14} />,
-    },
-    Overdue: {
-      className: "bg-red-50 text-red-700",
-      icon: <Clock3 size={14} />,
-    },
-  };
-
-  const current = config[status];
-
-  return (
-    <span
-      className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium ${current.className}`}
-    >
-      {current.icon}
-      {status}
-    </span>
   );
 }

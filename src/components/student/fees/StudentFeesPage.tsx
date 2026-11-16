@@ -1,37 +1,87 @@
-import { CreditCard, CircleDollarSign, Clock3, CheckCircle2 } from "lucide-react";
+"use client";
 
-import { fees } from "@/data/fees";
-import { students } from "@/data/students";
+import { useEffect, useMemo, useState } from "react";
+import {
+  CheckCircle2,
+  CircleDollarSign,
+  Clock3,
+  CreditCard,
+} from "lucide-react";
 
+import { fetchStudentFees } from "@/lib/student-api";
+import type { ApiStudentFee } from "@/lib/student-api";
+
+import StudentStatCards from "../StudentStatCards";
 import StudentFeeTable from "./StudentFeeTable";
 
 export default function StudentFeesPage() {
-  const currentStudent = students.find(
-    (student) => student.id === 1
-  );
+  const [search, setSearch] = useState("");
 
-  const studentFees = currentStudent
-    ? fees.filter(
-        (fee) => fee.studentId === currentStudent.id
-      )
-    : [];
+  const [state, setState] = useState<{
+    loaded: boolean;
+    fees: ApiStudentFee[];
+    error: string;
+  }>({
+    loaded: false,
+    fees: [],
+    error: "",
+  });
 
-  const totalAmount = studentFees.reduce(
+  useEffect(() => {
+    let active = true;
+
+    fetchStudentFees()
+      .then((fees) => {
+        if (!active) return;
+        setState({ loaded: true, fees, error: "" });
+      })
+      .catch((err: unknown) => {
+        if (!active) return;
+        setState({
+          loaded: true,
+          fees: [],
+          error:
+            err instanceof Error
+              ? err.message
+              : "Unable to load your fees.",
+        });
+      });
+
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  const filteredFees = useMemo(() => {
+    const value = search.trim().toLowerCase();
+
+    if (!value) return state.fees;
+
+    return state.fees.filter(
+      (fee) =>
+        fee.invoiceNumber.toLowerCase().includes(value) ||
+        fee.feeType.toLowerCase().includes(value) ||
+        fee.status.toLowerCase().includes(value) ||
+        fee.dueDate.toLowerCase().includes(value)
+    );
+  }, [search, state.fees]);
+
+  const totalAmount = state.fees.reduce(
     (total, fee) => total + fee.amount,
     0
   );
 
-  const paidAmount = studentFees.reduce(
+  const paidAmount = state.fees.reduce(
     (total, fee) => total + fee.paidAmount,
     0
   );
 
-  const remainingAmount = studentFees.reduce(
+  const remainingAmount = state.fees.reduce(
     (total, fee) => total + fee.remainingAmount,
     0
   );
 
-  const pendingCount = studentFees.filter(
+  const pendingCount = state.fees.filter(
     (fee) => fee.status === "Pending" || fee.status === "Partial"
   ).length;
 
@@ -58,48 +108,50 @@ export default function StudentFeesPage() {
     },
   ];
 
+  const header = (
+    <div>
+      <h1 className="text-2xl font-bold text-gray-900 sm:text-3xl">Fees</h1>
+
+      <p className="mt-1 text-sm text-gray-500 sm:text-base">
+        View your fee details, payments, and outstanding balance.
+      </p>
+    </div>
+  );
+
+  if (!state.loaded && !state.error) {
+    return (
+      <div className="space-y-5">
+        {header}
+
+        <div className="rounded-2xl border border-gray-100 bg-white p-10 text-center shadow-sm">
+          <div className="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-gray-200 border-t-[#01796F]" />
+          <p className="mt-4 text-sm text-gray-500">Loading your fees...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <main className="space-y-5">
-      <div>
-        <h1 className="text-2xl font-bold text-gray-900 sm:text-3xl">
-          Fees
-        </h1>
+    <div className="space-y-5">
+      {header}
 
-        <p className="mt-1 text-sm text-gray-500 sm:text-base">
-          View your fee details, payments, and outstanding balance.
-        </p>
-      </div>
+      {state.error && (
+        <div
+          role="alert"
+          className="rounded-2xl border border-red-200 bg-red-50 p-4 text-sm text-red-700"
+        >
+          {state.error}
+        </div>
+      )}
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {stats.map((stat) => {
-          const Icon = stat.icon;
+      <StudentStatCards stats={stats} />
 
-          return (
-            <div
-              key={stat.title}
-              className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm"
-            >
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-500">
-                    {stat.title}
-                  </p>
-
-                  <h2 className="mt-2 text-2xl font-bold text-gray-900">
-                    {stat.value}
-                  </h2>
-                </div>
-
-                <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#e6f4f2] text-[#01796f]">
-                  <Icon size={21} strokeWidth={1.8} />
-                </div>
-              </div>
-            </div>
-          );
-        })}
-      </div>
-
-      <StudentFeeTable fees={studentFees} />
-    </main>
+      <StudentFeeTable
+        fees={filteredFees}
+        search={search}
+        setSearch={setSearch}
+        total={state.fees.length}
+      />
+    </div>
   );
 }

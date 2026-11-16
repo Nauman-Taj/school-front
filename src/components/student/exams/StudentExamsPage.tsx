@@ -1,109 +1,135 @@
 "use client";
 
+import { useEffect, useMemo, useState } from "react";
 import {
-  CalendarDays,
-  CheckCircle2,
-  ClipboardList,
+  CalendarCheck,
   FileText,
+  GraduationCap,
+  Trophy,
 } from "lucide-react";
 
-import { exams } from "@/data/exams";
-import { students } from "@/data/students";
+import { fetchStudentExams } from "@/lib/student-api";
+import type { ApiStudentExam } from "@/lib/student-api";
+
+import StudentStatCards from "../StudentStatCards";
 import StudentExamTable from "./StudentExamTable";
 
 export default function StudentExamsPage() {
-  const currentStudent = students.find(
-    (student) => student.id === 1
-  );
+  const [search, setSearch] = useState("");
 
-  const studentExams = currentStudent
-    ? exams.filter(
-        (exam) =>
-          exam.className === currentStudent.className &&
-          exam.section === currentStudent.section
-      )
-    : [];
+  const [state, setState] = useState<{
+    loaded: boolean;
+    exams: ApiStudentExam[];
+    error: string;
+  }>({
+    loaded: false,
+    exams: [],
+    error: "",
+  });
 
-  const total = studentExams.length;
+  useEffect(() => {
+    let active = true;
 
-  const completed = studentExams.filter(
+    fetchStudentExams()
+      .then((exams) => {
+        if (!active) return;
+        setState({ loaded: true, exams, error: "" });
+      })
+      .catch((err: unknown) => {
+        if (!active) return;
+        setState({
+          loaded: true,
+          exams: [],
+          error:
+            err instanceof Error
+              ? err.message
+              : "Unable to load your exams.",
+        });
+      });
+
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  const filteredExams = useMemo(() => {
+    const value = search.trim().toLowerCase();
+
+    if (!value) return state.exams;
+
+    return state.exams.filter(
+      (exam) =>
+        exam.name.toLowerCase().includes(value) ||
+        exam.subject.toLowerCase().includes(value) ||
+        exam.examDate.toLowerCase().includes(value) ||
+        exam.status.toLowerCase().includes(value)
+    );
+  }, [search, state.exams]);
+
+  const completed = state.exams.filter(
     (exam) => exam.status === "Completed"
   ).length;
 
-  const upcoming = studentExams.filter(
+  const upcoming = state.exams.filter(
     (exam) => exam.status === "Upcoming"
   ).length;
 
-  const totalMarks = studentExams.reduce(
-    (sum, exam) => sum + exam.totalMarks,
+  const totalMarks = state.exams.reduce(
+    (total, exam) => total + exam.totalMarks,
     0
   );
 
   const stats = [
-    {
-      title: "Total Exams",
-      value: total,
-      icon: ClipboardList,
-    },
-    {
-      title: "Completed",
-      value: completed,
-      icon: CheckCircle2,
-    },
-    {
-      title: "Upcoming",
-      value: upcoming,
-      icon: CalendarDays,
-    },
-    {
-      title: "Total Marks",
-      value: totalMarks,
-      icon: FileText,
-    },
+    { title: "Total Exams", value: state.exams.length, icon: GraduationCap },
+    { title: "Completed", value: completed, icon: Trophy },
+    { title: "Upcoming", value: upcoming, icon: CalendarCheck },
+    { title: "Total Marks", value: totalMarks, icon: FileText },
   ];
 
+  const header = (
+    <div>
+      <h1 className="text-2xl font-bold text-gray-900 sm:text-3xl">Exams</h1>
+
+      <p className="mt-1 text-sm text-gray-500 sm:text-base">
+        The exam schedule for your class.
+      </p>
+    </div>
+  );
+
+  if (!state.loaded && !state.error) {
+    return (
+      <div className="space-y-5">
+        {header}
+
+        <div className="rounded-2xl border border-gray-100 bg-white p-10 text-center shadow-sm">
+          <div className="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-gray-200 border-t-[#01796F]" />
+          <p className="mt-4 text-sm text-gray-500">Loading your exams...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <main className="space-y-5">
-      <div>
-        <h1 className="text-2xl font-bold text-gray-800 sm:text-3xl">
-          Exams
-        </h1>
+    <div className="space-y-5">
+      {header}
 
-        <p className="mt-1 text-sm text-gray-500 sm:text-base">
-          View your examination schedule and exam information.
-        </p>
-      </div>
+      {state.error && (
+        <div
+          role="alert"
+          className="rounded-2xl border border-red-200 bg-red-50 p-4 text-sm text-red-700"
+        >
+          {state.error}
+        </div>
+      )}
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {stats.map((stat) => {
-          const Icon = stat.icon;
+      <StudentStatCards stats={stats} />
 
-          return (
-            <div
-              key={stat.title}
-              className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm"
-            >
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-500">
-                    {stat.title}
-                  </p>
-
-                  <h2 className="mt-2 text-2xl font-bold text-gray-800">
-                    {stat.value}
-                  </h2>
-                </div>
-
-                <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#e6f4f2] text-[#01796F]">
-                  <Icon size={21} strokeWidth={1.8} />
-                </div>
-              </div>
-            </div>
-          );
-        })}
-      </div>
-
-      <StudentExamTable exams={studentExams} />
-    </main>
+      <StudentExamTable
+        exams={filteredExams}
+        search={search}
+        setSearch={setSearch}
+        total={state.exams.length}
+      />
+    </div>
   );
 }

@@ -1,278 +1,326 @@
 "use client";
 
-import { useEffect, useState, type FormEvent } from "react";
+import { useState } from "react";
 import {
+  AlertCircle,
+  Check,
+  Eye,
+  EyeOff,
+  GraduationCap,
+  Lock,
   Mail,
   Phone,
-  UserRound,
-  GraduationCap,
-  UsersRound,
   ShieldCheck,
+  User,
+  UsersRound,
   Pencil,
-  Save,
-  X,
-  CheckCircle2,
-  AlertCircle,
 } from "lucide-react";
 
-import { getSession } from "@/lib/auth";
-import {
-  getRegisteredProfile,
-  saveRegisteredProfile,
-} from "@/lib/registeredProfiles";
-import { students } from "@/data/students";
-
-type StudentProfile = {
-  id: number;
-  name: string;
-  email?: string;
-  phone?: string;
-  applyingClass?: string;
-  guardianName?: string;
-  parentName?: string;
-  status?: string;
-  className?: string;
-  section?: string;
-  rollNo?: string | number;
-  [key: string]: unknown;
-};
+import { updateAuthSession } from "@/lib/auth";
+import { apiRequest } from "@/lib/api";
+import { getAuthToken } from "@/lib/auth";
+import { updateStudentProfile } from "@/lib/student-api";
+import { useStudentProfile } from "@/lib/useStudentProfile";
 
 type Feedback = {
   type: "success" | "error";
   message: string;
 };
 
+type PasswordForm = {
+  currentPassword: string;
+  newPassword: string;
+  confirmPassword: string;
+};
+
+const emptyPasswordForm: PasswordForm = {
+  currentPassword: "",
+  newPassword: "",
+  confirmPassword: "",
+};
+
 const inputClass =
-  "w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-800 outline-none transition placeholder:text-gray-400 focus:border-[#01796f] focus:ring-2 focus:ring-[#01796f]/10";
+  "w-full rounded-xl border border-gray-200 px-4 py-3 text-sm text-gray-900 outline-none transition focus:border-[#01796F] focus:ring-2 focus:ring-[#01796F]/10";
 
 const labelClass = "mb-2 block text-sm font-medium text-gray-700";
 
-export default function StudentProfilePage() {
-  const [session, setSession] = useState<ReturnType<typeof getSession>>(null);
-  const [currentStudent, setCurrentStudent] = useState<StudentProfile | null>(
-    null
-  );
-  const [isEditing, setIsEditing] = useState(false);
-  const [saving, setSaving] = useState(false);
-  const [feedback, setFeedback] = useState<Feedback | null>(null);
+function FeedbackBanner({ type, message }: Feedback) {
+  return (
+    <div
+      role="status"
+      className={`flex items-start gap-2 rounded-xl border p-4 text-sm ${
+        type === "success"
+          ? "border-[#b8e4dd] bg-[#e6f4f2] text-[#015f58]"
+          : "border-red-200 bg-red-50 text-red-700"
+      }`}
+    >
+      {type === "success" ? (
+        <Check size={18} className="mt-0.5 shrink-0" />
+      ) : (
+        <AlertCircle size={18} className="mt-0.5 shrink-0" />
+      )}
 
-  const [form, setForm] = useState({
-    name: "",
-    email: "",
-    phone: "",
-    guardianName: "",
+      {message}
+    </div>
+  );
+}
+
+export default function StudentProfilePage() {
+  const {
+    profile: loadedProfile,
+    loading,
+    error: profileError,
+  } = useStudentProfile();
+
+  // After a save the server response is the freshest copy of the profile.
+  const [savedProfile, setSavedProfile] = useState<
+    typeof loadedProfile
+  >(null);
+
+  const profile = savedProfile ?? loadedProfile;
+
+  const [isEditing, setIsEditing] = useState(false);
+  const [savingProfile, setSavingProfile] = useState(false);
+  const [savingPassword, setSavingPassword] = useState(false);
+
+  const [form, setForm] = useState({ name: "", email: "", phone: "" });
+
+  const [passwordVisibility, setPasswordVisibility] = useState({
+    currentPassword: false,
+    newPassword: false,
+    confirmPassword: false,
   });
 
-  useEffect(() => {
-    const activeSession = getSession();
-    setSession(activeSession);
+  const [passwordForm, setPasswordForm] =
+    useState<PasswordForm>(emptyPasswordForm);
 
-    if (!activeSession || activeSession.role !== "Student") return;
+  const [profileFeedback, setProfileFeedback] = useState<Feedback | null>(
+    null
+  );
 
-    const registered = getRegisteredProfile<StudentProfile>(
-      "Student",
-      activeSession
-    );
+  const [passwordFeedback, setPasswordFeedback] = useState<Feedback | null>(
+    null
+  );
 
-    const shared = students.find(
-      (student) =>
-        student.email?.trim().toLowerCase() ===
-        activeSession.email.trim().toLowerCase() ||
-        student.name.trim().toLowerCase() ===
-        activeSession.name.trim().toLowerCase()
-    );
+  const toForm = (source: {
+    name: string;
+    email: string | null;
+    phone: string | null;
+  }) => ({
+    name: source.name ?? "",
+    email: source.email ?? "",
+    phone: source.phone ?? "",
+  });
 
-    const student = registered ?? shared ?? null;
+  const handleStartEdit = () => {
+    if (!profile) return;
 
-    if (!student) return;
-
-    setCurrentStudent(student);
-
-    setForm({
-      name: student.name ?? "",
-      email: student.email ?? activeSession.email ?? "",
-      phone: student.phone ?? "",
-      guardianName:
-        ("guardianName" in student ? student.guardianName : undefined) ??
-        ("parentName" in student ? student.parentName : undefined) ??
-        "",
-    });
-  }, []);
-
-  const updateField = (
-    field: keyof typeof form,
-    value: string
-  ) => {
-    setForm((previous) => ({ ...previous, [field]: value }));
+    setForm(toForm(profile));
+    setProfileFeedback(null);
+    setIsEditing(true);
   };
 
-  const cancelEditing = () => {
-    if (!currentStudent) return;
+  const handleCancelEdit = () => {
+    if (!profile) return;
 
-    setForm({
-      name: currentStudent.name ?? "",
-      email: currentStudent.email ?? session?.email ?? "",
-      phone: currentStudent.phone ?? "",
-      guardianName:
-        currentStudent.guardianName ??
-        currentStudent.parentName ??
-        "",
-    });
-
+    setForm(toForm(profile));
     setIsEditing(false);
-    setFeedback(null);
+    setProfileFeedback(null);
   };
 
-  const handleSave = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    setFeedback(null);
-
-    if (!currentStudent || !session) return;
+  const handleSave = async () => {
+    if (!profile) return;
 
     const name = form.name.trim();
     const email = form.email.trim().toLowerCase();
 
     if (!name || !email) {
-      setFeedback({
+      setProfileFeedback({
         type: "error",
-        message: "Name and email address are required.",
+        message: "Name and email are required.",
       });
       return;
     }
 
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      setFeedback({
-        type: "error",
-        message: "Please enter a valid email address.",
-      });
-      return;
-    }
-
-    setSaving(true);
+    setSavingProfile(true);
 
     try {
-      const updatedStudent: StudentProfile = {
-        ...currentStudent,
+      const updated = await updateStudentProfile({
         name,
         email,
         phone: form.phone.trim(),
-        guardianName: form.guardianName.trim(),
-      };
-
-      saveRegisteredProfile("Student", updatedStudent);
-
-      const updatedSession = {
-        ...session,
-        name,
-        email,
-      };
-
-      if (localStorage.getItem("auth-session") !== null) {
-        localStorage.setItem(
-          "auth-session",
-          JSON.stringify(updatedSession)
-        );
-      } else if (sessionStorage.getItem("auth-session") !== null) {
-        sessionStorage.setItem(
-          "auth-session",
-          JSON.stringify(updatedSession)
-        );
-      }
-
-      setSession(updatedSession);
-      setCurrentStudent(updatedStudent);
-      setForm({
-        name,
-        email,
-        phone: updatedStudent.phone ?? "",
-        guardianName: updatedStudent.guardianName ?? "",
       });
+
+      setSavedProfile(updated);
+      setForm(toForm(updated));
       setIsEditing(false);
 
-      setFeedback({
+      // Keep the stored session in step with the edited profile.
+      updateAuthSession({ name: updated.name, email: updated.email ?? "" });
+
+      setProfileFeedback({
         type: "success",
-        message: "Your profile has been saved successfully.",
+        message: "Profile updated successfully.",
       });
-    } catch {
-      setFeedback({
+    } catch (err: unknown) {
+      setProfileFeedback({
         type: "error",
-        message: "Unable to save your profile. Please try again.",
+        message:
+          err instanceof Error
+            ? err.message
+            : "Could not save your profile. Please try again.",
       });
     } finally {
-      setSaving(false);
+      setSavingProfile(false);
     }
   };
 
-  if (!session || session.role !== "Student") {
+  const togglePassword = (field: keyof typeof passwordVisibility) => {
+    setPasswordVisibility((current) => ({
+      ...current,
+      [field]: !current[field],
+    }));
+  };
+
+  const handlePasswordUpdate = async () => {
+    const { currentPassword, newPassword, confirmPassword } = passwordForm;
+
+    if (!currentPassword || !newPassword || !confirmPassword) {
+      setPasswordFeedback({
+        type: "error",
+        message: "Please complete all password fields.",
+      });
+      return;
+    }
+
+    if (newPassword.length < 8) {
+      setPasswordFeedback({
+        type: "error",
+        message: "Your new password must contain at least 8 characters.",
+      });
+      return;
+    }
+
+    if (newPassword !== confirmPassword) {
+      setPasswordFeedback({
+        type: "error",
+        message: "The new passwords do not match.",
+      });
+      return;
+    }
+
+    if (currentPassword === newPassword) {
+      setPasswordFeedback({
+        type: "error",
+        message: "Your new password must be different from your current password.",
+      });
+      return;
+    }
+
+    setSavingPassword(true);
+
+    try {
+      const token = getAuthToken();
+
+      if (!token) {
+        throw new Error("Your session has expired. Please log in again.");
+      }
+
+      await apiRequest("/auth/me", {
+        method: "PATCH",
+        token,
+        body: JSON.stringify({ currentPassword, newPassword }),
+      });
+
+      setPasswordForm(emptyPasswordForm);
+      setPasswordVisibility({
+        currentPassword: false,
+        newPassword: false,
+        confirmPassword: false,
+      });
+
+      setPasswordFeedback({
+        type: "success",
+        message: "Password updated successfully.",
+      });
+    } catch (err: unknown) {
+      setPasswordFeedback({
+        type: "error",
+        message:
+          err instanceof Error
+            ? err.message
+            : "Could not update your password. Please try again.",
+      });
+    } finally {
+      setSavingPassword(false);
+    }
+  };
+
+  if (loading) {
     return (
-      <div className="space-y-5">
-        <PageHeader />
-        <EmptyState message="Please sign in with a student account to view your profile." />
+      <div className="rounded-2xl border border-gray-100 bg-white p-10 text-center shadow-sm">
+        <div className="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-gray-200 border-t-[#01796F]" />
+        <p className="mt-4 text-sm text-gray-500">Loading your profile...</p>
       </div>
     );
   }
 
-  if (!currentStudent) {
+  if (profileError) {
     return (
-      <div className="space-y-5">
-        <PageHeader />
-        <EmptyState message="Student profile not found. Please contact the school administration." />
+      <div className="rounded-2xl border border-gray-100 bg-white p-10 text-center shadow-sm">
+        <AlertCircle className="mx-auto mb-3 h-10 w-10 text-red-400" />
+
+        <h2 className="text-lg font-semibold text-gray-900">
+          Profile unavailable
+        </h2>
+
+        <p className="mt-2 text-sm text-gray-500">{profileError}</p>
       </div>
     );
   }
 
-  const classLabel =
-    currentStudent.className && currentStudent.section
-      ? `${currentStudent.className} - ${currentStudent.section}`
-      : currentStudent.applyingClass || "Not assigned";
+  if (!profile) {
+    return (
+      <div className="rounded-2xl border border-gray-100 bg-white p-10 text-center shadow-sm">
+        <User className="mx-auto mb-3 h-10 w-10 text-gray-400" />
 
-  const guardian =
-    currentStudent.guardianName ??
-    currentStudent.parentName ??
-    "Not provided";
+        <h2 className="text-lg font-semibold text-gray-900">
+          Student profile not found
+        </h2>
 
-  const status = currentStudent.status ?? "Active";
+        <p className="mt-2 text-sm text-gray-500">
+          We couldn&apos;t find a student profile matching your account. Please
+          contact the school administration.
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-5">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <PageHeader />
+      {/* Heading */}
+      <div>
+        <h1 className="text-2xl font-bold text-gray-900 sm:text-3xl">Profile</h1>
 
+        <p className="mt-1 text-sm text-gray-500 sm:text-base">
+          View and manage your account information.
+        </p>
       </div>
 
-      {feedback && (
-        <div
-          role="status"
-          className={`flex items-start gap-3 rounded-xl border p-4 text-sm ${feedback.type === "success"
-            ? "border-emerald-200 bg-emerald-50 text-emerald-800"
-            : "border-red-200 bg-red-50 text-red-700"
-            }`}
-        >
-          {feedback.type === "success" ? (
-            <CheckCircle2 size={19} className="mt-0.5 shrink-0" />
-          ) : (
-            <AlertCircle size={19} className="mt-0.5 shrink-0" />
-          )}
-          <p>{feedback.message}</p>
-        </div>
-      )}
-
-      {/* Profile Card */}
-      <section className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm sm:p-6">
+      {/* Profile header */}
+      <section className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
         <div className="flex flex-row items-center gap-3 sm:gap-5">
-          <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-[#e6f4f2] text-[#01796f] sm:h-20 sm:w-20">
-            <UserRound size={28} className="sm:hidden" />
-            <UserRound size={36} className="hidden sm:block" />
+          <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-[#e6f4f2] text-[#01796F] sm:h-20 sm:w-20">
+            <User size={28} className="sm:hidden" />
+            <User size={36} className="hidden sm:block" />
           </div>
 
-          <div className="min-w-0 ">
-            <h2 className="truncate text-base font-bold text-gray-900 sm:text-xl">
-              {currentStudent.name}
+          <div className="min-w-0">
+            <h2 className="truncate text-base font-bold text-gray-900 sm:text-2xl">
+              {profile.name}
             </h2>
-            <p className="mt-1 text-sm text-[#01796f]">Student</p>
-            <p className="mt-1 truncate text-xs text-gray-500 sm:text-sm">
-              {classLabel}
-            </p>
+
+            <p className="mt-1 text-sm text-gray-500">Student</p>
           </div>
 
           <div className="ml-auto shrink-0">
@@ -280,263 +328,273 @@ export default function StudentProfilePage() {
               type="button"
               onClick={() => {
                 if (isEditing) {
-                  cancelEditing();
+                  handleCancelEdit();
                 } else {
-                  setFeedback(null);
-                  setIsEditing(true);
+                  handleStartEdit();
                 }
               }}
-              className="inline-flex items-center justify-center gap-1.5 rounded-full bg-[#01796f] px-3 py-2 text-xs font-medium text-white transition hover:bg-[#015f58] sm:gap-2 sm:px-5 sm:py-2.5 sm:text-sm"
+              className="inline-flex items-center justify-center gap-1.5 rounded-full bg-[#01796F] px-3 py-2 text-xs font-medium text-white transition hover:bg-[#015f58] sm:gap-2 sm:px-5 sm:py-2.5 sm:text-sm"
             >
-              {isEditing ? <X size={14} /> : <Pencil size={14} />}
+              {isEditing ? <User size={14} /> : <Pencil size={14} />}
               {isEditing ? "Cancel" : "Edit Profile"}
             </button>
           </div>
         </div>
       </section>
 
-      {/* Personal Information */}
-      <section className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
-        <h2 className="mb-5 text-lg font-semibold text-gray-900">
-          Personal Information
-        </h2>
+      {/* Profile feedback */}
+      {profileFeedback && <FeedbackBanner {...profileFeedback} />}
+
+      {/* Personal information */}
+      <section className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
+        <div className="mb-5">
+          <h2 className="text-lg font-semibold text-gray-900">
+            Personal Information
+          </h2>
+
+          <p className="mt-1 text-sm text-gray-500">
+            Your contact details and school information.
+          </p>
+        </div>
 
         {isEditing ? (
-          <form onSubmit={handleSave} className="space-y-5">
-            <div className="grid gap-5 sm:grid-cols-2">
-              <FormField label="Full Name" required>
-                <input
-                  className={inputClass}
-                  value={form.name}
-                  onChange={(event) =>
-                    updateField("name", event.target.value)
-                  }
-                  maxLength={100}
-                  required
-                />
-              </FormField>
+          <div className="grid gap-5 sm:grid-cols-2">
+            <div>
+              <label className={labelClass} htmlFor="profileName">
+                Full Name
+              </label>
 
-              <FormField label="Email Address" required>
-                <input
-                  type="email"
-                  className={inputClass}
-                  value={form.email}
-                  onChange={(event) =>
-                    updateField("email", event.target.value)
-                  }
-                  maxLength={150}
-                  required
-                />
-              </FormField>
-
-              <FormField label="Phone Number">
-                <input
-                  type="tel"
-                  className={inputClass}
-                  value={form.phone}
-                  onChange={(event) =>
-                    updateField("phone", event.target.value)
-                  }
-                  maxLength={30}
-                />
-              </FormField>
-
-              <FormField label="Parent / Guardian">
-                <input
-                  className={inputClass}
-                  value={form.guardianName}
-                  onChange={(event) =>
-                    updateField("guardianName", event.target.value)
-                  }
-                  maxLength={100}
-                />
-              </FormField>
+              <input
+                id="profileName"
+                type="text"
+                value={form.name}
+                onChange={(event) =>
+                  setForm((current) => ({ ...current, name: event.target.value }))
+                }
+                className={inputClass}
+              />
             </div>
 
-            <div className="rounded-xl bg-[#f6f8f8] p-4 text-sm text-gray-600">
-              Class, roll number, student ID, and status are managed by the
-              school and cannot be changed here.
+            <div>
+              <label className={labelClass} htmlFor="profileEmail">
+                Email
+              </label>
+
+              <input
+                id="profileEmail"
+                type="email"
+                value={form.email}
+                onChange={(event) =>
+                  setForm((current) => ({
+                    ...current,
+                    email: event.target.value,
+                  }))
+                }
+                className={inputClass}
+              />
             </div>
 
-            <div className="flex justify-end gap-3 border-t border-gray-100 pt-5">
+            <div>
+              <label className={labelClass} htmlFor="profilePhone">
+                Phone
+              </label>
+
+              <input
+                id="profilePhone"
+                type="tel"
+                value={form.phone}
+                onChange={(event) =>
+                  setForm((current) => ({
+                    ...current,
+                    phone: event.target.value,
+                  }))
+                }
+                className={inputClass}
+              />
+            </div>
+
+            <div className="flex justify-end sm:col-span-2">
               <button
                 type="button"
-                onClick={cancelEditing}
-                className="rounded-full border border-gray-200 px-5 py-2.5 text-sm font-medium text-gray-700 transition hover:bg-gray-50"
+                onClick={handleSave}
+                disabled={savingProfile}
+                className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-[#01796F] px-5 py-3 text-sm font-medium text-white transition hover:bg-[#015f58] disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
               >
-                Cancel
-              </button>
-
-              <button
-                type="submit"
-                disabled={saving}
-                className="inline-flex items-center gap-2 rounded-full bg-[#01796f] px-5 py-2.5 text-sm font-medium text-white transition hover:bg-[#015f58] disabled:cursor-not-allowed disabled:opacity-60"
-              >
-                <Save size={16} />
-                {saving ? "Saving..." : "Save Changes"}
+                <Check size={17} />
+                {savingProfile ? "Saving..." : "Save Changes"}
               </button>
             </div>
-          </form>
+          </div>
         ) : (
           <div className="grid gap-5 sm:grid-cols-2">
-            <InfoItem
-              icon={<UserRound size={19} />}
-              label="Full Name"
-              value={currentStudent.name}
-            />
-            <InfoItem
-              icon={<Mail size={19} />}
+            <ProfileItem icon={User} label="Full Name" value={profile.name} />
+
+            <ProfileItem
+              icon={Mail}
               label="Email"
-              value={currentStudent.email || "Not provided"}
+              value={profile.email ?? "Not provided"}
             />
-            <InfoItem
-              icon={<Phone size={19} />}
+
+            <ProfileItem
+              icon={Phone}
               label="Phone"
-              value={currentStudent.phone || "Not provided"}
+              value={profile.phone ?? "Not provided"}
             />
-            <InfoItem
-              icon={<UsersRound size={19} />}
+
+            <ProfileItem
+              icon={UsersRound}
               label="Parent / Guardian"
-              value={guardian}
+              value={profile.parentName ?? "Not provided"}
+            />
+
+            <ProfileItem
+              icon={GraduationCap}
+              label="Class"
+              value={`${profile.className} - ${profile.section}`}
+            />
+
+            <ProfileItem
+              icon={ShieldCheck}
+              label="Roll Number"
+              value={profile.rollNo}
             />
           </div>
         )}
       </section>
 
-      {/* Academic Information */}
-      <section className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
-        <div className="mb-5 flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#e6f4f2] text-[#01796f]">
-            <GraduationCap size={19} />
-          </div>
+      {/* Password feedback */}
+      {passwordFeedback && <FeedbackBanner {...passwordFeedback} />}
 
-          <div>
-            <h2 className="font-semibold text-gray-900">
-              Academic Information
-            </h2>
-            <p className="text-sm text-gray-500">
-              Your current academic information.
-            </p>
-          </div>
+      {/* Change password */}
+      <section className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
+        <div className="mb-5">
+          <h2 className="text-lg font-semibold text-gray-900">
+            Change Password
+          </h2>
+
+          <p className="mt-1 text-sm text-gray-500">
+            Enter your current password before choosing a new one.
+          </p>
         </div>
 
-        <div className="grid gap-4 sm:grid-cols-2">
-          <AcademicCard label="Class" value={classLabel} />
-
-          <AcademicCard
-            label="Roll Number"
-            value={
-              currentStudent.rollNo != null
-                ? String(currentStudent.rollNo)
-                : "Not assigned"
+        <div className="grid gap-5 sm:grid-cols-2">
+          <PasswordInput
+            label="Current Password"
+            value={passwordForm.currentPassword}
+            onChange={(value) =>
+              setPasswordForm((current) => ({
+                ...current,
+                currentPassword: value,
+              }))
             }
+            showPassword={passwordVisibility.currentPassword}
+            onToggle={() => togglePassword("currentPassword")}
           />
 
-          <AcademicCard
-            label="Student ID"
-            value={String(currentStudent.id)}
-            icon={<ShieldCheck size={17} />}
+          <PasswordInput
+            label="New Password"
+            value={passwordForm.newPassword}
+            onChange={(value) =>
+              setPasswordForm((current) => ({
+                ...current,
+                newPassword: value,
+              }))
+            }
+            showPassword={passwordVisibility.newPassword}
+            onToggle={() => togglePassword("newPassword")}
           />
 
-          <div className="rounded-xl border border-gray-200 p-4">
-            <p className="text-sm font-semibold text-gray-900">Status</p>
-            <span
-              className={`mt-2 inline-flex rounded-full px-3 py-1 text-xs font-medium ${status.toLowerCase() === "active"
-                ? "bg-green-50 text-green-600"
-                : "bg-red-50 text-red-600"
-                }`}
-            >
-              {status}
-            </span>
-          </div>
+          <PasswordInput
+            label="Confirm New Password"
+            value={passwordForm.confirmPassword}
+            onChange={(value) =>
+              setPasswordForm((current) => ({
+                ...current,
+                confirmPassword: value,
+              }))
+            }
+            showPassword={passwordVisibility.confirmPassword}
+            onToggle={() => togglePassword("confirmPassword")}
+          />
+        </div>
+
+        <div className="mt-5 flex justify-end">
+          <button
+            type="button"
+            onClick={handlePasswordUpdate}
+            disabled={savingPassword}
+            className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-[#01796F] px-5 py-3 text-sm font-medium text-white transition hover:bg-[#015f58] disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
+          >
+            <Lock size={17} />
+            {savingPassword ? "Updating..." : "Update Password"}
+          </button>
         </div>
       </section>
     </div>
   );
 }
 
-function PageHeader() {
-  return (
-    <div>
-      <h1 className="text-2xl font-bold text-gray-900 sm:text-3xl">
-        Profile
-      </h1>
-      <p className="mt-1 text-sm text-gray-500 sm:text-base">
-        View your personal and academic information.
-      </p>
-    </div>
-  );
-}
-
-function FormField({
-  label,
-  required = false,
-  children,
-}: {
-  label: string;
-  required?: boolean;
-  children: React.ReactNode;
-}) {
-  return (
-    <div>
-      <label className={labelClass}>
-        {label}
-        {required && <span className="ml-1 text-red-500">*</span>}
-      </label>
-      {children}
-    </div>
-  );
-}
-
-function InfoItem({
-  icon,
-  label,
-  value,
-}: {
-  icon: React.ReactNode;
+type ProfileItemProps = {
+  icon: typeof User;
   label: string;
   value: string;
-}) {
+};
+
+function ProfileItem({ icon: Icon, label, value }: ProfileItemProps) {
   return (
     <div className="flex min-w-0 items-start gap-3">
-      <div className="mt-0.5 rounded-full bg-[#e6f4f2] p-2 text-[#01796f]">
-        {icon}
+      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#e6f4f2] text-[#01796F]">
+        <Icon size={18} />
       </div>
+
       <div className="min-w-0">
-        <p className="text-xs font-medium uppercase text-gray-400">
-          {label}
+        <p className="text-xs font-medium text-gray-500">{label}</p>
+
+        <p className="mt-1 break-words text-sm font-medium text-gray-900">
+          {value || "Not provided"}
         </p>
-        <p className="mt-1 break-words text-sm text-gray-700">{value}</p>
       </div>
     </div>
   );
 }
 
-function AcademicCard({
-  label,
-  value,
-  icon,
-}: {
+type PasswordInputProps = {
   label: string;
   value: string;
-  icon?: React.ReactNode;
-}) {
-  return (
-    <div className="rounded-xl border border-gray-200 p-4">
-      <div className="flex items-center gap-2">
-        {icon && <span className="text-[#01796f]">{icon}</span>}
-        <p className="text-sm font-semibold text-gray-900">{label}</p>
-      </div>
-      <p className="mt-1 text-sm text-gray-500">{value}</p>
-    </div>
-  );
-}
+  onChange: (value: string) => void;
+  showPassword: boolean;
+  onToggle: () => void;
+};
 
-function EmptyState({ message }: { message: string }) {
+function PasswordInput({
+  label,
+  value,
+  onChange,
+  showPassword,
+  onToggle,
+}: PasswordInputProps) {
   return (
-    <div className="rounded-2xl border border-gray-200 bg-white p-8 text-center shadow-sm">
-      <UserRound className="mx-auto mb-3 h-10 w-10 text-gray-400" />
-      <p className="text-sm text-gray-500">{message}</p>
+    <div>
+      <label className={labelClass}>{label}</label>
+
+      <div className="relative">
+        <input
+          type={showPassword ? "text" : "password"}
+          value={value}
+          onChange={(event) => onChange(event.target.value)}
+          autoComplete="current-password"
+          className={`${inputClass} pr-12`}
+        />
+
+        <button
+          type="button"
+          onClick={onToggle}
+          className="absolute right-3 top-1/2 -translate-y-1/2 rounded-full p-1 text-gray-400 transition hover:text-[#01796F]"
+          aria-label={showPassword ? "Hide password" : "Show password"}
+        >
+          {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+        </button>
+      </div>
     </div>
   );
 }

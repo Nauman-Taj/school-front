@@ -1,111 +1,144 @@
 "use client";
 
+import { useEffect, useMemo, useState } from "react";
 import {
   Award,
+  BookOpen,
   CheckCircle2,
-  FileText,
-  Percent,
+  Trophy,
 } from "lucide-react";
 
-import { results } from "@/data/results";
+import { fetchStudentResults } from "@/lib/student-api";
+import type { ApiStudentResult } from "@/lib/student-api";
+
+import StudentStatCards from "../StudentStatCards";
 import StudentResultsTable from "./StudentResultsTable";
 
 export default function StudentResultsPage() {
-  const studentResults = results.filter(
-    (result) => result.studentId === 1
-  );
+  const [search, setSearch] = useState("");
 
-  const totalSubjects = studentResults.length;
+  const [state, setState] = useState<{
+    loaded: boolean;
+    results: ApiStudentResult[];
+    error: string;
+  }>({
+    loaded: false,
+    results: [],
+    error: "",
+  });
 
-  const totalObtained = studentResults.reduce(
-    (sum, result) => sum + result.obtainedMarks,
+  useEffect(() => {
+    let active = true;
+
+    fetchStudentResults()
+      .then((results) => {
+        if (!active) return;
+        setState({ loaded: true, results, error: "" });
+      })
+      .catch((err: unknown) => {
+        if (!active) return;
+        setState({
+          loaded: true,
+          results: [],
+          error:
+            err instanceof Error
+              ? err.message
+              : "Unable to load your results.",
+        });
+      });
+
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  const filteredResults = useMemo(() => {
+    const value = search.trim().toLowerCase();
+
+    if (!value) return state.results;
+
+    return state.results.filter(
+      (result) =>
+        result.exam.toLowerCase().includes(value) ||
+        result.subject.toLowerCase().includes(value) ||
+        result.teacher.toLowerCase().includes(value) ||
+        result.grade.toLowerCase().includes(value) ||
+        result.status.toLowerCase().includes(value)
+    );
+  }, [search, state.results]);
+
+  const obtainedMarks = state.results.reduce(
+    (total, result) => total + result.obtainedMarks,
     0
   );
 
-  const totalMarks = studentResults.reduce(
-    (sum, result) => sum + result.totalMarks,
+  const totalMarks = state.results.reduce(
+    (total, result) => total + result.totalMarks,
     0
   );
 
   const percentage =
-    totalMarks > 0
-      ? Math.round((totalObtained / totalMarks) * 100)
-      : 0;
+    totalMarks > 0 ? Math.round((obtainedMarks / totalMarks) * 100) : 0;
 
-  const passed = studentResults.filter(
+  const passed = state.results.filter(
     (result) => result.status === "Pass"
   ).length;
-
-  const averageGrade =
-    studentResults.length > 0
-      ? studentResults[0].grade
-      : "-";
 
   const stats = [
     {
       title: "Total Subjects",
-      value: totalSubjects,
-      icon: FileText,
+      value: state.results.length,
+      icon: BookOpen,
     },
-    {
-      title: "Obtained Marks",
-      value: `${totalObtained}/${totalMarks}`,
-      icon: Award,
-    },
-    {
-      title: "Percentage",
-      value: `${percentage}%`,
-      icon: Percent,
-    },
-    {
-      title: "Passed",
-      value: `${passed}/${totalSubjects}`,
-      icon: CheckCircle2,
-    },
+    { title: "Obtained Marks", value: obtainedMarks, icon: Award },
+    { title: "Percentage", value: `${percentage}%`, icon: Trophy },
+    { title: "Passed", value: passed, icon: CheckCircle2 },
   ];
 
+  const header = (
+    <div>
+      <h1 className="text-2xl font-bold text-gray-900 sm:text-3xl">Results</h1>
+
+      <p className="mt-1 text-sm text-gray-500 sm:text-base">
+        Your examination results and academic performance.
+      </p>
+    </div>
+  );
+
+  if (!state.loaded && !state.error) {
+    return (
+      <div className="space-y-5">
+        {header}
+
+        <div className="rounded-2xl border border-gray-100 bg-white p-10 text-center shadow-sm">
+          <div className="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-gray-200 border-t-[#01796F]" />
+          <p className="mt-4 text-sm text-gray-500">Loading your results...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <main className="space-y-5">
-      <div>
-        <h1 className="text-2xl font-bold text-gray-800 sm:text-3xl">
-          Results
-        </h1>
+    <div className="space-y-5">
+      {header}
 
-        <p className="mt-1 text-sm text-gray-500 sm:text-base">
-          View your subject-wise examination results and academic performance.
-        </p>
-      </div>
+      {state.error && (
+        <div
+          role="alert"
+          className="rounded-2xl border border-red-200 bg-red-50 p-4 text-sm text-red-700"
+        >
+          {state.error}
+        </div>
+      )}
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {stats.map((stat) => {
-          const Icon = stat.icon;
+      <StudentStatCards stats={stats} />
 
-          return (
-            <div
-              key={stat.title}
-              className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm"
-            >
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-500">
-                    {stat.title}
-                  </p>
-
-                  <h2 className="mt-2 text-2xl font-bold text-gray-800">
-                    {stat.value}
-                  </h2>
-                </div>
-
-                <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#e6f4f2] text-[#01796F]">
-                  <Icon size={21} strokeWidth={1.8} />
-                </div>
-              </div>
-            </div>
-          );
-        })}
-      </div>
-
-      <StudentResultsTable />
-    </main>
+      <StudentResultsTable
+        results={filteredResults}
+        search={search}
+        setSearch={setSearch}
+        total={state.results.length}
+      />
+    </div>
   );
 }
