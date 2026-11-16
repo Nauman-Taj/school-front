@@ -106,24 +106,35 @@ export default function StudentStudyMaterialTable({
                         {material.date}
                       </td>
 
-                      <td className="px-5 py-4 text-center">
-                        {material.fileUrl ? (
-                          <a
-                            href={material.fileUrl}
-                            target="_blank"
-                            rel="noreferrer"
-                            title={`Open ${material.title}`}
-                            aria-label={`Open ${material.title}`}
-                            className="inline-flex items-center justify-center gap-2 rounded-full border border-gray-200 px-4 py-2 text-xs font-medium text-gray-700 transition hover:border-[#01796F] hover:bg-[#e6f4f2] hover:text-[#01796F]"
-                          >
-                            <Download size={16} />
-                            Download
-                          </a>
-                        ) : (
-                          <span className="text-xs text-gray-400">
-                            No file attached
-                          </span>
-                        )}
+                      <td className="px-5 py-4">
+                        <div className="flex items-center justify-center gap-2">
+                          {material.fileUrl ? (
+                            <a
+                              href={material.fileUrl}
+                              target="_blank"
+                              rel="noreferrer"
+                              title={`Open ${material.title}`}
+                              aria-label={`Open ${material.title}`}
+                              className="rounded-full p-2 text-gray-500 transition hover:bg-[#e6f4f2] hover:text-[#01796F]"
+                            >
+                              <Download size={17} />
+                            </a>
+                          ) : (
+                            <button
+                              type="button"
+                              title="No file is attached yet"
+                              aria-label={`No file is attached to ${material.title}`}
+                              onClick={() =>
+                                window.alert(
+                                  `No downloadable file is attached to "${material.title}" yet.`
+                                )
+                              }
+                              className="rounded-full p-2 text-gray-400 transition hover:bg-[#e6f4f2] hover:text-[#01796F]"
+                            >
+                              <Download size={17} />
+                            </button>
+                          )}
+                        </div>
                       </td>
                     </tr>
                   );
